@@ -100,6 +100,17 @@ func (h *HttpHandler) DeleteData(c echo.Context) error {
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 
+
+// SaveAction
+func (h *HttpHandler) SaveAction(c echo.Context) error {
+	params := h.RequestParse(c)
+	params["collname"] = c.Param("collname")
+	r, err := h.GetManager().GetDataManager().SaveData(params)
+	common.Must(err)
+	return c.JSON(http.StatusOK, r)
+}
+
+
 // ImportData
 func (h *HttpHandler) ImportData(c echo.Context) error {
 	params := h.RequestParse(c)

@@ -22,72 +22,87 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
+	"github.com/ca17/teamsacs/common"
+	"github.com/ca17/teamsacs/common/maputils"
 	"github.com/ca17/teamsacs/common/web"
 	"github.com/ca17/teamsacs/constant"
 )
 
-type Subscribe = DataObject
+type Subscribe map[string]interface{}
 
 // AuthorizationProfile Method
 func (a Subscribe) GetExpireTime() time.Time {
-	return a.GetDateValue("expire_time", time.Now().Add(time.Second*60))
+	return maputils.GetDateObject(a, "expire_time", time.Now().Add(time.Second*60))
 }
 
 func (a Subscribe) GetInterimInterval() int {
-	return a.GetIntValue("interim_interval", 120)
+	return maputils.GetIntValue(a, "interim_interval", 120)
 }
 
 func (a Subscribe) GetAddrPool() string {
-	return a.GetStringValue("addr_pool", constant.NA)
+	return maputils.GetStringValue(a, "addr_pool", constant.NA)
 }
 
 func (a Subscribe) GetIpaddr() string {
-	return a.GetStringValue("ipaddr", constant.NA)
+	return maputils.GetStringValue(a, "ipaddr", constant.NA)
 }
 
 func (a Subscribe) GetUpRateKbps() int {
-	return a.GetIntValue("up_rate", 0)
+	return maputils.GetIntValue(a,"up_rate", 0)
 }
 
 func (a Subscribe) GetDownRateKbps() int {
-	return a.GetIntValue("down_rate", 0)
+	return maputils.GetIntValue(a, "down_rate", 0)
 }
 
 func (a Subscribe) GetDomain() string {
-	return a.GetStringValue("domain", constant.NA)
+	return maputils.GetStringValue(a,"domain", constant.NA)
 }
 
 func (a Subscribe) GetLimitPolicy() string {
-	return a.GetStringValue("limit_policy", constant.NA)
+	return maputils.GetStringValue(a,"limit_policy", constant.NA)
 }
 
 func (a Subscribe) GetUpLimitPolicy() string {
-	return a.GetStringValue("up_limit_policy", constant.NA)
+	return maputils.GetStringValue(a,"up_limit_policy", constant.NA)
 }
 
 func (a Subscribe) GetDownLimitPolicy() string {
-	return a.GetStringValue("down_limit_policy", constant.NA)
+	return maputils.GetStringValue(a,"down_limit_policy", constant.NA)
 }
 
 
 func (a Subscribe) GetMacAddr() string {
-	return a.GetStringValue("mac_addr", constant.NA)
+	return maputils.GetStringValue(a,"mac_addr", constant.NA)
 }
 
 func (a Subscribe) GetPassword() string {
-	return a.GetStringValue("password", constant.NA)
+	return maputils.GetStringValue(a,"password", constant.NA)
 }
 
 func (a Subscribe) GetUsername() string {
-	return a.GetStringValue("username", constant.NA)
+	return maputils.GetStringValue(a,"username", constant.NA)
 }
 
 func (a Subscribe) GetActiveNum() int {
-	return a.GetIntValue("active_num", 0)
+	return maputils.GetIntValue(a,"active_num", 0)
 }
 
 func (a Subscribe) GetStatus() string {
-	return a.GetStringValue("status", constant.DISABLED)
+	return maputils.GetStringValue(a,"status", constant.ENABLED)
+}
+
+func (a Subscribe) GetBindVlan() int {
+	return maputils.GetIntValue(a,"bind_vlan", 0)
+}
+
+
+func (a Subscribe) GetVlan1() int {
+	return maputils.GetIntValue(a,"vlanid1", 0)
+}
+
+func (a Subscribe) GetVlan2() int {
+	return maputils.GetIntValue(a,"vlanid2", 0)
 }
 
 
@@ -136,5 +151,18 @@ func (m *SubscribeManager) GetSubscribeByMac(mac string) (*Subscribe, error) {
 func (m *SubscribeManager) UpdateSubscribeByUsername(username string, valmap map[string]interface{}) error {
 	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
 	_, err := coll.UpdateOne(context.TODO(), bson.M{"username": username}, valmap)
+	return err
+}
+
+
+func (m *SubscribeManager) AddSubscribeData(params web.RequestParams) error {
+	data := params.GetParamMap("data")
+	_id := data.GetString("_id")
+	if common.IsEmptyOrNA(_id) {
+		data["_id"] = common.UUID()
+	}
+	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
+	var err error
+	_, err = coll.InsertOne(context.TODO(), data)
 	return err
 }

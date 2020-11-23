@@ -80,7 +80,7 @@ func (h *HttpHandler) FreeradiusAuthorize(c echo.Context) error {
 	}
 
 	// Check user status
-	if user.GetStringValue("status", constant.DISABLED) == constant.DISABLED {
+	if user.GetStatus() == constant.DISABLED {
 		h.AddAuthlog(username, nasip, RadiusAuthFailure, "user disabled", RadiusAuthlogLevel, time.Since(start).Milliseconds())
 		return c.JSON(501, echo.Map{"Reply-Message": "user status disabled, reject auth"})
 	}
@@ -99,14 +99,14 @@ func (h *HttpHandler) FreeradiusAuthorize(c echo.Context) error {
 		h.AddAuthlog(username, nasip, RadiusAuthFailure, "user query count err"+err.Error(), RadiusAuthlogLevel, time.Since(start).Milliseconds())
 		return c.JSON(501, echo.Map{"Reply-Message": "user online count fetch error, reject auth, " + err.Error()})
 	}
-	var activeNum = user.GetIntValue("active_num", 0)
+	var activeNum = user.GetActiveNum()
 	if count > 0 && activeNum > 0 && count >= int64(activeNum) {
 		h.AddAuthlog(username, nasip, RadiusAuthFailure, "user online limit", RadiusAuthlogLevel, time.Since(start).Milliseconds())
 		return c.JSON(501, echo.Map{"Reply-Message": "user online over limit, reject auth"})
 	}
 
 	// freeradius response
-	var password = user.GetStringValue("password","******")
+	var password = user.GetPassword()
 	resp := map[string]interface{}{}
 	resp["control:Cleartext-Password"] = strings.TrimSpace(password)
 	resp["reply:Mikrotik-Rate-Limit"] = fmt.Sprintf("%dk/%dk", user.GetUpRateKbps(), user.GetDownRateKbps())

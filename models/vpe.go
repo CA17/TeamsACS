@@ -23,19 +23,41 @@ import (
 
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/aes"
+	"github.com/ca17/teamsacs/common/maputils"
 	"github.com/ca17/teamsacs/common/web"
+	"github.com/ca17/teamsacs/constant"
 )
 
 // Vpe
 // VPE is also a BRAS system
-type Vpe  = DataObject
+type Vpe  map[string]interface{}
 
-func (v DataObject) GetSecret() string {
-	return v.GetStringValue("secret","")
+func (v Vpe) GetSecret() string {
+	return maputils.GetStringValue(v, "secret",constant.NA)
 }
 
-func (v DataObject) GetVendorCode() string {
-	return v.GetStringValue("vendor_code","")
+func (v Vpe) GetVendorCode() string {
+	return maputils.GetStringValue(v, "vendor_code",constant.NA)
+}
+
+func (v Vpe) GetIpaddr() string {
+	return maputils.GetStringValue(v, "ipaddr",constant.NA)
+}
+
+func (v Vpe) GetCoaPort() int {
+	return maputils.GetIntValue(v, "coa_port",3799)
+}
+
+func (v Vpe) GetApiUser() (string, error) {
+	return maputils.GetStringValueWithErr(v, "api_user")
+}
+
+func (v Vpe) GetApiPwd() (string, error) {
+	return maputils.GetStringValueWithErr(v, "api_pwd")
+}
+
+func (v Vpe) GetApiAddr() (string, error) {
+	return maputils.GetStringValueWithErr(v, "api_addr")
 }
 
 // VpeManager
@@ -92,7 +114,7 @@ func (m *VpeManager) GetVpeBySn(sn string) (*Cpe, error) {
 	return result, err
 }
 
-
+// AddVpeData
 func (m *VpeManager) AddVpeData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
 	_id := data.GetString("_id")
@@ -100,11 +122,14 @@ func (m *VpeManager) AddVpeData(params web.RequestParams) error {
 		data["_id"] = common.UUID()
 	}
 	coll := m.GetTeamsAcsCollection(TeamsacsVpe)
-	apiPwd := data.GetMustString("api_pwd")
 	var err error
-	data["api_pwd"], err = aes.EncryptToB64(apiPwd, m.Config.System.Aeskey)
-	if err != nil {
-		return err
+	// If an api password is set, use aes encryption.
+	apiPwd := data.GetString("api_pwd")
+	if common.IsNotEmptyAndNA(apiPwd) {
+		data["api_pwd"], err = aes.EncryptToB64(apiPwd, m.Config.System.Aeskey)
+		if err != nil {
+			return err
+		}
 	}
 	_, err = coll.InsertOne(context.TODO(), data)
 	return err

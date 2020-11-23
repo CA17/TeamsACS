@@ -215,7 +215,11 @@ func (h *HttpHandler) RequestParseForm(c echo.Context) web.RequestParams {
 	data := make(map[string]interface{})
 	posts, _ := c.FormParams()
 	for k, vs := range posts {
-		data[k] = vs[0]
+		if k != "webix_operation" {
+			data[k] = vs[0]
+		}else{
+			params[k] = vs[0]
+		}
 	}
 	params["data"] = data
 	return params

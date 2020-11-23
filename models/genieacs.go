@@ -18,12 +18,17 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"time"
 
 	"github.com/ahmetb/go-linq"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/validutil"
 	"github.com/ca17/teamsacs/models/mikrotik"
 )
@@ -253,4 +258,41 @@ func (m *GenieacsManager) QueryMikrotikSourceData(sn string) ([]map[string]inter
 		}
 	}
 	return items, nil
+}
+
+type GenieacsTask struct {
+	Id        string    `json:"id"`
+	TId       string    `json:"_id"`
+	FileName  string    `json:"fileName"`
+	FileType  string    `json:"fileType"`
+	Name      string    `json:"name"`
+	Device    string    `json:"device"`
+	Timestamp time.Time `json:"timestamp"`
+}
+
+// GetAcsTaskDeviceIdList
+// Get a list of device IDs for currently running tasks
+func (m *GenieacsManager) GetAcsTaskDeviceIdList() ([]string, error) {
+	result := make([]string, 0)
+	resp := make([]GenieacsTask, 0)
+
+	hresp, err := http.Get(common.UrlJoin(m.Config.Genieacs.NbiUrl, "/tasks"))
+	if err != nil {
+		return nil, err
+	}
+
+	defer hresp.Body.Close()
+	body, err := ioutil.ReadAll(hresp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read tasks resp error %s", err.Error())
+	}
+
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return nil, fmt.Errorf("read tasks json resp error %s", err.Error())
+	}
+	for _, r := range resp {
+		result = append(result, r.Device)
+	}
+	return result, nil
 }

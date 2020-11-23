@@ -41,6 +41,7 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	e.Any("/nbi/data/:collname/itemvalues", h.GetDataValues)
 	e.Any("/nbi/data/:collname/delete", h.DeleteData)
 	e.POST( "/nbi/data/:collname/add",h.AddData)
+	e.POST( "/nbi/data/:collname/save",h.SaveAction)
 	e.POST( "/nbi/data/:collname/update", h.UpdateData)
 	e.POST( "/nbi/data/:collname/import", h.ImportData)
 	e.Any( "/nbi/data/:collname/export", h.ExportData)
@@ -56,8 +57,16 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	e.Any("/nbi/config/query", h.QueryConfig)
 	e.Any("/nbi/syslog/query", h.QuerySyslog)
 
+	e.Any("/nbi/cpe/add", h.AddCpeData)
 	e.Any("/nbi/cpe/query", h.QueryCpes)
+	e.Any("/nbi/cpe/policy/mikrotik/runapi", h.RunMikrotikCpeApiPolicy)
+	e.Any("/nbi/cpe/policy/runtr069", h.RunCpeTr069Policy)
+	e.Any("/nbi/cpe/policy/mikrotik/runscript", h.RunMikrotikCpeScriptPolicy)
+
+	e.Any("/nbi/vpe/add", h.AddVpeData)
 	e.Any("/nbi/vpe/query", h.QueryVpes)
+	e.Any("/nbi/vpe/policy/mikrotik/runapi", h.RunMikrotikVpeApiPolicy)
+
 	e.Any("/nbi/subscribe/query", h.QuerySubscribes)
 
 	// token

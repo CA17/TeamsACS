@@ -23,11 +23,29 @@ import (
 
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/aes"
+	"github.com/ca17/teamsacs/common/maputils"
 	"github.com/ca17/teamsacs/common/web"
 )
 
 // Cpe
-type Cpe = DataObject
+type Cpe map[string]interface{}
+
+
+func (v Cpe) GetApiUser() (string, error) {
+	return maputils.GetStringValueWithErr(v, "api_user")
+}
+
+func (v Cpe) GetApiPwd() (string, error) {
+	return maputils.GetStringValueWithErr(v, "api_pwd")
+}
+
+func (v Cpe) GetApiAddr() (string, error) {
+	return maputils.GetStringValueWithErr(v, "api_addr")
+}
+
+func (v Cpe) GetDeviceId() string {
+	return maputils.GetStringValue(v, "device_id","")
+}
 
 type CpeManager struct{ *ModelManager }
 
@@ -70,7 +88,6 @@ func (m *CpeManager) ExistCpe(sn string) bool {
 	return count > 0
 }
 
-
 func (m *CpeManager) AddCpeData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
 	_id := data.GetString("_id")
@@ -78,11 +95,14 @@ func (m *CpeManager) AddCpeData(params web.RequestParams) error {
 		data["_id"] = common.UUID()
 	}
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
-	apiPwd := data.GetMustString("api_pwd")
 	var err error
-	data["api_pwd"], err = aes.EncryptToB64(apiPwd, m.Config.System.Aeskey)
-	if err != nil {
-		return err
+	// If an api password is set, use aes encryption.
+	apiPwd := data.GetString("api_pwd")
+	if common.IsNotEmptyAndNA(apiPwd) {
+		data["api_pwd"], err = aes.EncryptToB64(apiPwd, m.Config.System.Aeskey)
+		if err != nil {
+			return err
+		}
 	}
 	_, err = coll.InsertOne(context.TODO(), data)
 	return err

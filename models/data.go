@@ -18,6 +18,7 @@ package models
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -36,7 +37,6 @@ func (m *ModelManager) GetDataManager() *DataManager {
 	store, _ := m.ManagerMap.Get("DataManager")
 	return store.(*DataManager)
 }
-
 
 // GetDataById
 func (m *DataManager) GetData(params web.RequestParams) (*Attributes, error) {
@@ -75,7 +75,6 @@ func (m *DataManager) GetDataNameValues(params web.RequestParams) ([]NameValue, 
 	return nvs, err
 }
 
-
 // AddData
 func (m *DataManager) AddData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
@@ -109,14 +108,37 @@ func (m *DataManager) UpdateData(params web.RequestParams) error {
 
 // DeleteData
 func (m *DataManager) DeleteData(params web.RequestParams) error {
-	ids := params.GetParamMap("querymap").GetMustString("ids")
-	idarray :=  bson.A{}
-	for _, id := range strings.Split(ids, ",") {
-		idarray = append(idarray, id)
-	}
 	collname := params.GetMustString("collname")
-	filter := bson.M{"_id": bson.M{"$in":idarray}}
-	_, err := m.GetTeamsAcsCollection(collname).DeleteMany(context.TODO(), filter)
-	return err
+	ids := params.GetParamMap("querymap").GetString("ids")
+	if ids != "" {
+		idarray := bson.A{}
+		for _, id := range strings.Split(ids, ",") {
+			idarray = append(idarray, id)
+		}
+		filter := bson.M{"_id": bson.M{"$in": idarray}}
+		_, err := m.GetTeamsAcsCollection(collname).DeleteMany(context.TODO(), filter)
+		return err
+	}else{
+		_id := params.GetParamMap("data").GetString("_id")
+		_, err := m.GetTeamsAcsCollection(collname).DeleteMany(context.TODO(), bson.M{"_id": _id})
+		return err
+	}
 }
 
+// SaveData
+func (m *DataManager) SaveData(params web.RequestParams) (interface{}, error) {
+	op := params.GetString("webix_operation")
+	switch op {
+	case "insert":
+		params["_id"] = common.UUID()
+		err := m.AddData(params)
+		return map[string]interface{}{"id": params["_id"]}, err
+	case "update":
+		err := m.UpdateData(params)
+		return map[string]interface{}{"status": "updated"}, err
+	case "delete":
+		err := m.DeleteData(params)
+		return make(map[string]interface{}), err
+	}
+	return nil, errors.New("Unsupported Operations")
+}

@@ -55,6 +55,11 @@ type FreeradiusConfig struct {
 	Debug bool   `yaml:"debug" json:"debug"`
 }
 
+type GenieacsConfig struct {
+	NbiUrl string `yaml:"nbi_url" json:"nbi_url"`
+	Debug  bool   `yaml:"debug" json:"debug"`
+}
+
 type GrpcConfig struct {
 	Host  string `yaml:"host" json:"host"`
 	Port  int    `yaml:"port" json:"port"`
@@ -81,6 +86,7 @@ type AppConfig struct {
 	System     SysConfig        `yaml:"system" json:"system"`
 	NBI        NBIConfig        `yaml:"nbi" json:"nbi"`
 	Freeradius FreeradiusConfig `yaml:"freeradius" json:"freeradius"`
+	Genieacs   GenieacsConfig   `yaml:"genieacs" json:"genieacs"`
 	Mongodb    MongodbConfig    `yaml:"mongodb" json:"mongodb"`
 	Grpc       GrpcConfig       `yaml:"grpc" json:"grpc"`
 	Radiusd    RadiusdConfig    `yaml:"radiusd" json:"radiusd"`
@@ -139,6 +145,10 @@ var DefaultAppConfig = &AppConfig{
 		Host:  "0.0.0.0",
 		Port:  1980,
 		Debug: true,
+	},
+	Genieacs : GenieacsConfig{
+		NbiUrl: "http://192.168.1.18:7557",
+		Debug:  true,
 	},
 	Grpc: GrpcConfig{
 		Host:  "0.0.0.0",

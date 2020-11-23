@@ -27,8 +27,8 @@ func (s *AcctService) processAcctStart(r *radius.Request, vr *radparser.VendorRe
 
 func (s *AcctService) processAcctUpdateBefore(r *radius.Request, vr *radparser.VendorRequest,  user *models.Subscribe, vpe *models.Vpe, nasrip string) {
 	// 用户状态变更为停用后触发下线
-	var username = user.GetStringValue("username",constant.NA)
-	if user.GetStringValue("status", constant.DISABLED) == constant.DISABLED {
+	var username = user.GetUsername()
+	if user.GetStatus() == constant.DISABLED {
 		s.processAcctDisconnect(r, vpe, username, nasrip)
 	}
 
@@ -85,7 +85,7 @@ func (s *AcctService) processAcctNasOff(r *radius.Request) {
 
 
 func (s *AcctService) processAcctDisconnect(r *radius.Request, vpe *models.Vpe, username, nasrip string) {
-	packet := radius.New(radius.CodeDisconnectRequest, []byte(vpe.GetStringValue("secret",constant.NA)))
+	packet := radius.New(radius.CodeDisconnectRequest, []byte(vpe.GetSecret()))
 	sessionid := rfc2866.AcctSessionID_GetString(r.Packet)
 	if sessionid == "" {
 		radlog.Errorf("radius disconnect user:%s, but sessionid is empty", username)
@@ -93,7 +93,7 @@ func (s *AcctService) processAcctDisconnect(r *radius.Request, vpe *models.Vpe, 
 	}
 	_ = rfc2865.UserName_SetString(packet, username)
 	_ = rfc2866.AcctSessionID_Set(packet, []byte(sessionid))
-	var coaPort = vpe.GetIntValue("coa_port", 3799)
+	var coaPort = vpe.GetCoaPort()
 	radlog.Infof("disconnect user:%s => (%s:%d): %s", username, nasrip, coaPort, debug.FormatPacket(packet))
 	response, err := radius.Exchange(context.Background(), packet, fmt.Sprintf("%s:%d", nasrip, coaPort))
 	if err != nil {

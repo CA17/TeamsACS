@@ -23,12 +23,13 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/ca17/teamsacs/common"
+	"github.com/ca17/teamsacs/models"
 )
 
 func (h *HttpHandler) QuerySubscribes(c echo.Context) error {
 	params := h.RequestParse(c)
 	params.GetSortMap()["update_time"] = "desc"
-	// 查询即将过期的帐号
+	// Check for expiring accounts
 	expireDays := params.GetQueryMap().GetInt64("expire_days")
 	if expireDays > 0 {
 		trmap := params.GetTimeRangeMap()
@@ -40,4 +41,10 @@ func (h *HttpHandler) QuerySubscribes(c echo.Context) error {
 	return c.JSON(http.StatusOK, data)
 }
 
+func (h *HttpHandler) AddSubscribeData(c echo.Context) error {
+	params := h.RequestParse(c)
+	params["collname"] = models.TeamsacsSubscribe
+	common.Must(h.GetManager().GetSubscribeManager().AddSubscribeData(params))
+	return c.JSON(http.StatusOK, h.RestSucc("Success"))
+}
 

@@ -45,6 +45,10 @@ const (
 	TeamsacsAccounting = "accounting"
 	TeamsacsAuthlog    = "authlog"
 	TeamsacsSyslog     = "syslog"
+	TeamsacsPolicyVariable     = "policy_variable"
+	TeamsacsMikrotikApiPolicy     = "mikrotik_api_policy"
+	TeamsacsMikrotikScriptPolicy     = "mikrotik_script_policy"
+	TeamsacsTr069Policy     = "tr069_policy"
 
 	GenieacsDevices = "devices"
 	GenieacsFaults  = "faults"
@@ -109,6 +113,7 @@ func (m *ModelManager) registerManagers() {
 	m.ManagerMap.Set("ConfigManager", &ConfigManager{m})
 	m.ManagerMap.Set("GenieacsManager", &GenieacsManager{m})
 	m.ManagerMap.Set("DataManager", &DataManager{m})
+	m.ManagerMap.Set("PolicyManager", &PolicyManager{m})
 }
 
 func (m *ModelManager) GetTeamsAcsCollection(coll string) *mongo.Collection {
