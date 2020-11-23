@@ -31,6 +31,10 @@ import (
 type Cpe map[string]interface{}
 
 
+func (v Cpe) Set(key string, value interface{} ) {
+	v[key] = value
+}
+
 func (v Cpe) GetApiUser() (string, error) {
 	return maputils.GetStringValueWithErr(v, "api_user")
 }
@@ -45,6 +49,10 @@ func (v Cpe) GetApiAddr() (string, error) {
 
 func (v Cpe) GetDeviceId() string {
 	return maputils.GetStringValue(v, "device_id","")
+}
+
+func (v Cpe) GetID() string {
+	return maputils.GetStringValue(v, "_id","")
 }
 
 type CpeManager struct{ *ModelManager }
@@ -105,5 +113,32 @@ func (m *CpeManager) AddCpeData(params web.RequestParams) error {
 		}
 	}
 	_, err = coll.InsertOne(context.TODO(), data)
+	return err
+}
+
+func (m *CpeManager) AddCpeDataMap(cpe Cpe) error {
+	_id := cpe.GetID()
+	if common.IsEmptyOrNA(_id) {
+		cpe["_id"] = common.UUID()
+	}
+	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
+	var err error
+	// If an api password is set, use aes encryption.
+	apiPwd,_ := cpe.GetApiPwd()
+	if common.IsNotEmptyAndNA(apiPwd) {
+		cpe["api_pwd"], err = aes.EncryptToB64(apiPwd, m.Config.System.Aeskey)
+		if err != nil {
+			return err
+		}
+	}
+	_, err = coll.InsertOne(context.TODO(), cpe)
+	return err
+}
+
+// UpdateVpeBySn
+func (m *CpeManager) UpdateCpeBySn(sn string, valmap map[string]interface{}) error {
+	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
+	update := bson.M{"$set": valmap}
+	_, err := coll.UpdateOne(context.TODO(), bson.M{"sn": sn}, update)
 	return err
 }

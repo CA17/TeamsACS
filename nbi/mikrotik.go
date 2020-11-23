@@ -44,14 +44,14 @@ func (h *HttpHandler) InvokeMikrotikVpeApi(c echo.Context) error {
 	args = append(args, c.FormValue("command"))
 	params := c.FormValue("params")
 	for _, p := range strings.Split(params, ",") {
-		if p == ""{
+		if p == "" {
 			continue
 		}
 		args = append(args, "?"+p)
 	}
 	props := c.FormValue("props")
 	if props != "" {
-		args = append(args, "=.proplist=" + props)
+		args = append(args, "=.proplist="+props)
 	}
 	reply, err := conn.Run(args...)
 	common.Must(err)
@@ -65,7 +65,11 @@ func (h *HttpHandler) QueryMikrotikDeviceInterfaces(c echo.Context) error {
 	var result = make(map[string]interface{})
 	data, err := h.GetManager().GetGenieacsManager().QueryMikrotikEthernetInterface(c.QueryParam("sn"))
 	common.Must(err)
-	result["data"] = data.Items
+	if data != nil {
+		result["data"] = data.Items
+	} else {
+		result["data"] = common.EmptyList
+	}
 	return c.JSON(http.StatusOK, result)
 }
 
@@ -73,7 +77,11 @@ func (h *HttpHandler) QueryMikrotikDevicePPPInterfaces(c echo.Context) error {
 	var result = make(map[string]interface{})
 	data, err := h.GetManager().GetGenieacsManager().QueryMikrotikPPPInterface(c.QueryParam("sn"))
 	common.Must(err)
-	result["data"] = data.Items
+	if data != nil {
+		result["data"] = data.Items
+	} else {
+		result["data"] = common.EmptyList
+	}
 	return c.JSON(http.StatusOK, result)
 }
 
@@ -81,7 +89,11 @@ func (h *HttpHandler) QueryMikrotikDeviceRouters(c echo.Context) error {
 	var result = make(map[string]interface{})
 	data, err := h.GetManager().GetGenieacsManager().QueryMikrotikRouters(c.QueryParam("sn"))
 	common.Must(err)
-	result["data"] = data.Items
+	if data != nil {
+		result["data"] = data.Items
+	} else {
+		result["data"] = common.EmptyList
+	}
 	return c.JSON(http.StatusOK, result)
 }
 
@@ -89,7 +101,11 @@ func (h *HttpHandler) QueryMikrotikDeviceDnsClientServer(c echo.Context) error {
 	var result = make(map[string]interface{})
 	data, err := h.GetManager().GetGenieacsManager().QueryMikrotikDnsServer(c.QueryParam("sn"))
 	common.Must(err)
-	result["data"] = data.Items
+	if data != nil {
+		result["data"] = data.Items
+	} else {
+		result["data"] = common.EmptyList
+	}
 	return c.JSON(http.StatusOK, result)
 }
 
@@ -97,6 +113,10 @@ func (h *HttpHandler) QueryMikrotikDeviceIpInterfaces(c echo.Context) error {
 	var result = make(map[string]interface{})
 	data, err := h.GetManager().GetGenieacsManager().QueryMikrotikIpInterface(c.QueryParam("sn"))
 	common.Must(err)
-	result["data"] = data.Items
+	if data != nil {
+		result["data"] = data.Items
+	} else {
+		result["data"] = common.EmptyList
+	}
 	return c.JSON(http.StatusOK, result)
 }

@@ -100,6 +100,11 @@ func (m *VpeManager) GetVpeByIdentifier(identifier string) (*Vpe, error) {
 	return result, err
 }
 
+func (m *VpeManager) ExistVpe(sn string) bool {
+	coll := m.GetTeamsAcsCollection(TeamsacsVpe)
+	count, _ := coll.CountDocuments(context.TODO(), bson.M{"sn": sn})
+	return count > 0
+}
 
 
 func (m *VpeManager) GetVpeBySn(sn string) (*Cpe, error) {
@@ -132,5 +137,13 @@ func (m *VpeManager) AddVpeData(params web.RequestParams) error {
 		}
 	}
 	_, err = coll.InsertOne(context.TODO(), data)
+	return err
+}
+
+// UpdateVpeBySn
+func (m *VpeManager) UpdateVpeBySn(sn string, valmap map[string]interface{}) error {
+	coll := m.GetTeamsAcsCollection(TeamsacsVpe)
+	update := bson.M{"$set": valmap}
+	_, err := coll.UpdateOne(context.TODO(), bson.M{"sn": sn}, update)
 	return err
 }

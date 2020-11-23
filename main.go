@@ -36,6 +36,7 @@ import (
 	"github.com/ca17/teamsacs/nbi"
 	"github.com/ca17/teamsacs/radiusd"
 	"github.com/ca17/teamsacs/radiusd/radlog"
+	"github.com/ca17/teamsacs/scheduler"
 	"github.com/ca17/teamsacs/syslogd"
 )
 
@@ -235,7 +236,7 @@ func main() {
 		})
 	}
 
-	if *startRfc5424 || os.Getenv("TEAMSACS_RFC5424") == "true"{
+	if *startRfc5424 || os.Getenv("TEAMSACS_RFC5424") == "true" {
 		g.Go(func() error {
 			log.Info("Start rfc5424 Syslog Server ...")
 			return syslogserv.StartRfc5424()
@@ -245,6 +246,10 @@ func main() {
 	g.Go(func() error {
 		log.Info("Start Syslog Server ...")
 		return syslogserv.StartTextlog()
+	})
+
+	g.Go(func() error {
+		return scheduler.Start(manager)
 	})
 
 	time.Sleep(time.Millisecond * 50)
