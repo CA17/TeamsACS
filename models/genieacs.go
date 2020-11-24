@@ -47,9 +47,6 @@ func (m *GenieacsManager) QueryMikrotikDeviceInfo() ([]mikrotik.DeviceInfo, erro
 	if err != nil {
 		return nil, err
 	}
-	if len(items) == 0 {
-		return nil, nil
-	}
 	result := make([]mikrotik.DeviceInfo, 0)
 	linq.From(items).
 		Select(func(c mikrotik.T) mikrotik.T {
@@ -72,9 +69,6 @@ func (m *GenieacsManager) QueryMikrotikDnsServer(sn string) (*mikrotik.DnsClient
 	items, err := m.QueryMikrotikSourceData(sn)
 	if err != nil {
 		return nil, err
-	}
-	if len(items) == 0 {
-		return nil, nil
 	}
 	var result = linq.From(items).
 		Select(func(c mikrotik.T) mikrotik.T {
@@ -109,9 +103,6 @@ func (m *GenieacsManager) QueryMikrotikRouters(sn string) (*mikrotik.DeviceRoute
 	if err != nil {
 		return nil, err
 	}
-	if len(items) == 0 {
-		return nil, nil
-	}
 	var result = linq.From(items).
 		Select(func(c mikrotik.T) mikrotik.T {
 			return linq.KeyValue{
@@ -144,9 +135,6 @@ func (m *GenieacsManager) QueryMikrotikEthernetInterface(sn string) (*mikrotik.E
 	items, err := m.QueryMikrotikSourceData(sn)
 	if err != nil {
 		return nil, err
-	}
-	if len(items) == 0 {
-		return nil, nil
 	}
 	var result = linq.From(items).
 		Select(func(c mikrotik.T) mikrotik.T {
@@ -214,9 +202,6 @@ func (m *GenieacsManager) QueryMikrotikIpInterface(sn string) (*mikrotik.IpInter
 	if err != nil {
 		return nil, err
 	}
-	if len(items) == 0 {
-		return nil, nil
-	}
 	var result = linq.From(items).
 		Select(func(c mikrotik.T) mikrotik.T {
 			return linq.KeyValue{
@@ -265,7 +250,7 @@ func (m *GenieacsManager) QueryMikrotikSourceData(sn string) ([]map[string]inter
 		var elem map[string]interface{}
 		err := cur.Decode(&elem)
 		if err != nil {
-			fmt.Println(err)
+			return nil, err
 		} else {
 			items = append(items, elem)
 		}

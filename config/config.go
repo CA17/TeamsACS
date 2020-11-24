@@ -222,6 +222,11 @@ func LoadConfig(cfile string) *AppConfig {
 	setEnvValue("TEAMSACS_FREERADIUS_WEB_HOST", func(v string) {
 		cfg.Freeradius.Host = v
 	})
+
+	setEnvValue("TEAMSACS_GENIEACS_NBIURL", func(v string) {
+		cfg.Genieacs.NbiUrl = v
+	})
+
 	setEnvValue("TEAMSACS_FREERADIUS_WEB_DEBUG", func(v string) {
 		cfg.Freeradius.Debug = v == "true"
 	})

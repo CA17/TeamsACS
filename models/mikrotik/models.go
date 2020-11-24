@@ -162,13 +162,17 @@ func (info *DeviceInfo) ParseBson(val map[string]interface{}) {
 	info.UpTime = GetInt64SubValue(val, "UpTime", "_value", "")
 	info.Timestamp = ParseDateTime(val["_timestamp"])
 
-	MemoryStatus := val["MemoryStatus"].(TMap)
-	Free := GetFloat64SubValue(MemoryStatus, "Free", "_value", "")
-	Total := GetFloat64SubValue(MemoryStatus, "Total", "_value", "")
-	info.MemoryUsage = int64(math.Round((Total - Free) / Total * 100))
+	MemoryStatus, ok := val["MemoryStatus"]
+	if ok {
+		Free := GetFloat64SubValue(MemoryStatus.(TMap), "Free", "_value", "")
+		Total := GetFloat64SubValue(MemoryStatus.(TMap), "Total", "_value", "")
+		info.MemoryUsage = int64(math.Round((Total - Free) / Total * 100))
+	}
 
-	ProcessStatus := val["ProcessStatus"].(TMap)
-	info.CPUUsage = GetInt64SubValue(ProcessStatus, "CPUUsage", "_value", "")
+	ProcessStatus, ok := val["ProcessStatus"]
+	if ok {
+		info.CPUUsage = GetInt64SubValue(ProcessStatus.(TMap), "CPUUsage", "_value", "")
+	}
 }
 
 type DeviceEthernet struct {

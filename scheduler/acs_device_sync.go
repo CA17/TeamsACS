@@ -29,12 +29,15 @@ func SyncAcsDeviceInfo(manager *models.ModelManager) {
 		return
 	}
 
+	log.Infof("fetch device num %d", len(devinfos))
+
 	ctime := time.Now()
 	for _, dev := range devinfos {
 		sn := dev.SerialNumber
 		if sn == "" {
 			continue
 		}
+		log.Infof("Process Device sn=%s", sn)
 
 		picture, ok := picmap[dev.ProductClass]
 		if !ok {
