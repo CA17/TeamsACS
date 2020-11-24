@@ -25,11 +25,11 @@ import (
 
 func TestOperator2json(t *testing.T) {
 	item := &Operator{
-		ID:        common.UUID(),
-		Email:     "test@teamsacs.com",
-		Username:  "opr",
-		Level:     "opr",
-		Remark:    "opr",
+		ID:       common.UUID(),
+		Email:    "test@teamsacs.com",
+		Username: "opr",
+		Level:    "opr",
+		Remark:   "opr",
 	}
 	bs, err := json.MarshalIndent(item, "", "\t")
 	if err != nil {
@@ -43,9 +43,6 @@ func Benchmark(b *testing.B) {
 	vpe := make(Vpe)
 	vpe["secret"] = "aaa"
 	for i := 0; i < b.N; i++ {
-		vpe.GetStringValue("secret","")
+		vpe.GetSecret()
 	}
 }
-
-
-
