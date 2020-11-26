@@ -18,6 +18,7 @@ package models
 
 import (
 	"context"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 
@@ -30,8 +31,7 @@ import (
 // Cpe
 type Cpe map[string]interface{}
 
-
-func (v Cpe) Set(key string, value interface{} ) {
+func (v Cpe) Set(key string, value interface{}) {
 	v[key] = value
 }
 
@@ -48,11 +48,11 @@ func (v Cpe) GetApiAddr() (string, error) {
 }
 
 func (v Cpe) GetDeviceId() string {
-	return maputils.GetStringValue(v, "device_id","")
+	return maputils.GetStringValue(v, "device_id", "")
 }
 
 func (v Cpe) GetID() string {
-	return maputils.GetStringValue(v, "_id","")
+	return maputils.GetStringValue(v, "_id", "")
 }
 
 type CpeManager struct{ *ModelManager }
@@ -90,6 +90,10 @@ func (m *CpeManager) QueryCpes(params web.RequestParams) (*web.PageResult, error
 	return m.QueryPagerItems(params, TeamsacsCpe)
 }
 
+func (m *CpeManager) QueryCpeList(params web.RequestParams) (*web.QueryResult, error) {
+	return m.QueryItems(params, TeamsacsCpe)
+}
+
 func (m *CpeManager) ExistCpe(sn string) bool {
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
 	count, _ := coll.CountDocuments(context.TODO(), bson.M{"sn": sn})
@@ -124,7 +128,7 @@ func (m *CpeManager) AddCpeDataMap(cpe Cpe) error {
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
 	var err error
 	// If an api password is set, use aes encryption.
-	apiPwd,_ := cpe.GetApiPwd()
+	apiPwd, _ := cpe.GetApiPwd()
 	if common.IsNotEmptyAndNA(apiPwd) {
 		cpe["api_pwd"], err = aes.EncryptToB64(apiPwd, m.Config.System.Aeskey)
 		if err != nil {
@@ -132,6 +136,27 @@ func (m *CpeManager) AddCpeDataMap(cpe Cpe) error {
 		}
 	}
 	_, err = coll.InsertOne(context.TODO(), cpe)
+	return err
+}
+
+func (m *CpeManager) UpdateCpeData(params web.RequestParams) error {
+	data := params.GetParamMap("data")
+	data["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
+	_id := data.GetMustString("_id")
+	var err error
+	// If an api password is set, use aes encryption.
+	apiPwd := data.GetString("api_pwd")
+	if common.IsNotEmptyAndNA(apiPwd) {
+		data["api_pwd"], err = aes.EncryptToB64(apiPwd, m.Config.System.Aeskey)
+		if err != nil {
+			return err
+		}
+	}else{
+		delete(data, "api_pwd")
+	}
+	query := bson.M{"_id": _id}
+	update := bson.M{"$set": data}
+	_, err = m.GetTeamsAcsCollection(TeamsacsCpe).UpdateOne(context.TODO(), query, update)
 	return err
 }
 

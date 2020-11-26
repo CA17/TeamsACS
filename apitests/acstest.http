@@ -1,0 +1,10 @@
+POST http://10.189.189.67:7557/devices/E48D8C-CHR-i8TqFHmQnNG/tasks?timeout=5000&connection_request
+Content-Type: application/json
+
+{
+  "name": "setParameterValues",
+  "parameterValues": [["Device.DeviceInfo.X_MIKROTIK_SystemIdentity", "1111"]]
+}
+
+
+###

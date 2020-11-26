@@ -37,17 +37,30 @@ import (
 func (h *HttpHandler) QueryCpes(c echo.Context) error {
 	params := h.RequestParse(c)
 	params.GetParamMap("sortmap")["update_time"] = "desc"
-	data, err := h.GetManager().GetCpeManager().QueryCpes(params)
-	if err != nil {
-		return h.GetInternalError(err)
+	ispager := params.GetQueryMap().GetString("ispager") == "true"
+	if ispager {
+		data, err := h.GetManager().GetCpeManager().QueryCpes(params)
+		common.Must(err)
+		return c.JSON(http.StatusOK, data)
+	} else {
+		params.Set("limit",100)
+		data, err := h.GetManager().GetCpeManager().QueryCpeList(params)
+		common.Must(err)
+		return c.JSON(http.StatusOK, data)
 	}
-	return c.JSON(http.StatusOK, data)
 }
 
 func (h *HttpHandler) AddCpeData(c echo.Context) error {
 	params := h.RequestParse(c)
 	params["collname"] = models.TeamsacsCpe
 	common.Must(h.GetManager().GetCpeManager().AddCpeData(params))
+	return c.JSON(http.StatusOK, h.RestSucc("Success"))
+}
+
+func (h *HttpHandler) UpdateCpeData(c echo.Context) error {
+	params := h.RequestParse(c)
+	params["collname"] = models.TeamsacsCpe
+	common.Must(h.GetManager().GetCpeManager().UpdateCpeData(params))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 
@@ -94,8 +107,8 @@ func (h *HttpHandler) RunMikrotikCpeApiPolicy(c echo.Context) error {
 		return c.JSON(200, h.RestError(fmt.Sprintf("Api Password Decrypt error %s", err.Error())))
 	}
 	apiCommand := common.Must2(policy.GetApiCommand()).(string)
-	apiParams := common.Must2(policy.GetApiParams()).(string)
-	apiProps := common.Must2(policy.GetApiProps()).(string)
+	apiParams,_ := policy.GetApiParams()
+	apiProps,_ := policy.GetApiProps()
 
 	// connect to cpe
 	conn, err := routeros.Dial(apiAddr, user, pwd)
@@ -124,7 +137,7 @@ func (h *HttpHandler) RunMikrotikCpeApiPolicy(c echo.Context) error {
 		log.Info(reply.String())
 	}
 
-	return c.JSON(http.StatusOK, h.RestResult(reply.Done))
+	return c.JSON(http.StatusOK, h.RestResult(reply))
 }
 
 // RunCpeTr069Policy
@@ -148,13 +161,10 @@ func (h *HttpHandler) RunCpeTr069Policy(c echo.Context) error {
 
 	client := &http.Client{}
 	client.Timeout = time.Second * 5
-	url := common.UrlJoin(
+	url := common.UrlJoin2(
 		h.GetManager().Config.Genieacs.NbiUrl,
 		fmt.Sprintf("/devices/%s/tasks%s", cpe.GetDeviceId(), connParamStr))
 
-	if h.GetManager().Config.NBI.Debug {
-		log.Infof("invoke genieacs api => %s", url)
-	}
 	data, err := policy.GetTr069ParamData()
 	if err != nil {
 		return c.JSON(200, h.RestError(fmt.Sprintf("Tr069 Param data error %s", err.Error())))
@@ -169,14 +179,18 @@ func (h *HttpHandler) RunCpeTr069Policy(c echo.Context) error {
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
-		return c.JSON(200, h.RestError(fmt.Sprintf("Tr069 invoke error %s", err.Error())))
+		errstr := fmt.Sprintf("Tr069 invoke error %s", err.Error())
+		log.Error(errstr)
+		return c.JSON(200, h.RestError(errstr))
 	}
 
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return c.JSON(200, h.RestError(fmt.Sprintf("Tr069 invoke resp read error %s", err.Error())))
+		errstr := fmt.Sprintf("Tr069 invoke resp read error %s", err.Error())
+		log.Error(errstr)
+		return c.JSON(200, h.RestError(errstr))
 	}
 	bodystr := string(body)
 	if h.GetManager().Config.Genieacs.Debug {
@@ -262,7 +276,7 @@ func (h *HttpHandler) RunMikrotikCpeScriptPolicy(c echo.Context) error {
 	if c.QueryParam("async") == "true" {
 		connParamStr = ""
 	}
-	taskurl := common.UrlJoin(h.GetManager().Config.Genieacs.NbiUrl, fmt.Sprintf("devices/%s/tasks%s", cpe.GetDeviceId(), connParamStr))
+	taskurl := common.UrlJoin2(h.GetManager().Config.Genieacs.NbiUrl, fmt.Sprintf("devices/%s/tasks%s", cpe.GetDeviceId(), connParamStr))
 	taskdatamap := map[string]string{"name": "download", "fileName": filename, "fileType": "3 Vendor Configuration File"}
 	datajson, err := json.MarshalIndent(&taskdatamap, "", "\t")
 	if err != nil {

@@ -384,6 +384,19 @@ func UrlJoin(hurl string, elm ...string) string {
 }
 
 
+func UrlJoin2(hurl string, elm ...string) string {
+	u, err := url.Parse(hurl)
+	Must(err)
+	u.Path = path.Join(u.Path, path.Join(elm...))
+	sb := strings.Builder{}
+	sb.WriteString(u.Scheme)
+	sb.WriteString("://")
+	sb.WriteString(u.Host)
+	sb.WriteString(u.Path)
+	return sb.String()
+}
+
+
 
 var notfloat = errors.New("not float value")
 

@@ -167,6 +167,10 @@ type RequestParams map[string]interface{}
 
 var EmptyRequestParams = make(RequestParams)
 
+func (jp RequestParams) Set(key string, value interface{} ) {
+	jp[key] = value
+}
+
 // 获取单个字符串
 func (jp RequestParams) GetString(key string) string {
 	v, ok := jp[key]

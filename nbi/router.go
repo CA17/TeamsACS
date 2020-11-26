@@ -58,6 +58,7 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	e.Any("/nbi/syslog/query", h.QuerySyslog)
 
 	e.Any("/nbi/cpe/add", h.AddCpeData)
+	e.Any("/nbi/cpe/update", h.UpdateCpeData)
 	e.Any("/nbi/cpe/query", h.QueryCpes)
 	e.Any("/nbi/cpe/policy/mikrotik/runapi", h.RunMikrotikCpeApiPolicy)
 	e.Any("/nbi/cpe/policy/runtr069", h.RunCpeTr069Policy)

@@ -147,7 +147,7 @@ var DefaultAppConfig = &AppConfig{
 		Debug: true,
 	},
 	Genieacs : GenieacsConfig{
-		NbiUrl: "http://192.168.1.18:7557",
+		NbiUrl: "http://127.0.0.1:7557",
 		Debug:  true,
 	},
 	Grpc: GrpcConfig{
