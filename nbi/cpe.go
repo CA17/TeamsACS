@@ -117,6 +117,7 @@ func (h *HttpHandler) RunMikrotikCpeApiPolicy(c echo.Context) error {
 	}
 	args := make([]string, 0)
 	args = append(args, apiCommand)
+	apiParams = h.replaceVariables(apiParams)
 	for _, p := range strings.Split(apiParams, ",") {
 		if p == "" {
 			continue
@@ -276,7 +277,7 @@ func (h *HttpHandler) RunMikrotikCpeScriptPolicy(c echo.Context) error {
 	if c.QueryParam("async") == "true" {
 		connParamStr = ""
 	}
-	taskurl := common.UrlJoin2(h.GetManager().Config.Genieacs.NbiUrl, fmt.Sprintf("devices/%s/tasks%s", cpe.GetDeviceId(), connParamStr))
+	taskurl := common.UrlJoin2(h.GetManager().Config.Genieacs.NbiUrl, fmt.Sprintf("/devices/%s/tasks%s", cpe.GetDeviceId(), connParamStr))
 	taskdatamap := map[string]string{"name": "download", "fileName": filename, "fileType": "3 Vendor Configuration File"}
 	datajson, err := json.MarshalIndent(&taskdatamap, "", "\t")
 	if err != nil {

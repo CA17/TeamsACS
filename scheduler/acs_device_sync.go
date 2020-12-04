@@ -22,6 +22,6 @@ func SyncAcsDeviceInfo(manager *models.ModelManager) {
 
 	log.Infof("fetch device num %d", len(devinfos))
 
-	manager.GetGenieacsManager().SyncDeviceInfo(devinfos)
+	manager.GetGenieacsManager().SyncMikrotikDeviceInfo(devinfos)
 
 }

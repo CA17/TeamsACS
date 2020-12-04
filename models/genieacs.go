@@ -306,7 +306,7 @@ var picmap = map[string]string{
 
 
 // Sync all device info to teamsacs colls
-func (m GenieacsManager) SyncDeviceInfo(devinfos []mikrotik.DeviceInfo) {
+func (m GenieacsManager) SyncMikrotikDeviceInfo(devinfos []mikrotik.DeviceInfo) {
 	ctime := time.Now()
 	for _, dev := range devinfos {
 		sn := dev.SerialNumber

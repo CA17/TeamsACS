@@ -47,6 +47,14 @@ func (h *HttpHandler) AddVpeData(c echo.Context) error {
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 
+func (h *HttpHandler) UpdateVpeData(c echo.Context) error {
+	params := h.RequestParse(c)
+	params["collname"] = models.TeamsacsVpe
+	common.Must(h.GetManager().GetVpeManager().UpdateVpeData(params))
+	return c.JSON(http.StatusOK, h.RestSucc("Success"))
+}
+
+
 
 // RunMikrotikVpeApiPolicy
 // sn string

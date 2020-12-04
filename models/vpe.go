@@ -18,6 +18,7 @@ package models
 
 import (
 	"context"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 
@@ -137,6 +138,28 @@ func (m *VpeManager) AddVpeData(params web.RequestParams) error {
 		}
 	}
 	_, err = coll.InsertOne(context.TODO(), data)
+	return err
+}
+
+
+func (m *VpeManager) UpdateVpeData(params web.RequestParams) error {
+	data := params.GetParamMap("data")
+	data["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
+	_id := data.GetMustString("_id")
+	var err error
+	// If an api password is set, use aes encryption.
+	apiPwd := data.GetString("api_pwd")
+	if common.IsNotEmptyAndNA(apiPwd) {
+		data["api_pwd"], err = aes.EncryptToB64(apiPwd, m.Config.System.Aeskey)
+		if err != nil {
+			return err
+		}
+	}else{
+		delete(data, "api_pwd")
+	}
+	query := bson.M{"_id": _id}
+	update := bson.M{"$set": data}
+	_, err = m.GetTeamsAcsCollection(TeamsacsCpe).UpdateOne(context.TODO(), query, update)
 	return err
 }
 
