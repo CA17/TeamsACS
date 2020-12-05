@@ -141,7 +141,7 @@ func (m *VpeManager) AddVpeData(params web.RequestParams) error {
 	return err
 }
 
-
+// UpdateVpeData
 func (m *VpeManager) UpdateVpeData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
 	data["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
