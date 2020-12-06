@@ -57,6 +57,7 @@ func (h *HttpHandler) RunMikrotikVpeApiPolicy(c echo.Context) error {
 	if err != nil {
 		return c.JSON(200, h.RestError(fmt.Sprintf("Connect Vpe error %s", err.Error())))
 	}
+	defer api.Client.Close()
 
 	reply, err := api.ExecuteCommand(apiCommand, apiParams, apiProps)
 	if err != nil {
