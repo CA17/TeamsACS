@@ -159,7 +159,7 @@ func (m *VpeManager) UpdateVpeData(params web.RequestParams) error {
 	}
 	query := bson.M{"_id": _id}
 	update := bson.M{"$set": data}
-	_, err = m.GetTeamsAcsCollection(TeamsacsCpe).UpdateOne(context.TODO(), query, update)
+	_, err = m.GetTeamsAcsCollection(TeamsacsVpe).UpdateOne(context.TODO(), query, update)
 	return err
 }
 

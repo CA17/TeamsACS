@@ -8,7 +8,6 @@ require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-co-op/gocron v0.1.1
-	github.com/go-routeros/routeros v0.0.0-20190905230431-4e69e5fc3b22
 	github.com/golang/protobuf v1.4.2
 	github.com/influxdata/go-syslog/v3 v3.0.0
 	github.com/labstack/echo/v4 v4.1.15
@@ -24,6 +23,7 @@ require (
 	google.golang.org/protobuf v1.23.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
+	gopkg.in/routeros.v2 v2.0.0-20190905230420-1bbf141cdd91
 	gopkg.in/yaml.v2 v2.2.8
 	layeh.com/radius v0.0.0-20200828214147-d62a6e0a1819
 )

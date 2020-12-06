@@ -18,47 +18,11 @@ package nbi
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 
 	"github.com/ca17/teamsacs/common"
-	"github.com/ca17/teamsacs/common/log"
-
-	"github.com/go-routeros/routeros"
 )
-
-// InvokeMikrotikApi
-func (h *HttpHandler) InvokeMikrotikVpeApi(c echo.Context) error {
-	vpe, err := h.GetManager().GetVpeManager().GetVpeBySn(c.QueryParam("sn"))
-	common.Must(err)
-	apiAddr, err := vpe.GetApiAddr()
-	common.Must(err)
-	user, err := vpe.GetApiUser()
-	common.Must(err)
-	pwd, err := vpe.GetApiPwd()
-	common.Must(err)
-	conn, err := routeros.Dial(apiAddr, user, pwd)
-	common.Must(err)
-	args := make([]string, 0)
-	args = append(args, c.FormValue("command"))
-	params := c.FormValue("params")
-	for _, p := range strings.Split(params, ",") {
-		if p == "" {
-			continue
-		}
-		args = append(args, "?"+p)
-	}
-	props := c.FormValue("props")
-	if props != "" {
-		args = append(args, "=.proplist="+props)
-	}
-	reply, err := conn.Run(args...)
-	common.Must(err)
-	log.Info(reply.String())
-
-	return c.JSON(http.StatusOK, h.RestResult(reply.Done))
-}
 
 // QueryMikrotikDeviceInterfaces
 func (h *HttpHandler) QueryMikrotikDeviceInterfaces(c echo.Context) error {

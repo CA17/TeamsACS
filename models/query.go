@@ -124,8 +124,12 @@ func (m *ModelManager) QueryItemOptions(params web.RequestParams, collatiion str
 	coll := m.GetTeamsAcsCollection(collatiion)
 	querymap := params.GetParamMap("querymap")
 	optionName := querymap.GetString("optionname")
+	optionId := querymap.GetString("optionid")
 	if optionName == "" {
 		return jsonoptions, fmt.Errorf("option name is empty")
+	}
+	if optionId == "" {
+		optionId = "_id"
 	}
 	var q = bson.D{}
 	for qname, val := range params.GetParamMap("filtermap") {
@@ -142,7 +146,7 @@ func (m *ModelManager) QueryItemOptions(params web.RequestParams, collatiion str
 		if err != nil {
 			log.Error(err)
 		} else {
-			optionId := elem["_id"].(string)
+			optionId := elem[optionId].(string)
 			optionValue := elem[optionName]
 			if optionValue == nil || optionValue == "" {
 				continue
