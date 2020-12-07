@@ -47,6 +47,33 @@ func (a *MikrotikApi) Connect() error {
 	return nil
 }
 
+// ExecuteCommand
+func (a *MikrotikApi) ExecuteCommand(command string, params string, props string) (*routeros.Reply, error) {
+	args := make([]string, 0)
+	args = append(args, command)
+	for _, p := range strings.Split(params, ",") {
+		if p == "" {
+			continue
+		}
+		args = append(args, p)
+	}
+	if props != "" {
+		args = append(args, "=.proplist="+props)
+	}
+	if a.Debug {
+		log.Infof("Mikrotik Command Exec: %s %s %s", command, params, props)
+	}
+	reply, err := a.Client.Run(args...)
+	if err != nil {
+		return nil, fmt.Errorf("command[%s %s %s] exec error %s", command, params, props, err.Error())
+	}
+	if a.Debug {
+		log.Infof("Mikrotik Command Exec Reply: %s", reply.String())
+	}
+	return reply, nil
+}
+
+
 
 // AddSocksUser
 func (a *MikrotikApi) AddSocksUser(name, password, rateLimit string) error {
@@ -76,28 +103,32 @@ func (a *MikrotikApi) RemoveSocksUser(name string) error {
 }
 
 
-// ExecuteCommand
-func (a *MikrotikApi) ExecuteCommand(command string, params string, props string) (*routeros.Reply, error) {
-	args := make([]string, 0)
-	args = append(args, command)
-	for _, p := range strings.Split(params, ",") {
-		if p == "" {
-			continue
-		}
-		args = append(args, p)
-	}
-	if props != "" {
-		args = append(args, "=.proplist="+props)
-	}
-	if a.Debug {
-		log.Infof("Mikrotik Command Exec: %s %s %s", command, params, props)
-	}
-	reply, err := a.Client.Run(args...)
+// AddPPPUser
+// add  ppp user with fix ip
+func (a *MikrotikApi) AddPPPUser(name, password, ip, gateway string) error {
+	_, err := a.Client.Run("/ppp/secret/add", "=name="+name, "=password="+password, "=local-address="+gateway, "=remote-address="+ip)
 	if err != nil {
-		return nil, fmt.Errorf("command[%s %s %s] exec error %s", command, params, props, err.Error())
+		return fmt.Errorf("AddPPPUser Execute Api error %s", err.Error())
+	}
+	return nil
+}
+
+// RemovePPPUser
+func (a *MikrotikApi) RemovePPPUser(name string) error {
+	reply, err := a.Client.Run("/ppp/secret/getall", "?name="+name, "=.proplist=.id")
+	if err != nil {
+		return fmt.Errorf("RemovePPPUser find error %s", err.Error())
 	}
 	if a.Debug {
-		log.Infof("Mikrotik Command Exec Reply: %s", reply.String())
+		log.Info(reply.String())
 	}
-	return reply, nil
+	for _, re := range reply.Re {
+		_, err := a.Client.Run("/ppp/secret/remove", "=.id="+re.Map[".id"])
+		if err != nil {
+			return fmt.Errorf("RemovePPPUser  error %s", err.Error())
+		}
+	}
+	return nil
 }
+
+
