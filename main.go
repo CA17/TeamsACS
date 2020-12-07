@@ -68,12 +68,12 @@ var (
 	install         = flag.Bool("install", false, "run install")
 	startFreeradius = flag.Bool("freeradius-api", true, "run freeradius api")
 	startNbi        = flag.Bool("nbi-service", true, "run northbound interface api")
-	startSbi        = flag.Bool("sbi-service", true, "run southbound interface api")
 	startRfc3164    = flag.Bool("syslog-rfc3164", false, "run rfc3164 syslog server")
 	startRfc5424    = flag.Bool("syslog-rfc5424", false, "run rfc5424 syslog server")
 	uninstall       = flag.Bool("uninstall", false, "run uninstall")
 	initcfg         = flag.Bool("initcfg", false, "write default config > /etc/teamsacs.yaml")
-	initSuper       = flag.Bool("initsuper", false, "init super password to 'Teams@Acs' ")
+	initAdmin       = flag.Bool("init-admin", false, "init admin api secret")
+	adminName       = flag.String("admin", "admin", "init admin api secret with username ")
 )
 
 // Print version information
@@ -187,7 +187,13 @@ func main() {
 
 	manager := models.NewModelManager(appconfig, *dev)
 
-	if *initSuper {
+	if *initAdmin && *adminName != ""{
+		apisecret, err := manager.GetOpsManager().InitSuper(*adminName)
+		if err != nil {
+			fmt.Fprintln(os.Stdout, err.Error())
+			os.Exit(0)
+		}
+		fmt.Fprintln(os.Stdout, *adminName + " "+ apisecret)
 		return
 	}
 

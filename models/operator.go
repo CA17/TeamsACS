@@ -27,7 +27,6 @@ import (
 	"github.com/ca17/teamsacs/constant"
 )
 
-
 // Operator
 type Operator struct {
 	ID        string `bson:"_id,omitempty" json:"id,omitempty"`
@@ -38,7 +37,6 @@ type Operator struct {
 	Status    string `bson:"status,omitempty" json:"status,omitempty"`
 	Remark    string `bson:"remark,omitempty" json:"remark,omitempty"`
 }
-
 
 func (a *Operator) AddValidate() error {
 	switch {
@@ -57,7 +55,6 @@ func (m *ModelManager) GetOpsManager() *OperatorManager {
 	store, _ := m.ManagerMap.Get("OperatorManager")
 	return store.(*OperatorManager)
 }
-
 
 // ExistOperator
 func (m *OperatorManager) ExistOperator(username string) bool {
@@ -84,15 +81,13 @@ func (m *OperatorManager) GetOperator(username string) (*Operator, error) {
 	return result, err
 }
 
-
 // UpdateApiSecret
 func (m *OperatorManager) UpdateApiSecret(username string) (string, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsOperator)
 	apisecret := common.UUID()
-	_, err := coll.UpdateOne(context.TODO(), bson.M{"username": username}, bson.M{"$set":bson.M{"api_secret":apisecret}})
+	_, err := coll.UpdateOne(context.TODO(), bson.M{"username": username}, bson.M{"$set": bson.M{"api_secret": apisecret}})
 	return apisecret, err
 }
-
 
 // UpdateOperator
 // update by username
@@ -100,10 +95,10 @@ func (m *OperatorManager) UpdateOperator(operator *Operator) error {
 	coll := m.GetTeamsAcsCollection(TeamsacsOperator)
 	query := bson.M{"username": operator.Username}
 	data := bson.M{}
-	if common.InSlice(operator.Level, []string{constant.NBIAdminLevel,constant.NBIOprLevel}) {
+	if common.InSlice(operator.Level, []string{constant.NBIAdminLevel, constant.NBIOprLevel}) {
 		data["level"] = operator.Level
 	}
-	if common.InSlice(operator.Status, []string{constant.ENABLED,constant.DISABLED}) {
+	if common.InSlice(operator.Status, []string{constant.ENABLED, constant.DISABLED}) {
 		data["status"] = operator.Status
 	}
 	data["email"] = operator.Email
@@ -122,7 +117,7 @@ func (m *OperatorManager) AddOperator(operator *Operator) (string, error) {
 	if m.ExistOperator(operator.Username) {
 		return "", fmt.Errorf("operator exists")
 	}
-	if common.IsEmptyOrNA(operator.ApiSecret){
+	if common.IsEmptyOrNA(operator.ApiSecret) {
 		operator.ApiSecret = common.UUID()
 	}
 	operator.Status = constant.ENABLED
@@ -131,6 +126,32 @@ func (m *OperatorManager) AddOperator(operator *Operator) (string, error) {
 		return "", err
 	}
 	return r.InsertedID.(string), err
+}
+
+// initSuper
+func (m *OperatorManager) InitSuper(username string) (string, error) {
+    secret := common.UUID()
+	if !m.ExistOperator(username) {
+		sopr := new(Operator)
+		sopr.Username = username
+		sopr.ApiSecret = secret
+		sopr.Level = ""
+		sopr.Status = constant.ENABLED
+		sopr.Level = constant.NBIAdminLevel
+		sopr.Email = ""
+		sopr.Remark = "init"
+		_, err := m.AddOperator(sopr)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		var err error
+		secret, err = m.UpdateApiSecret(username)
+		if err != nil {
+			return "", err
+		}
+	}
+	return secret, nil
 }
 
 // DeleteSubscribe
