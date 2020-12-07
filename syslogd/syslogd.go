@@ -18,6 +18,7 @@ package syslogd
 
 import (
 	"net"
+	"strings"
 	"time"
 
 	"github.com/influxdata/go-syslog/v3"
@@ -128,13 +129,34 @@ func (s SyslogServer) HandleText(remoteaddr net.Addr, data []byte) {
 		}
 	}()
 	var message = string(data)
-	s.Manager.GetOpsManager().AddSyslog(&models.Syslog{
+	logtext := &models.Syslog{
 		Logtype:   "text",
 		Attrs:     map[string]interface{}{
+			"Hostname": remoteaddr.String(),
 			"Message" : message,
+			"Facility": 3,
+			"FacilityMessage": "system daemons messages",
+			"Timestamp": time.Now(),
+			"Appname" : "N/A",
 		},
 		Timestamp: time.Now(),
-	})
+	}
+	switch  {
+	case  strings.Contains(message, "[DEBU]"):
+		logtext.Attrs["Severity"] = 7
+		logtext.Attrs["SeverityMessage"] = "debug-level messages"
+	case  strings.Contains(message, "[ERRO]"):
+		logtext.Attrs["Severity"] = 3
+		logtext.Attrs["SeverityMessage"] = "error conditions"
+	case  strings.Contains(message, "[WARN]"):
+		logtext.Attrs["Severity"] = 4
+		logtext.Attrs["SeverityMessage"] = "warning conditions"
+	default:
+		logtext.Attrs["Severity"] = 6
+		logtext.Attrs["SeverityMessage"] = "informational messages"
+	}
+
+	s.Manager.GetOpsManager().AddSyslog(logtext)
 }
 
 
