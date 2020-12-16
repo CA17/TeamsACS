@@ -17,6 +17,8 @@
 package common
 
 import (
+	"fmt"
+	"net/url"
 	"testing"
 )
 
@@ -72,6 +74,10 @@ func TestToSnakeCase1(t *testing.T) {
 	}
 }
 
+func TestUnicode(t *testing.T) {
+	s, _ := ToGbkHexString("好")
+	fmt.Println(url.QueryEscape(s))
+}
 
 func TestUUID(t *testing.T) {
 	t.Log(UUID())

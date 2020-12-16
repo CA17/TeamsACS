@@ -41,7 +41,6 @@ func (m *ModelManager) GetGenieacsManager() *GenieacsManager {
 	return store.(*GenieacsManager)
 }
 
-
 // query device info by cpesn
 func (m *GenieacsManager) QueryMikrotikDeviceInfo() ([]mikrotik.DeviceInfo, error) {
 	items, err := m.QueryMikrotikSourceData("")
@@ -95,6 +94,9 @@ func (m *GenieacsManager) QueryMikrotikDnsServer(sn string) (*mikrotik.DnsClient
 		}).
 		First()
 
+	if result == nil {
+		return nil, nil
+	}
 	return result.(*mikrotik.DnsClientServer), nil
 }
 
@@ -128,6 +130,9 @@ func (m *GenieacsManager) QueryMikrotikRouters(sn string) (*mikrotik.DeviceRoute
 		}).
 		First()
 
+	if result == nil {
+		return nil, nil
+	}
 	return result.(*mikrotik.DeviceRouter), nil
 }
 
@@ -161,6 +166,9 @@ func (m *GenieacsManager) QueryMikrotikEthernetInterface(sn string) (*mikrotik.E
 		}).
 		First()
 
+	if result == nil {
+		return nil, nil
+	}
 	return result.(*mikrotik.EthernetInterface), nil
 }
 
@@ -194,6 +202,9 @@ func (m *GenieacsManager) QueryMikrotikPPPInterface(sn string) (*mikrotik.PPPInt
 		}).
 		First()
 
+	if result == nil {
+		return nil, nil
+	}
 	return result.(*mikrotik.PPPInterface), nil
 }
 
@@ -230,6 +241,9 @@ func (m *GenieacsManager) QueryMikrotikIpInterface(sn string) (*mikrotik.IpInter
 		}).
 		First()
 
+	if result == nil {
+		return nil, nil
+	}
 	return result.(*mikrotik.IpInterface), nil
 }
 
@@ -304,7 +318,6 @@ var picmap = map[string]string{
 	"RB4011iGS+":        "RB4011iGS+.png",
 }
 
-
 // Sync all device info to teamsacs colls
 func (m GenieacsManager) SyncMikrotikDeviceInfo(devinfos []mikrotik.DeviceInfo) {
 	ctime := time.Now()
@@ -331,7 +344,7 @@ func (m GenieacsManager) SyncMikrotikDeviceInfo(devinfos []mikrotik.DeviceInfo) 
 			"cpuuse":        dev.CPUUsage,
 			"memuse":        dev.MemoryUsage,
 			"version":       dev.HardwareVersion,
-			"timestamp": dev.Timestamp,
+			"timestamp":     dev.Timestamp,
 			"picture":       picture,
 			"update_time":   ctime,
 			"last_inform":   ctime,
@@ -377,10 +390,9 @@ func (m GenieacsManager) SyncMikrotikDeviceInfo(devinfos []mikrotik.DeviceInfo) 
 			cpe.Set("memuse", int(dev.MemoryUsage))
 			cpe.Set("rd_ipaddr", "")
 			cpe.Set("remark", "tr069 auto join")
-			cpe.Set("status",  common.ENABLED)
-			cpe.Set("picture",  picture)
-			cpe.Set("create_time",  ctime.Format("2006-01-02 15:04:05"))
-
+			cpe.Set("status", common.ENABLED)
+			cpe.Set("picture", picture)
+			cpe.Set("create_time", ctime.Format("2006-01-02 15:04:05"))
 
 			err := m.GetCpeManager().AddCpeDataMap(cpe)
 			if err != nil {
@@ -392,4 +404,3 @@ func (m GenieacsManager) SyncMikrotikDeviceInfo(devinfos []mikrotik.DeviceInfo) 
 	}
 
 }
-

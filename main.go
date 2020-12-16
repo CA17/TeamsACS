@@ -66,6 +66,7 @@ var (
 	dev             = flag.Bool("dev", false, "run develop mode")
 	port            = flag.Int("p", 0, "web port")
 	install         = flag.Bool("install", false, "run install")
+	startRadius = flag.Bool("radiusd", false, "run radius server")
 	startFreeradius = flag.Bool("freeradius-api", true, "run freeradius api")
 	startNbi        = flag.Bool("nbi-service", true, "run northbound interface api")
 	startRfc3164    = flag.Bool("syslog-rfc3164", false, "run rfc3164 syslog server")
@@ -201,15 +202,18 @@ func main() {
 		log.Debug("Running for Dev Mode")
 	}
 
-	g.Go(func() error {
-		log.Info("Start Radius auth Server ...")
-		return radiusd.ListenRadiusAuthServer(manager)
-	})
+	if *startRadius {
+		g.Go(func() error {
+			log.Info("Start Radius auth Server ...")
+			return radiusd.ListenRadiusAuthServer(manager)
+		})
 
-	g.Go(func() error {
-		log.Info("Start Radius acct Server ...")
-		return radiusd.ListenRadiusAcctServer(manager)
-	})
+		g.Go(func() error {
+			log.Info("Start Radius acct Server ...")
+			return radiusd.ListenRadiusAcctServer(manager)
+		})
+	}
+
 
 	time.Sleep(time.Millisecond * 50)
 

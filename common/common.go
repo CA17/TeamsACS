@@ -17,6 +17,7 @@
 package common
 
 import (
+	"bytes"
 	"crypto/md5"
 	"crypto/rand"
 	sha1_ "crypto/sha1"
@@ -38,6 +39,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 
 	"github.com/bwmarrin/snowflake"
 
@@ -53,7 +56,6 @@ const (
 	ENABLED  = "enabled"
 	DISABLED = "disabled"
 )
-
 
 func init() {
 }
@@ -75,7 +77,6 @@ func MakeDir(path string) {
 	}
 }
 
-
 func FileExists(file string) bool {
 	info, err := os.Stat(file)
 	return err == nil && !info.IsDir()
@@ -94,11 +95,22 @@ func Must(err error) {
 }
 
 // panic error
+func MustStringValue(val string, err error) string {
+	if err != nil {
+		panic(err)
+	}
+	if val == "" || val == "N/A" {
+		panic(fmt.Errorf("value cannot be null or N/A"))
+	}
+	return val
+}
+
+// panic error
 func MustDebug(err error, debug bool) {
 	if err != nil {
 		if debug {
 			panic(errors.WithStack(err))
-		}else{
+		} else {
 			panic(err)
 		}
 	}
@@ -111,7 +123,6 @@ func MustCallBefore(err error, callbefore func()) {
 	}
 }
 
-
 func Must2(v interface{}, err error) interface{} {
 	Must(err)
 	return v
@@ -120,7 +131,6 @@ func Must2(v interface{}, err error) interface{} {
 func IgnoreError(v interface{}, err error) interface{} {
 	return v
 }
-
 
 func UUID() string {
 	unix32bits := uint32(time.Now().UTC().Unix())
@@ -145,7 +155,6 @@ func UUIDBase32() (string, error) {
 	return id.Base32(), nil
 }
 
-
 // Convert to Big Hump format
 func ToCamelCase(str string) string {
 	temp := strings.Split(str, "_")
@@ -163,7 +172,6 @@ func ToSnakeCase(str string) string {
 	return strings.ToLower(snake)
 }
 
-
 func Sha1Hash(src string) string {
 	h := sha1_.New()
 	h.Write([]byte(src))
@@ -177,7 +185,6 @@ func Sha256Hash(src string) string {
 	bs := h.Sum(nil)
 	return fmt.Sprintf("%x", bs)
 }
-
 
 func Sha256HashWithSalt(src string, salt string) string {
 	h := sha256_.New()
@@ -319,7 +326,6 @@ func parseWithLocation(name string, timeStr string) (time.Time, error) {
 	}
 }
 
-
 var mobileRe, _ = regexp.Compile("(?i:Mobile|iPod|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP)")
 
 func MobileAgent(userAgent string) string {
@@ -383,7 +389,6 @@ func UrlJoin(hurl string, elm ...string) string {
 	return u.String()
 }
 
-
 func UrlJoin2(hurl string, elm ...string) string {
 	u, err := url.Parse(hurl)
 	Must(err)
@@ -396,18 +401,16 @@ func UrlJoin2(hurl string, elm ...string) string {
 	return sb.String()
 }
 
-
-
 var notfloat = errors.New("not float value")
 
-func ParseFloat64(v interface{}) (float64,error) {
+func ParseFloat64(v interface{}) (float64, error) {
 	switch v.(type) {
 	case float64:
-		return v.(float64),nil
+		return v.(float64), nil
 	case int64:
-		return float64(v.(int64)),nil
+		return float64(v.(int64)), nil
 	case int:
-		return float64(v.(int)),nil
+		return float64(v.(int)), nil
 	case string:
 		fv, err := strconv.ParseFloat(v.(string), 64)
 		if err != nil {
@@ -420,16 +423,16 @@ func ParseFloat64(v interface{}) (float64,error) {
 
 var notint = errors.New("not int value")
 
-func ParseInt64(v interface{}) (int64,error) {
+func ParseInt64(v interface{}) (int64, error) {
 	switch v.(type) {
 	case float64:
-		return int64(v.(float64)),nil
+		return int64(v.(float64)), nil
 	case int64:
 		return v.(int64), nil
 	case int:
-		return int64(v.(int)),nil
+		return int64(v.(int)), nil
 	case string:
-		ival, err := strconv.ParseInt(v.(string), 10,64)
+		ival, err := strconv.ParseInt(v.(string), 10, 64)
 		if err != nil {
 			return 0, err
 		}
@@ -438,14 +441,14 @@ func ParseInt64(v interface{}) (int64,error) {
 	return 0, notint
 }
 
-func ParseString(v interface{}) (string,error) {
+func ParseString(v interface{}) (string, error) {
 	switch v.(type) {
 	case float64:
-		return strconv.FormatFloat(v.(float64), 'f', 2, 64),nil
+		return strconv.FormatFloat(v.(float64), 'f', 2, 64), nil
 	case int64:
 		return strconv.FormatInt(v.(int64), 10), nil
 	case int:
-		return strconv.Itoa(v.(int)),nil
+		return strconv.Itoa(v.(int)), nil
 	case string:
 		return v.(string), nil
 	case nil:
@@ -455,4 +458,18 @@ func ParseString(v interface{}) (string,error) {
 	default:
 		return fmt.Sprintf("%v", v), nil
 	}
+}
+
+func ToGbkHexString(src string) (string, error){
+	var buf strings.Builder
+	reader := transform.NewReader(bytes.NewReader([]byte(src)), simplifiedchinese.GBK.NewEncoder())
+	data, e := ioutil.ReadAll(reader)
+	if e != nil {
+		return "", e
+	}
+	for _, b := range data {
+		buf.WriteByte('\\')
+		buf.WriteString(strings.ToUpper(hex.EncodeToString([]byte{b})))
+	}
+	return buf.String(), nil
 }

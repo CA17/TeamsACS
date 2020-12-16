@@ -105,8 +105,8 @@ func (a *MikrotikApi) RemoveSocksUser(name string) error {
 
 // AddPPPUser
 // add  ppp user with fix ip
-func (a *MikrotikApi) AddPPPUser(name, password, ip, gateway string) error {
-	_, err := a.Client.Run("/ppp/secret/add", "=name="+name, "=password="+password, "=local-address="+gateway, "=remote-address="+ip)
+func (a *MikrotikApi) AddPPPUser(name, password, ip, gateway, remark string) error {
+	_, err := a.Client.Run("/ppp/secret/add", "=name="+name, "=password="+password, "=local-address="+gateway, "=comment="+remark, "=remote-address="+ip)
 	if err != nil {
 		return fmt.Errorf("AddPPPUser Execute Api error %s", err.Error())
 	}

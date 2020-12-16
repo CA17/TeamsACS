@@ -19,11 +19,14 @@ package nbi
 import (
 	"fmt"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/aes"
+	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/common/maputils"
 	"github.com/ca17/teamsacs/common/validutil"
 	"github.com/ca17/teamsacs/common/web"
@@ -33,46 +36,76 @@ import (
 // SyncUser
 // sync socks account
 func (h *HttpHandler) SyncManageUser(c echo.Context) error {
+	var errorResult = func(err error) error {
+		return c.JSON(200, h.RestError(err.Error()))
+	}
+	log.Info("SyncManageUser Start")
 	frm := web.NewWebForm(c)
 	vpeSn, err := frm.GetMustVal("vpe_sn")
-	common.Must(err)
+	if err != nil {
+		return errorResult(err)
+	}
 	cpeSn, err := frm.GetMustVal("cpe_sn")
-	common.Must(err)
+	if err != nil {
+		return errorResult(err)
+	}
 	vpe, err := h.GetManager().GetVpeManager().GetVpeBySn(vpeSn)
-	common.Must(err)
+	if err != nil {
+		return errorResult(err)
+	}
 	cpe, err := h.GetManager().GetCpeManager().GetCpeBySn(cpeSn)
+	log.Info("SyncManageUser Start -> parse params")
 	// api params
-	apiAddr := common.Must2(vpe.GetApiAddr()).(string)
-	apiUser := common.Must2(vpe.GetApiUser()).(string)
-	pwdencrypt := common.Must2(vpe.GetApiPwd()).(string)
+	apiAddr,err := vpe.GetApiAddr()
+	if err != nil {
+		return errorResult(err)
+	}
+	apiUser,err := vpe.GetApiUser()
+	if err != nil {
+		return errorResult(err)
+	}
+	pwdencrypt,err := vpe.GetApiPwd()
+	if err != nil {
+		return errorResult(err)
+	}
 	apiPwd, err := aes.DecryptFromB64(pwdencrypt, h.GetManager().Config.System.Aeskey)
 	if err != nil {
-		return c.JSON(200, h.RestError(fmt.Sprintf("Api Password Decrypt error %s", err.Error())))
+		return errorResult(fmt.Errorf("api Password Decrypt error %s", err.Error()))
 	}
-
+	log.Info("SyncManageUser -> connect to vpe")
 	// connect to cpe
 	api := mikrotik_api.NewMikrotikApi(apiUser, apiPwd, apiAddr, false)
 	err = api.Connect()
 	if err != nil {
-		return c.JSON(200, h.RestError(fmt.Sprintf("Connect Vpe error %s", err.Error())))
+		return errorResult(fmt.Errorf("connect Vpe error %s", err.Error()))
 	}
 	defer api.Client.Close()
 
 	rdIpaddr, err := maputils.GetStringValueWithErr(*cpe, "rd_ipaddr")
-	common.Must(err)
-	if !validutil.IsIP(rdIpaddr) {
-		return h.GetInternalError("cpe ip format error")
+	if err != nil {
+		return errorResult(err)
 	}
-	rdGateway, err := maputils.GetStringValueWithErr(*cpe, "rd_gateway")
-	common.Must(err)
-	if !validutil.IsIP(rdGateway) {
-		return h.GetInternalError("cpe gateway ip format error")
+	if !validutil.IsIP(rdIpaddr) {
+		return errorResult(fmt.Errorf("cpe ip format error"))
 	}
 
-	_ = api.RemovePPPUser(cpeSn)
-	err = api.AddPPPUser(cpeSn, cpeSn, rdIpaddr, rdGateway)
+	rdGateway, err := maputils.GetStringValueWithErr(*cpe, "rd_gateway")
 	if err != nil {
-		return c.JSON(200, h.RestError(fmt.Sprintf("VPE SyncManageUser Execute Api error %s", err.Error())))
+		return errorResult(err)
+	}
+	if !validutil.IsIP(rdGateway) {
+		return errorResult(fmt.Errorf("cpe gateway ip format error"))
+	}
+
+	remark, _ := maputils.GetStringValueWithErr(*cpe, "remark")
+	remark = fmt.Sprintf("%s updated:%s", remark, time.Now().String())
+
+	log.Info("SyncManageUser -> exec api")
+	_ = api.RemovePPPUser(cpeSn)
+	hexremark, _ := common.ToGbkHexString(remark)
+	err = api.AddPPPUser(cpeSn, cpeSn, rdIpaddr, rdGateway, strings.ReplaceAll(hexremark, "\\", "%"))
+	if err != nil {
+		return errorResult(fmt.Errorf("VPE SyncManageUser Execute Api error %s", err.Error()))
 	}
 
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))

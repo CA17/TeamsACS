@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/360EntSecGroup-Skylar/excelize v1.4.1
+	github.com/Azure/azure-storage-blob-go v0.12.0
 	github.com/ahmetb/go-linq v3.0.0+incompatible
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -19,6 +20,7 @@ require (
 	go.elastic.co/apm/module/apmechov4 v1.8.0
 	go.mongodb.org/mongo-driver v1.4.2
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
+	golang.org/x/text v0.3.3
 	google.golang.org/grpc v1.33.0
 	google.golang.org/protobuf v1.23.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
