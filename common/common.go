@@ -87,6 +87,19 @@ func DirExists(file string) bool {
 	return err == nil && info.IsDir()
 }
 
+// create a file to test the upload and download.
+func CreateTmpFile(data []byte) (*os.File, error) {
+	tmpFile, err := ioutil.TempFile(os.TempDir(), "teamsacs-")
+	if err != nil {
+		return nil, fmt.Errorf("cannot create temporary file, %s", err.Error())
+	}
+	_, err = tmpFile.Write(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to write to temporary file, %s", err.Error())
+	}
+	return tmpFile, nil
+}
+
 // panic error
 func Must(err error) {
 	if err != nil {
@@ -460,7 +473,7 @@ func ParseString(v interface{}) (string, error) {
 	}
 }
 
-func ToGbkHexString(src string) (string, error){
+func ToGbkHexString(src string) (string, error) {
 	var buf strings.Builder
 	reader := transform.NewReader(bytes.NewReader([]byte(src)), simplifiedchinese.GBK.NewEncoder())
 	data, e := ioutil.ReadAll(reader)
@@ -472,4 +485,32 @@ func ToGbkHexString(src string) (string, error){
 		buf.WriteString(strings.ToUpper(hex.EncodeToString([]byte{b})))
 	}
 	return buf.String(), nil
+}
+
+func GetPointString(s *string) string {
+	if s != nil {
+		return *s
+	}
+	return ""
+}
+
+func GetPointInt64(s *int64) int64 {
+	if s != nil {
+		return *s
+	}
+	return 0
+}
+
+func GetPointBool(s *bool) bool {
+	if s != nil {
+		return *s
+	}
+	return false
+}
+
+func GetPointTime(s *time.Time) time.Time {
+	if s != nil {
+		return *s
+	}
+	return time.Time{}
 }
