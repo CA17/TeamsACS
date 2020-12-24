@@ -1,0 +1,15 @@
+POST http://{{nbi_url}}/nbi/cpe/backup/upload/23234245
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryZH2mtPGZmAnlSg1F
+
+------WebKitFormBoundaryZH2mtPGZmAnlSg1F
+Content-Disposition: form-data; name="upload"; filename="WechatIMG1890.jpeg"
+Content-Type: image/jpeg
+
+
+------WebKitFormBoundaryZH2mtPGZmAnlSg1F
+Content-Disposition: form-data; name="upload_fullpath"
+
+WechatIMG1890.jpeg
+------WebKitFormBoundaryZH2mtPGZmAnlSg1F--
+
+###

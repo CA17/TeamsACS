@@ -27,6 +27,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/ca17/teamsacs/common"
+	"github.com/ca17/teamsacs/common/azureblob"
 	"github.com/ca17/teamsacs/common/gmail"
 	"github.com/ca17/teamsacs/common/mongodb"
 	"github.com/ca17/teamsacs/common/tpl"
@@ -68,6 +69,7 @@ type NameValue struct {
 type ModelManager struct {
 	Config       *config.AppConfig
 	Mongo        *mongo.Client
+	AzureBlobC *azureblob.AzureBlob
 	Sched        *gocron.Scheduler
 	TplRender    *tpl.CommonTemplate
 	Location     *time.Location
@@ -85,6 +87,7 @@ func NewModelManager(appconfig *config.AppConfig, dev bool) *ModelManager {
 	m.Mongo = _mongodb
 	loc, err := time.LoadLocation(appconfig.System.Location)
 	common.Must(err)
+	m.AzureBlobC = azureblob.NewAzureBlob(appconfig.AzureStorage.AccountName, appconfig.AzureStorage.AccountKey)
 	m.Location = loc
 	m.registerManagers()
 	m.TplRender = tpl.NewCommonTemplate([]string{"/resources/templates"}, m.Dev, m.GetTemplateFuncMap())

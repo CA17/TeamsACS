@@ -33,6 +33,11 @@ type MongodbConfig struct {
 	Passwd string `yaml:"passwd" json:"passwd"`
 }
 
+type AzureStorageConfig struct {
+	AccountName    string `yaml:"account_name"`
+	AccountKey   string `yaml:"account_key"`
+}
+
 type SysConfig struct {
 	Appid      string `yaml:"appid" json:"appid"`
 	Workdir    string `yaml:"workdir" json:"workdir"`
@@ -91,6 +96,7 @@ type AppConfig struct {
 	Grpc       GrpcConfig       `yaml:"grpc" json:"grpc"`
 	Radiusd    RadiusdConfig    `yaml:"radiusd" json:"radiusd"`
 	Syslogd    SyslogdConfig    `yaml:"syslogd" json:"syslogd"`
+	AzureStorage  AzureStorageConfig `yaml:"azure_storage"`
 }
 
 func (c *AppConfig) GetLogDir() string {
@@ -174,6 +180,10 @@ var DefaultAppConfig = &AppConfig{
 		User:   "",
 		Passwd: "",
 	},
+	AzureStorage: AzureStorageConfig{
+		AccountName: "",
+		AccountKey:  "",
+	},
 }
 
 func setEnvValue(name string, f func(v string)) {
@@ -206,6 +216,8 @@ func LoadConfig(cfile string) *AppConfig {
 	setEnvValue("TEAMSACS_WORKER_DIR", func(v string) {
 		cfg.System.Workdir = v
 	})
+
+	// Acs Config
 	setEnvValue("TEAMSACS_NBI_HOST", func(v string) {
 		cfg.NBI.Host = v
 	})
@@ -219,12 +231,15 @@ func LoadConfig(cfile string) *AppConfig {
 		cfg.NBI.Port = int(v)
 	})
 
-	setEnvValue("TEAMSACS_FREERADIUS_WEB_HOST", func(v string) {
-		cfg.Freeradius.Host = v
-	})
-
+	// GenieAcs Config
 	setEnvValue("TEAMSACS_GENIEACS_NBIURL", func(v string) {
 		cfg.Genieacs.NbiUrl = v
+	})
+
+
+	// FreeRADIUS Config
+	setEnvValue("TEAMSACS_FREERADIUS_WEB_HOST", func(v string) {
+		cfg.Freeradius.Host = v
 	})
 
 	setEnvValue("TEAMSACS_FREERADIUS_WEB_DEBUG", func(v string) {
@@ -234,6 +249,7 @@ func LoadConfig(cfile string) *AppConfig {
 		cfg.Freeradius.Port = int(v)
 	})
 
+	// Mongodb Config
 	setEnvValue("TEAMSACS_MONGODB_URL", func(v string) {
 		cfg.Mongodb.Url = v
 	})
@@ -244,6 +260,7 @@ func LoadConfig(cfile string) *AppConfig {
 		cfg.Mongodb.Passwd = v
 	})
 
+	// Grpc Config
 	setEnvValue("TEAMSACS_GRPC_HOST", func(v string) {
 		cfg.Grpc.Host = v
 	})
@@ -255,6 +272,7 @@ func LoadConfig(cfile string) *AppConfig {
 		cfg.Grpc.Debug = v == "true"
 	})
 
+	// Radius config
 	setEnvInt64Value("TEAMSACS_RADIUS_AUTH_PORT", func(v int64) {
 		cfg.Radiusd.AuthPort = int(v)
 	})
@@ -265,6 +283,14 @@ func LoadConfig(cfile string) *AppConfig {
 
 	setEnvValue("TEAMSACS_RADIUS_DEBUG", func(v string) {
 		cfg.Radiusd.Debug = v == "true"
+	})
+
+	// AzureStorage Config
+	setEnvValue("TEAMSACS_AZURE_STORAGE_ACCOUNT", func(v string) {
+		cfg.AzureStorage.AccountName = v
+	})
+	setEnvValue("TEAMSACS_AZURE_STORAGE_ACCESS_KEY", func(v string) {
+		cfg.AzureStorage.AccountKey = v
 	})
 
 	return cfg

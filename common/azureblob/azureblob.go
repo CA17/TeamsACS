@@ -66,23 +66,29 @@ func filterErrors(err error) error {
 
 // UploadFile
 // upload file to azure blob
-func (a *AzureBlob) UploadFile(containerName, target, filepath string) (azblob.CommonResponse, error) {
+func (a *AzureBlob) UploadFile(containerName, targetFilepath, filepath string) (azblob.CommonResponse, error) {
+	if !common.FileExists(filepath) {
+		return nil, fmt.Errorf("file %s not exists", filepath)
+	}
+	file, err := os.Open(filepath)
+	err = filterErrors(err)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	return a.UploadFileObject(containerName, targetFilepath, file)
+}
+
+// UploadFileObject
+// upload file to azure blob
+func (a *AzureBlob) UploadFileObject(containerName, targetFilepath string, file *os.File) (azblob.CommonResponse, error) {
 	ctx := context.Background()
 	containerURL, err := a.GetContainerURL(ctx, containerName)
 	if err != nil {
 		return nil, err
 	}
 
-	if !common.FileExists(filepath) {
-		return nil, fmt.Errorf("file %s not exists", filepath)
-	}
-
-	blobURL := containerURL.NewBlockBlobURL(path.Join(target, path.Base(filepath)))
-	file, err := os.Open(filepath)
-	err = filterErrors(err)
-	if err != nil {
-		return nil, err
-	}
+	blobURL := containerURL.NewBlockBlobURL(path.Base(targetFilepath))
 	// You can use the low-level PutBlob API to upload files. Low-level APIs are simple wrappers for the Azure Storage REST APIs.
 	// Note that PutBlob can upload up to 256MB data in one shot. Details: https://docs.microsoft.com/en-us/rest/api/storageservices/put-blob
 	// Following is commented out intentionally because we will instead use UploadFileToBlockBlob API to upload the blob
@@ -91,7 +97,7 @@ func (a *AzureBlob) UploadFile(containerName, target, filepath string) (azblob.C
 
 	// The high-level API UploadFileToBlockBlob function uploads blocks in parallel for optimal performance, and can handle large files as well.
 	// This function calls PutBlock/PutBlockList for files larger 256 MBs, and calls PutBlob for any file smaller
-	log.Infof("Uploading the file with blob name: %s\n", path.Base(filepath))
+	log.Infof("Uploading the file with blob name: %s\n", path.Base(targetFilepath))
 	opt := azblob.UploadToBlockBlobOptions{BlockSize: 4 * 1024 * 1024, Parallelism: 16}
 	r, err := azblob.UploadFileToBlockBlob(ctx, file, blobURL, opt)
 	err = filterErrors(err)
@@ -100,6 +106,9 @@ func (a *AzureBlob) UploadFile(containerName, target, filepath string) (azblob.C
 	}
 	return r, nil
 }
+
+
+
 
 type FileItem struct {
 	Container        string

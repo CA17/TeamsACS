@@ -63,6 +63,7 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	e.Any("/nbi/cpe/policy/mikrotik/runapi", h.RunMikrotikCpeApiPolicy)
 	e.Any("/nbi/cpe/policy/runtr069", h.RunCpeTr069Policy)
 	e.Any("/nbi/cpe/policy/mikrotik/runscript", h.RunMikrotikCpeScriptPolicy)
+	e.POST("/nbi/cpe/backup/upload/:sn", h.UploadCpeBackup)
 
 	e.Any("/nbi/vpe/add", h.AddVpeData)
 	e.Any("/nbi/vpe/update", h.UpdateVpeData)

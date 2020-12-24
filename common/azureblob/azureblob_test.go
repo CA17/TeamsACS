@@ -30,7 +30,7 @@ func TestAzureBlob_UploadFile(t *testing.T) {
 
 func TestAzureBlob_UploadFile2(t *testing.T) {
 	ab := NewAzureBlob(os.Getenv("TEAMSACS_AZURE_STORAGE_ACCOUNT"), os.Getenv("TEAMSACS_AZURE_STORAGE_ACCESS_KEY"))
-	r, err := ab.UploadFile("test", "20201101","/Users/wangjuntao/github/goproject/src/TeamsACS/common/azureblob/azureblob.go")
+	r, err := ab.UploadFile("test", "20201101/test.go","/Users/wangjuntao/github/goproject/src/TeamsACS/common/azureblob/azureblob.go")
 	t.Log(r.Response())
 	t.Log(err)
 }

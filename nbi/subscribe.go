@@ -36,6 +36,13 @@ func (h *HttpHandler) QuerySubscribes(c echo.Context) error {
 		trmap["end"] = "expire_time"
 		trmap["end_value"] = time.Now().Add(time.Hour * 24 * time.Duration(expireDays)).Format("2006-01-02 15:04:05")
 	}
+
+	keyword :=  params.GetQueryMap().GetString("keyword")
+	if keyword != "" {
+		filtermap := params.GetFilterMap()
+		filtermap["filter[remark]"] = keyword
+	}
+
 	data, err := h.GetManager().GetSubscribeManager().QuerySubscribes(params)
 	common.Must(err)
 	return c.JSON(http.StatusOK, data)
