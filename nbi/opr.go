@@ -23,13 +23,12 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/ca17/teamsacs/common"
-	"github.com/ca17/teamsacs/constant"
 	"github.com/ca17/teamsacs/models"
 )
 
 // QueryOperator
 func (h *HttpHandler) QueryOperator(c echo.Context) error {
-	if h.GetUserLevel(c) != constant.NBIAdminLevel {
+	if !h.IsManager(c) {
 		return c.NoContent(http.StatusForbidden)
 	}
 	params := h.RequestParse(c)
@@ -42,7 +41,7 @@ func (h *HttpHandler) QueryOperator(c echo.Context) error {
 
 // AddOperator
 func (h *HttpHandler) AddOperator(c echo.Context) error {
-	if h.GetUserLevel(c) != constant.NBIAdminLevel && !strings.HasPrefix(c.Request().RemoteAddr, "127.0.0.1")  {
+	if !h.IsManager(c) && !strings.HasPrefix(c.Request().RemoteAddr, "127.0.0.1")  {
 		return c.NoContent(http.StatusForbidden)
 	}
 	item := new(models.Operator)
@@ -57,7 +56,7 @@ func (h *HttpHandler) AddOperator(c echo.Context) error {
 
 // UpdateOperator
 func (h *HttpHandler) UpdateOperator(c echo.Context) error {
-	if h.GetUserLevel(c) != constant.NBIAdminLevel {
+	if !h.IsManager(c)  {
 		return c.NoContent(http.StatusForbidden)
 	}
 	item := new(models.Operator)
@@ -69,11 +68,11 @@ func (h *HttpHandler) UpdateOperator(c echo.Context) error {
 
 // DeleteOperator
 func (h *HttpHandler) DeleteOperator(c echo.Context) error {
-	if h.GetUserLevel(c) != constant.NBIAdminLevel {
+	if !h.IsManager(c) {
 		return c.NoContent(http.StatusForbidden)
 	}
 	params := h.RequestParse(c)
-	username := params.GetMustString("username")
+	username := params.GetFilterMap().GetMustString("username")
 	common.Must(h.GetManager().GetOpsManager().DeleteOperator(username))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }

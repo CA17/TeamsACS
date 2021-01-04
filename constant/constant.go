@@ -22,6 +22,7 @@ const (
 	DISABLED = "disabled"
 
 	NBIAdminLevel = "admin"
+	NBISuperLevel = "super"
 	NBIOprLevel = "opr"
 )
 

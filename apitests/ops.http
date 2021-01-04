@@ -3,7 +3,7 @@ Content-Type: application/json
 authorization: Bearer {{nbi_token}}
 
 {
-  "id": "5f9ec620-bad9-51d7-a062-e6ac-00f0fa6s",
+  "id": "5f9ec620-bad9-51d7-a062-e6ac-00f0fa61",
   "email": "test@teamsacs.com",
   "username": "opr",
   "level": "opr",
@@ -23,8 +23,7 @@ authorization: Bearer {{nbi_token}}
 
 ###
 
-POST http://{{nbi_url}}/nbi/opr/query
-Content-Type: application/json
+GET http://{{nbi_url}}/nbi/opr/query?filter[username]=opr
 authorization: Bearer {{nbi_token}}
 
 {}
@@ -38,7 +37,7 @@ authorization: Bearer {{nbi_token}}
 ###
 
 
-GET http://{{nbi_url}}/nbi/opr/delete?username=opr
+GET http://{{nbi_url}}/nbi/opr/delete?filter[username]=opr
 authorization: Bearer {{nbi_token}}
 
 ###

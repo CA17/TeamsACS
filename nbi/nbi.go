@@ -31,6 +31,7 @@ import (
 	"github.com/ca17/teamsacs/common/web"
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/ca17/teamsacs/config"
+	"github.com/ca17/teamsacs/constant"
 	"github.com/ca17/teamsacs/models"
 )
 
@@ -139,6 +140,13 @@ func (h *HttpHandler) GetUserLevel(c echo.Context) string {
 	jd := h.GetJwtData(c)
 	level, _ := jd["lvl"]
 	return level.(string)
+}
+
+// Get current api user level
+func (h *HttpHandler) IsManager(c echo.Context) bool {
+	jd := h.GetJwtData(c)
+	level, _ := jd["lvl"].(string)
+	return level == constant.NBISuperLevel || level == constant.NBIAdminLevel
 }
 
 // Get current api user id

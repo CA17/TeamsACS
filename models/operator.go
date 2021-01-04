@@ -64,8 +64,8 @@ func (m *OperatorManager) ExistOperator(username string) bool {
 }
 
 // QueryOperators
-func (m *OperatorManager) QueryOperators(params web.RequestParams) (*web.PageResult, error) {
-	return m.QueryPagerItems(params, TeamsacsOperator)
+func (m *OperatorManager) QueryOperators(params web.RequestParams) (*web.QueryResult, error) {
+	return m.QueryItems(params, TeamsacsOperator)
 }
 
 // GetOperator
