@@ -18,6 +18,9 @@ package models
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -30,26 +33,27 @@ import (
 	"github.com/ca17/teamsacs/common/azureblob"
 	"github.com/ca17/teamsacs/common/gmail"
 	"github.com/ca17/teamsacs/common/mongodb"
+	"github.com/ca17/teamsacs/common/elk"
 	"github.com/ca17/teamsacs/common/tpl"
 	"github.com/ca17/teamsacs/config"
 )
 
 const (
-	MDBTeamsacs        = "teamsacs"
-	MDBGenieacs        = "genieacs"
-	TeamsacsConfig     = "config"
-	TeamsacsOperator   = "operator"
-	TeamsacsSubscribe  = "subscribe"
-	TeamsacsVpe        = "vpe"
-	TeamsacsCpe        = "cpe"
-	TeamsacsOnline     = "online"
-	TeamsacsAccounting = "accounting"
-	TeamsacsAuthlog    = "authlog"
-	TeamsacsSyslog     = "syslog"
-	TeamsacsPolicyVariable     = "policy_variable"
-	TeamsacsMikrotikApiPolicy     = "mikrotik_api_policy"
-	TeamsacsMikrotikScriptPolicy     = "mikrotik_script_policy"
-	TeamsacsTr069Policy     = "tr069_policy"
+	MDBTeamsacs                  = "teamsacs"
+	MDBGenieacs                  = "genieacs"
+	TeamsacsConfig               = "config"
+	TeamsacsOperator             = "operator"
+	TeamsacsSubscribe            = "subscribe"
+	TeamsacsVpe                  = "vpe"
+	TeamsacsCpe                  = "cpe"
+	TeamsacsOnline               = "online"
+	TeamsacsAccounting           = "accounting"
+	TeamsacsAuthlog              = "authlog"
+	TeamsacsSyslog               = "syslog"
+	TeamsacsPolicyVariable       = "policy_variable"
+	TeamsacsMikrotikApiPolicy    = "mikrotik_api_policy"
+	TeamsacsMikrotikScriptPolicy = "mikrotik_script_policy"
+	TeamsacsTr069Policy          = "tr069_policy"
 
 	GenieacsDevices = "devices"
 	GenieacsFaults  = "faults"
@@ -57,19 +61,18 @@ const (
 	GenieacsPresets = "presets"
 )
 
-
-
 type Attributes = map[string]interface{}
 
 type NameValue struct {
-	Name string `json:"name"`
+	Name  string      `json:"name"`
 	Value interface{} `json:"value"`
 }
 
 type ModelManager struct {
 	Config       *config.AppConfig
 	Mongo        *mongo.Client
-	AzureBlobC *azureblob.AzureBlob
+	Elastic      *Elastic
+	AzureBlobC   *azureblob.AzureBlob
 	Sched        *gocron.Scheduler
 	TplRender    *tpl.CommonTemplate
 	Location     *time.Location
@@ -92,6 +95,7 @@ func NewModelManager(appconfig *config.AppConfig, dev bool) *ModelManager {
 	m.registerManagers()
 	m.TplRender = tpl.NewCommonTemplate([]string{"/resources/templates"}, m.Dev, m.GetTemplateFuncMap())
 	m.SetupSyslogDB()
+	m.SetupElastic()
 	go m.StartScheduler()
 	return m
 }
@@ -101,10 +105,19 @@ func (m *ModelManager) SetupSyslogDB() {
 	var size = int64(1024 * 1024 * 512)
 	var max = int64(m.Config.Syslogd.MaxRecodes)
 	_ = m.Mongo.Database(MDBTeamsacs).CreateCollection(context.TODO(), TeamsacsSyslog, &options.CreateCollectionOptions{
-		Capped:              &Capped,
-		MaxDocuments:        &max,
-		SizeInBytes:         &size,
+		Capped:       &Capped,
+		MaxDocuments: &max,
+		SizeInBytes:  &size,
 	})
+}
+
+func (m *ModelManager) SetupElastic() {
+	urls := strings.Split(m.Config.Elastic.Urls, ",")
+	_elastic, err := elk.NewSimpleElasticClient(m.Config.Elastic.User, m.Config.Elastic.Pwd, urls...)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "SetupElastic error, "+err.Error())
+	}
+	m.Elastic = NewElastic(_elastic)
 }
 
 func (m *ModelManager) registerManagers() {

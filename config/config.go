@@ -34,8 +34,8 @@ type MongodbConfig struct {
 }
 
 type AzureStorageConfig struct {
-	AccountName    string `yaml:"account_name"`
-	AccountKey   string `yaml:"account_key"`
+	AccountName string `yaml:"account_name"`
+	AccountKey  string `yaml:"account_key"`
 }
 
 type SysConfig struct {
@@ -52,6 +52,13 @@ type NBIConfig struct {
 	Port      int    `yaml:"port" json:"port"`
 	Debug     bool   `yaml:"debug" json:"debug"`
 	JwtSecret string `yaml:"jwt_secret" json:"jwt_secret"`
+}
+
+type ElasticConfig struct {
+	Urls  string `yaml:"urls" json:"urls"`
+	User  string `yaml:"user" json:"user"`
+	Pwd   string `yaml:"pwd" json:"pwd"`
+	Debug bool   `yaml:"debug" json:"debug"`
 }
 
 type FreeradiusConfig struct {
@@ -88,15 +95,16 @@ type SyslogdConfig struct {
 }
 
 type AppConfig struct {
-	System     SysConfig        `yaml:"system" json:"system"`
-	NBI        NBIConfig        `yaml:"nbi" json:"nbi"`
-	Freeradius FreeradiusConfig `yaml:"freeradius" json:"freeradius"`
-	Genieacs   GenieacsConfig   `yaml:"genieacs" json:"genieacs"`
-	Mongodb    MongodbConfig    `yaml:"mongodb" json:"mongodb"`
-	Grpc       GrpcConfig       `yaml:"grpc" json:"grpc"`
-	Radiusd    RadiusdConfig    `yaml:"radiusd" json:"radiusd"`
-	Syslogd    SyslogdConfig    `yaml:"syslogd" json:"syslogd"`
-	AzureStorage  AzureStorageConfig `yaml:"azure_storage"`
+	System       SysConfig          `yaml:"system" json:"system"`
+	NBI          NBIConfig          `yaml:"nbi" json:"nbi"`
+	Freeradius   FreeradiusConfig   `yaml:"freeradius" json:"freeradius"`
+	Genieacs     GenieacsConfig     `yaml:"genieacs" json:"genieacs"`
+	Mongodb      MongodbConfig      `yaml:"mongodb" json:"mongodb"`
+	Grpc         GrpcConfig         `yaml:"grpc" json:"grpc"`
+	Radiusd      RadiusdConfig      `yaml:"radiusd" json:"radiusd"`
+	Elastic      ElasticConfig      `yaml:"elastic" json:"elastic"`
+	Syslogd      SyslogdConfig      `yaml:"syslogd" json:"syslogd"`
+	AzureStorage AzureStorageConfig `yaml:"azure_storage"`
 }
 
 func (c *AppConfig) GetLogDir() string {
@@ -152,7 +160,7 @@ var DefaultAppConfig = &AppConfig{
 		Port:  1980,
 		Debug: true,
 	},
-	Genieacs : GenieacsConfig{
+	Genieacs: GenieacsConfig{
 		NbiUrl: "http://127.0.0.1:7557",
 		Debug:  true,
 	},
@@ -166,6 +174,12 @@ var DefaultAppConfig = &AppConfig{
 		AuthPort: 1812,
 		AcctPort: 1813,
 		Debug:    true,
+	},
+	Elastic: ElasticConfig{
+		Urls:  "http://172.26.1.163:9200",
+		User:  "",
+		Pwd:   "",
+		Debug: true,
 	},
 	Syslogd: SyslogdConfig{
 		Host:        "0.0.0.0",
@@ -236,7 +250,6 @@ func LoadConfig(cfile string) *AppConfig {
 		cfg.Genieacs.NbiUrl = v
 	})
 
-
 	// FreeRADIUS Config
 	setEnvValue("TEAMSACS_FREERADIUS_WEB_HOST", func(v string) {
 		cfg.Freeradius.Host = v
@@ -283,6 +296,21 @@ func LoadConfig(cfile string) *AppConfig {
 
 	setEnvValue("TEAMSACS_RADIUS_DEBUG", func(v string) {
 		cfg.Radiusd.Debug = v == "true"
+	})
+
+	// Elastic config
+	setEnvValue("TEAMSACS_ELASTIC_URLS", func(v string) {
+		cfg.Elastic.Urls = v
+	})
+	setEnvValue("TEAMSACS_ELASTIC_USER", func(v string) {
+		cfg.Elastic.User = v
+	})
+	setEnvValue("TEAMSACS_ELASTIC_PWD", func(v string) {
+		cfg.Elastic.Pwd = v
+	})
+
+	setEnvValue("TEAMSACS_ELASTIC_DEBUG", func(v string) {
+		cfg.Elastic.Debug = v == "true"
 	})
 
 	// AzureStorage Config

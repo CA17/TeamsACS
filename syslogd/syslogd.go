@@ -25,6 +25,7 @@ import (
 	"github.com/influxdata/go-syslog/v3/rfc3164"
 	"github.com/influxdata/go-syslog/v3/rfc5424"
 
+	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/models"
 )
@@ -58,24 +59,28 @@ func (s SyslogServer) HandleRfc3164(remoteaddr net.Addr, data []byte) {
 	}()
 	message, err := s.Rfc3164Parser.Parse(data)
 	if err != nil {
-		log.Error(err)
-		return
+		common.Must(err)
 	}
 
 	slog := *message.(*rfc3164.SyslogMessage)
+	attrs := map[string]interface{}{
+		"Message":         *slog.Message,
+		"Facility":        *slog.Facility,
+		"FacilityMessage": *slog.FacilityMessage(),
+		"Severity":        *slog.Severity,
+		"SeverityMessage": *slog.SeverityMessage(),
+		"Priority":        *slog.Priority,
+		"Timestamp":       *slog.Timestamp,
+		"Hostname":        *slog.Hostname,
+		"Appname":         "N/A",
+	}
+	if slog.Appname != nil {
+		attrs["Appname"]=  *slog.Appname
+	}
+
 	s.Manager.GetOpsManager().AddSyslog(&models.Syslog{
 		Logtype:   "rfc3164",
-		Attrs:     map[string]interface{}{
-			"Message" : *slog.Message,
-			"Facility" : *slog.Facility,
-			"FacilityMessage" : *slog.FacilityMessage(),
-			"Severity" : *slog.Severity,
-			"SeverityMessage" : *slog.SeverityMessage(),
-			"Priority" : *slog.Priority,
-			"Timestamp" : *slog.Timestamp,
-			"Hostname" : *slog.Hostname,
-			"Appname" : *slog.Appname,
-		},
+		Attrs:attrs,
 		Timestamp: time.Now(),
 	})
 }
@@ -98,20 +103,20 @@ func (s SyslogServer) HandleRfc5424(remoteaddr net.Addr, data []byte) {
 	}
 	slog := *message.(*rfc5424.SyslogMessage)
 	s.Manager.GetOpsManager().AddSyslog(&models.Syslog{
-		Logtype:   "rfc5424",
-		Attrs:     map[string]interface{}{
-			"Message" : *slog.Message,
-			"Facility" : *slog.Facility,
-			"FacilityMessage" : *slog.FacilityMessage(),
-			"Severity" : *slog.Severity,
-			"SeverityMessage" : *slog.SeverityMessage(),
-			"Priority" : *slog.Priority,
-			"Timestamp" : *slog.Timestamp,
-			"Hostname" : *slog.Hostname,
-			"Appname" : *slog.Appname,
-			"ProcID" : *slog.ProcID,
-			"MsgID" : *slog.MsgID,
-			"Version" : slog.Version,
+		Logtype: "rfc5424",
+		Attrs: map[string]interface{}{
+			"Message":         *slog.Message,
+			"Facility":        *slog.Facility,
+			"FacilityMessage": *slog.FacilityMessage(),
+			"Severity":        *slog.Severity,
+			"SeverityMessage": *slog.SeverityMessage(),
+			"Priority":        *slog.Priority,
+			"Timestamp":       *slog.Timestamp,
+			"Hostname":        *slog.Hostname,
+			"Appname":         *slog.Appname,
+			"ProcID":          *slog.ProcID,
+			"MsgID":           *slog.MsgID,
+			"Version":         slog.Version,
 		},
 		Timestamp: time.Now(),
 	})
@@ -130,25 +135,25 @@ func (s SyslogServer) HandleText(remoteaddr net.Addr, data []byte) {
 	}()
 	var message = string(data)
 	logtext := &models.Syslog{
-		Logtype:   "text",
-		Attrs:     map[string]interface{}{
-			"Hostname": remoteaddr.String(),
-			"Message" : message,
-			"Facility": 3,
+		Logtype: "text",
+		Attrs: map[string]interface{}{
+			"Hostname":        remoteaddr.String(),
+			"Message":         message,
+			"Facility":        3,
 			"FacilityMessage": "system daemons messages",
-			"Timestamp": time.Now(),
-			"Appname" : "N/A",
+			"Timestamp":       time.Now(),
+			"Appname":         "N/A",
 		},
 		Timestamp: time.Now(),
 	}
-	switch  {
-	case  strings.Contains(message, "[DEBU]"):
+	switch {
+	case strings.Contains(message, "[DEBU]"):
 		logtext.Attrs["Severity"] = 7
 		logtext.Attrs["SeverityMessage"] = "debug-level messages"
-	case  strings.Contains(message, "[ERRO]"):
+	case strings.Contains(message, "[ERRO]"):
 		logtext.Attrs["Severity"] = 3
 		logtext.Attrs["SeverityMessage"] = "error conditions"
-	case  strings.Contains(message, "[WARN]"):
+	case strings.Contains(message, "[WARN]"):
 		logtext.Attrs["Severity"] = 4
 		logtext.Attrs["SeverityMessage"] = "warning conditions"
 	default:
@@ -158,7 +163,6 @@ func (s SyslogServer) HandleText(remoteaddr net.Addr, data []byte) {
 
 	s.Manager.GetOpsManager().AddSyslog(logtext)
 }
-
 
 func (s SyslogServer) StartRfc3164() error {
 	ip := net.ParseIP(s.Manager.Config.Syslogd.Host)
@@ -177,7 +181,7 @@ func (s SyslogServer) StartRfc3164() error {
 		if s.Debug {
 			log.Info(string(logdata))
 		}
-		go s.HandleRfc3164(remoteAddr,logdata)
+		go s.HandleRfc3164(remoteAddr, logdata)
 	}
 }
 

@@ -14,6 +14,7 @@ require (
 	github.com/labstack/echo/v4 v4.1.15
 	github.com/labstack/gommon v0.3.0
 	github.com/mitchellh/mapstructure v1.2.2
+	github.com/olivere/elastic/v7 v7.0.22
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
 	github.com/pkg/errors v0.9.1

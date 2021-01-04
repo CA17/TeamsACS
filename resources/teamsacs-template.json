@@ -1,0 +1,158 @@
+{
+  "order": 0,
+  "index_patterns": [
+    "teamsacs-*"
+  ],
+  "settings": {
+    "number_of_shards": "3",
+    "number_of_replicas": "0",
+    "auto_expand_replicas": "0-1",
+    "codec": "best_compression",
+    "index.refresh_interval": "5s"
+  },
+  "mappings": {
+    "properties": {
+      "@timestamp": {
+        "type": "date"
+      },
+      "source": {
+        "type": "keyword"
+      },
+      "sn": {
+        "type": "keyword"
+      },
+      "name": {
+        "type": "keyword"
+      },
+      "tags": {
+        "type": "keyword"
+      },
+      "model": {
+        "type": "keyword"
+      },
+      "version": {
+        "type": "keyword"
+      },
+      "devtype": {
+        "type": "keyword"
+      },
+      "sysstat": {
+        "properties": {
+		  "stattime": {
+	        "type": "date"
+	      },
+          "memPercent": {
+            "type": "integer"
+          },
+          "cpuPercent": {
+            "type": "integer"
+          }
+          "upTime": {
+            "type": "long"
+          }
+        }
+      },
+      "netstat": {
+        "properties": {
+          "interface": {
+            "type": "keyword"
+          },
+          "mac": {
+            "type": "keyword"
+          },
+		  "stattime": {
+	        "type": "date"
+	      },
+          "sendBytes": {
+            "type": "long"
+          },
+          "recvBytes": {
+            "type": "long"
+          },
+          "sendDrops": {
+            "type": "long"
+          },
+          "recvDrops": {
+            "type": "long"
+          },
+          "sendErrors": {
+            "type": "long"
+          },
+          "recvErrors": {
+            "type": "long"
+          },
+          "sendPackets": {
+            "type": "long"
+          },
+          "recvPackets": {
+            "type": "long"
+          }
+        }
+      },
+      "radiuslog": {
+        "properties": {
+          "username": {
+            "type": "keyword"
+          },
+          "acctSessionId": {
+            "type": "keyword"
+          },
+          "nasId": {
+            "type": "keyword"
+          },
+          "nasAddr": {
+            "type": "keyword"
+          },
+          "framedIpaddr": {
+            "type": "keyword"
+          },
+          "framedNetmask": {
+            "type": "keyword"
+          },
+          "macAddr": {
+            "type": "keyword"
+          },
+          "nasPort": {
+            "type": "keyword"
+          },
+          "nasClass": {
+            "type": "keyword"
+          },
+          "nasPortId": {
+            "type": "keyword"
+          },
+          "nasPortType": {
+            "type": "keyword"
+          },
+          "serviceType": {
+            "type": "keyword"
+          },
+          "acctSessionTime": {
+            "type": "long"
+          },
+          "acctInputTotal": {
+            "type": "long"
+          },
+          "acctOutputTotal": {
+            "type": "long"
+          },
+          "acctInputPackets": {
+            "type": "long"
+          },
+          "acctOutputPackets": {
+            "type": "long"
+          },
+          "sessionTimeout": {
+            "type": "long"
+          },
+          "acctStartTime": {
+            "type": "date"
+          },
+          "acctStopTime": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,310 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package models
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"time"
+
+	"github.com/olivere/elastic/v7"
+
+	"github.com/ca17/teamsacs/common"
+)
+
+const IndexPrefix = "teamsacs-log"
+
+type Elastic struct {
+	Client *elastic.Client
+}
+
+func NewElastic(client *elastic.Client) *Elastic {
+	e := &Elastic{Client: client}
+	go e.InitTemplate()
+	return e
+}
+
+const _mapping = `
+{
+  "order": 0,
+  "index_patterns": [
+    "teamsacs-*"
+  ],
+  "settings": {
+    "number_of_shards": "3",
+    "number_of_replicas": "0",
+    "auto_expand_replicas": "0-1",
+    "codec": "best_compression",
+    "index.refresh_interval": "5s"
+  },
+  "mappings": {
+    "properties": {
+      "@timestamp": {
+        "type": "date"
+      },
+      "source": {
+        "type": "keyword"
+      },
+      "sn": {
+        "type": "keyword"
+      },
+      "name": {
+        "type": "keyword"
+      },
+      "tags": {
+        "type": "keyword"
+      },
+      "model": {
+        "type": "keyword"
+      },
+      "version": {
+        "type": "keyword"
+      },
+      "devtype": {
+        "type": "keyword"
+      },
+      "sysstat": {
+        "properties": {
+		  "stattime": {
+	        "type": "date"
+	      },
+          "memPercent": {
+            "type": "integer"
+          },
+          "cpuPercent": {
+            "type": "integer"
+          },
+          "upTime": {
+            "type": "long"
+          }
+        }
+      },
+      "netstat": {
+        "properties": {
+          "interface": {
+            "type": "keyword"
+          },
+          "mac": {
+            "type": "keyword"
+          },
+		  "stattime": {
+	        "type": "date"
+	      },
+          "sendBytes": {
+            "type": "long"
+          },
+          "recvBytes": {
+            "type": "long"
+          },
+          "sendDrops": {
+            "type": "long"
+          },
+          "recvDrops": {
+            "type": "long"
+          },
+          "sendErrors": {
+            "type": "long"
+          },
+          "recvErrors": {
+            "type": "long"
+          },
+          "sendPackets": {
+            "type": "long"
+          },
+          "recvPackets": {
+            "type": "long"
+          }
+        }
+      },
+      "radiuslog": {
+        "properties": {
+          "username": {
+            "type": "keyword"
+          },
+          "acctSessionId": {
+            "type": "keyword"
+          },
+          "nasId": {
+            "type": "keyword"
+          },
+          "nasAddr": {
+            "type": "keyword"
+          },
+          "framedIpaddr": {
+            "type": "keyword"
+          },
+          "framedNetmask": {
+            "type": "keyword"
+          },
+          "macAddr": {
+            "type": "keyword"
+          },
+          "nasPort": {
+            "type": "keyword"
+          },
+          "nasClass": {
+            "type": "keyword"
+          },
+          "nasPortId": {
+            "type": "keyword"
+          },
+          "nasPortType": {
+            "type": "keyword"
+          },
+          "serviceType": {
+            "type": "keyword"
+          },
+          "acctSessionTime": {
+            "type": "long"
+          },
+          "acctInputTotal": {
+            "type": "long"
+          },
+          "acctOutputTotal": {
+            "type": "long"
+          },
+          "acctInputPackets": {
+            "type": "long"
+          },
+          "acctOutputPackets": {
+            "type": "long"
+          },
+          "sessionTimeout": {
+            "type": "long"
+          },
+          "acctStartTime": {
+            "type": "date"
+          },
+          "acctStopTime": {
+            "type": "date"
+          }
+        }
+      }
+    }
+  }
+}`
+
+type DeviceSysstat struct {
+	Stattime   string `json:"stattime"`
+	UpTime     int64  `json:"upTime"`
+	MemPercent int64  `json:"memPercent"`
+	CpuPercent int64  `json:"cpuPercent"`
+}
+
+type DeviceNetstat struct {
+	Interface   string `json:"interface"`
+	Mac         string `json:"mac"`
+	Stattime    string `json:"stattime"`
+	SendBytes   int64  `json:"sendBytes"`
+	RecvBytes   int64  `json:"recvBytes"`
+	SendDrops   int64  `json:"sendDrops"`
+	RecvDrops   int64  `json:"recvDrops"`
+	SendErrors  int64  `json:"sendErrors"`
+	RecvErrors  int64  `json:"recvErrors"`
+	SendPackets int64  `json:"sendPackets"`
+	RecvPackets int64  `json:"recvPackets"`
+}
+
+type Radiuslog struct {
+	Username          string `json:"username"`
+	AcctSessionId     string `json:"acctSessionId"`
+	NasId             string `json:"nasId"`
+	NasAddr           string `json:"nasAddr"`
+	FramedIpaddr      string `json:"framedIpaddr"`
+	FramedNetmask     string `json:"framedNetmask"`
+	MacAddr           string `json:"macAddr"`
+	NasPort           string `json:"nasPort"`
+	NasClass          string `json:"nasClass"`
+	NasPortId         string `json:"nasPortId"`
+	NasPortType       string `json:"nasPortType"`
+	ServiceType       string `json:"serviceType"`
+	AcctSessionTime   string `json:"acctSessionTime"`
+	AcctInputTotal    int64  `json:"acctInputTotal"`
+	AcctOutputTotal   int64  `json:"acctOutputTotal"`
+	AcctInputPackets  int64  `json:"acctInputPackets"`
+	AcctOutputPackets int64  `json:"acctOutputPackets"`
+	SessionTimeout    int64  `json:"sessionTimeout"`
+	AcctStartTime     string `json:"acctStartTime"`
+	AcctStopTime      string `json:"acctStopTime"`
+}
+
+type TeamsacsLog struct {
+	Timestamp string         `json:"@timestamp"`
+	Source    string         `json:"source"`
+	Sn        string         `json:"sn"`
+	Name      string         `json:"name"`
+	Tags      string         `json:"tags,omitempty"`
+	Model     string         `json:"model"`
+	Version   string         `json:"version"` // ros ver
+	Devtype   string         `json:"devtype"` // cpe | vpe
+	Sysstat   *DeviceSysstat `json:"sysstat,omitempty"`
+	Netstat   *DeviceNetstat `json:"netstat,omitempty"`
+	Radiuslog *Radiuslog     `json:"radiuslog,omitempty"`
+}
+
+func GetCurrentIndexName() string {
+	suffix := time.Now().Format("20060102")
+	indexName := fmt.Sprintf("%s-%s", IndexPrefix, suffix)
+	return indexName
+}
+
+func GetSearchIndexOfMonth() string {
+	suffix := time.Now().Format("200601")
+	indexName := fmt.Sprintf("%s-%s", IndexPrefix, suffix)
+	return indexName
+}
+
+func (e *Elastic) checkClient() error {
+	switch {
+	case e.Client == nil:
+		return errors.New("elasticsearch Client is nil")
+	}
+	return nil
+}
+
+// InitTemplate
+// Initialize the global template and call it only at system startup
+func (e *Elastic) InitTemplate() error {
+	if err := e.checkClient(); err != nil {
+		return err
+	}
+	ctx := context.Background()
+	_, err := e.Client.IndexPutTemplate("teamsacs-template").BodyJson(_mapping).Do(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// BulkTeamslog
+func (e *Elastic) BulkTeamslog(logs ...TeamsacsLog) (*elastic.BulkResponse, error) {
+	if err := e.checkClient(); err != nil {
+		return nil, err
+	}
+	bulkRequest := e.Client.Bulk()
+	for _, log := range logs {
+		req := elastic.NewBulkIndexRequest().Index(GetCurrentIndexName()).Id(common.UUID()).Doc(log)
+		bulkRequest = bulkRequest.Add(req)
+	}
+	ctx := context.Background()
+	bulkResponse, err := bulkRequest.Do(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return bulkResponse, nil
+}

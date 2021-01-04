@@ -228,6 +228,7 @@ func (v *EthernetInterfaceItemStats) ParseBson(valmap map[string]interface{}) {
 	v.ErrorsSent = GetInt64SubValue(valmap, "ErrorsSent", "_value", 0)
 	v.PacketsReceived = GetInt64SubValue(valmap, "PacketsReceived", "_value", 0)
 	v.PacketsSent = GetInt64SubValue(valmap, "PacketsSent", "_value", 0)
+	v.Timestamp = ParseDateTime(valmap["_timestamp"])
 }
 
 // 路由表
