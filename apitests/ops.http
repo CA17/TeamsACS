@@ -23,7 +23,7 @@ authorization: Bearer {{nbi_token}}
 
 ###
 
-GET http://{{nbi_url}}/nbi/opr/query?filter[username]=opr
+GET http://{{nbi_url}}/nbi/opr/query?equal[username]=opr
 authorization: Bearer {{nbi_token}}
 
 {}
@@ -37,7 +37,7 @@ authorization: Bearer {{nbi_token}}
 ###
 
 
-GET http://{{nbi_url}}/nbi/opr/delete?filter[username]=opr
+GET http://{{nbi_url}}/nbi/opr/delete?equal[username]=opr
 authorization: Bearer {{nbi_token}}
 
 ###

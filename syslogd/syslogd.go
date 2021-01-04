@@ -25,7 +25,6 @@ import (
 	"github.com/influxdata/go-syslog/v3/rfc3164"
 	"github.com/influxdata/go-syslog/v3/rfc5424"
 
-	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/models"
 )
@@ -59,7 +58,8 @@ func (s SyslogServer) HandleRfc3164(remoteaddr net.Addr, data []byte) {
 	}()
 	message, err := s.Rfc3164Parser.Parse(data)
 	if err != nil {
-		common.Must(err)
+		s.HandleText(remoteaddr, data)
+		return
 	}
 
 	slog := *message.(*rfc3164.SyslogMessage)
@@ -98,7 +98,7 @@ func (s SyslogServer) HandleRfc5424(remoteaddr net.Addr, data []byte) {
 	}()
 	message, err := s.Rfc5424Parser.Parse(data)
 	if err != nil {
-		log.Error(err)
+		s.HandleText(remoteaddr, data)
 		return
 	}
 	slog := *message.(*rfc5424.SyslogMessage)

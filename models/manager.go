@@ -102,12 +102,10 @@ func NewModelManager(appconfig *config.AppConfig, dev bool) *ModelManager {
 
 func (m *ModelManager) SetupSyslogDB() {
 	var Capped = true
-	var size = int64(1024 * 1024 * 512)
 	var max = int64(m.Config.Syslogd.MaxRecodes)
 	_ = m.Mongo.Database(MDBTeamsacs).CreateCollection(context.TODO(), TeamsacsSyslog, &options.CreateCollectionOptions{
 		Capped:       &Capped,
 		MaxDocuments: &max,
-		SizeInBytes:  &size,
 	})
 }
 

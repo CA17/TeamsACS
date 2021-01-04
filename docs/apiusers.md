@@ -53,7 +53,7 @@ Date: Mon, 04 Jan 2021 01:31:16 GMT
 Request
 
 ```
-GET http://{{nbi_url}}/nbi/opr/query?filter[username]=opr
+GET http://{{nbi_url}}/nbi/opr/query?equal[username]=opr
 authorization: Bearer {{nbi_token}}
 
 ```
@@ -115,7 +115,7 @@ Date: Mon, 04 Jan 2021 03:47:04 GMT
 Request
 
 ```
-GET http://{{nbi_url}}/nbi/opr/delete?filter[username]=opr
+GET http://{{nbi_url}}/nbi/opr/delete?equal[username]=opr
 authorization: Bearer {{nbi_token}}
 ```
 

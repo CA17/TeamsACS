@@ -72,7 +72,7 @@ func (h *HttpHandler) DeleteOperator(c echo.Context) error {
 		return c.NoContent(http.StatusForbidden)
 	}
 	params := h.RequestParse(c)
-	username := params.GetFilterMap().GetMustString("username")
+	username := params.GetEqualMap().GetMustString("username")
 	common.Must(h.GetManager().GetOpsManager().DeleteOperator(username))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
