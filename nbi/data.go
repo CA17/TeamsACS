@@ -34,6 +34,7 @@ import (
 // QueryData
 func (h *HttpHandler) QueryData(c echo.Context) error {
 	params := h.RequestParse(c)
+	params.GetParamMap("sortmap")["update_time"] = "desc"
 	params["collname"] = c.Param("collname")
 	data, err := h.GetManager().GetDataManager().QueryItems(params,c.Param("collname"))
 	common.Must(err)
@@ -43,6 +44,7 @@ func (h *HttpHandler) QueryData(c echo.Context) error {
 // QueryData
 func (h *HttpHandler) QueryPageData(c echo.Context) error {
 	params := h.RequestParse(c)
+	params.GetParamMap("sortmap")["update_time"] = "desc"
 	params["collname"] = c.Param("collname")
 	data, err := h.GetManager().GetDataManager().QueryPagerItems(params, c.Param("collname"))
 	common.Must(err)
