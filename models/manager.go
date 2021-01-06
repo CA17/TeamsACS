@@ -79,12 +79,14 @@ type ModelManager struct {
 	WebJwtConfig *middleware.JWTConfig
 	MailSender   *gmail.MailSender
 	ManagerMap   cmap.ConcurrentMap
+	DeviceStatCache cmap.ConcurrentMap
 	Dev          bool
 }
 
 func NewModelManager(appconfig *config.AppConfig, dev bool) *ModelManager {
 	m := &ModelManager{Config: appconfig, Dev: dev}
 	m.ManagerMap = cmap.New()
+	m.DeviceStatCache = cmap.New()
 	_mongodb, err := mongodb.GetMongodbClient(appconfig.Mongodb)
 	common.Must(err)
 	m.Mongo = _mongodb

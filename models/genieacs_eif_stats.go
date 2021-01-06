@@ -62,33 +62,53 @@ func (m *GenieacsManager) StatMikrotikEthernetInterface(sn string) error {
 				// eif.Items = append(eif.Items, *eifItem)
 				stat := eifItem.Stats
 
-				getSysstat := func() * DeviceSysstat{
-					if time.Now().Sub(info.Timestamp.Time()) >  time.Minute *2 {
+				getSysstat := func() *DeviceSysstat {
+					if time.Now().Sub(info.Timestamp.Time()) > time.Minute*2 {
 						return nil
 					}
 					return &DeviceSysstat{
-						Stattime: info.Timestamp.Time().Format(time.RFC3339),
-						MemPercent:  info.MemoryUsage,
-						CpuPercent:   info.CPUUsage,
-						UpTime: info.UpTime,
+						Stattime:   info.Timestamp.Time().Format(time.RFC3339),
+						MemPercent: info.MemoryUsage,
+						CpuPercent: info.CPUUsage,
+						UpTime:     info.UpTime,
 					}
 				}
-				getNetstat := func() * DeviceNetstat{
-					if time.Now().Sub(stat.Timestamp.Time()) >  time.Minute *2 {
+				getNetstat := func() *DeviceNetstat {
+					if time.Now().Sub(stat.Timestamp.Time()) > time.Minute*2 {
 						return nil
 					}
+					cachekey := fmt.Sprintf("%s-%s", eif.Sn, eifItem.Key)
+					scache, ok := m.DeviceStatCache.Get(cachekey)
+					m.DeviceStatCache.Set(cachekey, stat)
+					if ok {
+
+						var cacheStat = scache.(mikrotik.EthernetInterfaceItemStats)
+						return &DeviceNetstat{
+							Interface:   eifItem.Key,
+							Mac:         eifItem.MACAddress,
+							Stattime:    stat.Timestamp.Time().Format(time.RFC3339),
+							SendBytes:   _ifLtZeroInt64(stat.BytesSent-cacheStat.BytesSent, 0),
+							RecvBytes:   _ifLtZeroInt64(stat.BytesReceived-cacheStat.BytesReceived, 0),
+							SendDrops:   _ifLtZeroInt64(stat.DiscardPacketsSent-cacheStat.DiscardPacketsSent, 0),
+							RecvDrops:   _ifLtZeroInt64(stat.DiscardPacketsReceived-cacheStat.DiscardPacketsReceived, 0),
+							SendErrors:  _ifLtZeroInt64(stat.ErrorsSent-cacheStat.ErrorsSent, 0),
+							RecvErrors:  _ifLtZeroInt64(stat.ErrorsReceived-cacheStat.ErrorsReceived, 0),
+							SendPackets: _ifLtZeroInt64(stat.PacketsSent-cacheStat.PacketsSent, 0),
+							RecvPackets: _ifLtZeroInt64(stat.PacketsReceived-cacheStat.PacketsReceived, 0),
+						}
+					}
 					return &DeviceNetstat{
-						Interface: eifItem.Key,
-						Mac: eifItem.MACAddress,
-						Stattime: stat.Timestamp.Time().Format(time.RFC3339),
-						SendBytes:   stat.BytesSent,
-						RecvBytes:   stat.BytesReceived,
-						SendDrops:   stat.DiscardPacketsSent,
-						RecvDrops:   stat.DiscardPacketsReceived,
-						SendErrors:  stat.ErrorsSent,
-						RecvErrors:  stat.ErrorsReceived,
-						SendPackets: stat.PacketsSent,
-						RecvPackets: stat.PacketsReceived,
+						Interface:   eifItem.Key,
+						Mac:         eifItem.MACAddress,
+						Stattime:    stat.Timestamp.Time().Format(time.RFC3339),
+						SendBytes:   0,
+						RecvBytes:   0,
+						SendDrops:   0,
+						RecvDrops:   0,
+						SendErrors:  0,
+						RecvErrors:  0,
+						SendPackets: 0,
+						RecvPackets: 0,
 					}
 				}
 
@@ -118,4 +138,11 @@ func (m *GenieacsManager) StatMikrotikEthernetInterface(sn string) error {
 		return err
 	}
 	return nil
+}
+
+func _ifLtZeroInt64(s, defval int64) int64 {
+	if s < 0 {
+		return defval
+	}
+	return s
 }

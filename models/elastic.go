@@ -207,17 +207,25 @@ type DeviceSysstat struct {
 }
 
 type DeviceNetstat struct {
-	Interface   string `json:"interface"`
-	Mac         string `json:"mac"`
-	Stattime    string `json:"stattime"`
-	SendBytes   int64  `json:"sendBytes"`
-	RecvBytes   int64  `json:"recvBytes"`
-	SendDrops   int64  `json:"sendDrops"`
-	RecvDrops   int64  `json:"recvDrops"`
-	SendErrors  int64  `json:"sendErrors"`
-	RecvErrors  int64  `json:"recvErrors"`
-	SendPackets int64  `json:"sendPackets"`
-	RecvPackets int64  `json:"recvPackets"`
+	Interface        string `json:"interface"`
+	Mac              string `json:"mac"`
+	Stattime         string `json:"stattime"`
+	SendBytes        int64  `json:"sendBytes"`
+	RecvBytes        int64  `json:"recvBytes"`
+	SendDrops        int64  `json:"sendDrops"`
+	RecvDrops        int64  `json:"recvDrops"`
+	SendErrors       int64  `json:"sendErrors"`
+	RecvErrors       int64  `json:"recvErrors"`
+	SendPackets      int64  `json:"sendPackets"`
+	RecvPackets      int64  `json:"recvPackets"`
+	SendBytesTotal   int64  `json:"sendBytesTotal"`
+	RecvBytesTotal   int64  `json:"recvBytesTotal"`
+	SendDropsTotal   int64  `json:"sendDropsTotal"`
+	RecvDropsTotal   int64  `json:"recvDropsTotal"`
+	SendErrorsTotal  int64  `json:"sendErrorsTotal"`
+	RecvErrorsTotal  int64  `json:"recvErrorsTotal"`
+	SendPacketsTotal int64  `json:"sendPacketsTotal"`
+	RecvPacketsTotal int64  `json:"recvPacketsTotal"`
 }
 
 type Radiuslog struct {
