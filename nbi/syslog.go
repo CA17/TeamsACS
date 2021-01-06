@@ -24,7 +24,7 @@ import (
 
 func (h *HttpHandler) QuerySyslog(c echo.Context) error {
 	params := h.RequestParse(c)
-	params.GetParamMap("sortmap")["Timestamp"] = "desc"
+	params.GetParamMap("sortmap")["timestamp"] = "desc"
 	data, err := h.GetManager().GetOpsManager().QuerySyslog(params)
 	if err != nil {
 		return h.GetInternalError(err)
