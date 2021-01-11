@@ -44,7 +44,7 @@ func ElkDataSync(manager *models.ModelManager) {
 
 	for _, name := range synclist {
 		items, err := manager.QueryItems(map[string]interface{}{}, name)
-		if err == nil {
+		if err != nil {
 			continue
 		}
 		if items != nil {
