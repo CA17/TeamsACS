@@ -161,6 +161,9 @@ func (m *SubscribeManager) AddSubscribeData(params web.RequestParams) error {
 	if common.IsEmptyOrNA(_id) {
 		data["_id"] = common.UUID()
 	}
+	go func() {
+		_ = m.Elastic.AddData("teamsacs_subscribe", data)
+	}()
 	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
 	var err error
 	_, err = coll.InsertOne(context.TODO(), data)

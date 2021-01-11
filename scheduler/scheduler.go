@@ -13,6 +13,7 @@ func Start(manager *models.ModelManager) error {
 	// 日志分发任务
 	_, _ = s.Every(60).Second().StartImmediately().Do(SyncAcsDeviceInfo, manager)
 	_, _ = s.Every(60).Second().StartImmediately().Do(StatAcsDeviceEif, manager)
+	_, _ = s.Every(1).Day().StartImmediately().Do(ElkDataSync, manager)
 	// _, _ = s.Every(10).Minute().Do(CheckAcsScriptTask, manager, "10m")
 	// _, _ = s.Every(30).Minute().Do(CheckAcsScriptTask, manager, "30m")
 	// _, _ = s.Every(60).Minute().Do(CheckAcsScriptTask, manager, "60m")

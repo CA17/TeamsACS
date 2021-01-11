@@ -31,9 +31,9 @@ import (
 
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/azureblob"
+	"github.com/ca17/teamsacs/common/elk"
 	"github.com/ca17/teamsacs/common/gmail"
 	"github.com/ca17/teamsacs/common/mongodb"
-	"github.com/ca17/teamsacs/common/elk"
 	"github.com/ca17/teamsacs/common/tpl"
 	"github.com/ca17/teamsacs/config"
 )
@@ -79,6 +79,7 @@ type ModelManager struct {
 	WebJwtConfig *middleware.JWTConfig
 	MailSender   *gmail.MailSender
 	ManagerMap   cmap.ConcurrentMap
+	// acs device stat cache
 	DeviceStatCache cmap.ConcurrentMap
 	Dev          bool
 }
@@ -146,4 +147,20 @@ func (m *ModelManager) GetTemplateFuncMap() map[string]interface{} {
 			return time.Now().Unix()
 		},
 	}
+}
+
+
+// UpdateVpeBySn
+func (m *ModelManager) SyncElkData(name string) error {
+	items, err := m.QueryItems(map[string]interface{}{}, name)
+	if err == nil {
+		return err
+	}
+	if items != nil {
+		_, err := m.Elastic.BulkData("teamsacs_"+name, *items, true)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

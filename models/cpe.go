@@ -117,6 +117,9 @@ func (m *CpeManager) AddCpeData(params web.RequestParams) error {
 		}
 	}
 	_, err = coll.InsertOne(context.TODO(), data)
+	go func() {
+		_ = m.Elastic.AddData("teamsacs_cpe", data)
+	}()
 	return err
 }
 
@@ -136,6 +139,9 @@ func (m *CpeManager) AddCpeDataMap(cpe Cpe) error {
 		}
 	}
 	_, err = coll.InsertOne(context.TODO(), cpe)
+	go func() {
+		_ = m.Elastic.AddData("teamsacs_cpe", cpe)
+	}()
 	return err
 }
 
@@ -151,11 +157,14 @@ func (m *CpeManager) UpdateCpeData(params web.RequestParams) error {
 		if err != nil {
 			return err
 		}
-	}else{
+	} else {
 		delete(data, "api_pwd")
 	}
 	query := bson.M{"_id": _id}
 	update := bson.M{"$set": data}
+	go func() {
+		_ = m.Elastic.UpdateData("teamsacs_cpe", data)
+	}()
 	_, err = m.GetTeamsAcsCollection(TeamsacsCpe).UpdateOne(context.TODO(), query, update)
 	return err
 }
@@ -167,3 +176,4 @@ func (m *CpeManager) UpdateCpeBySn(sn string, valmap map[string]interface{}) err
 	_, err := coll.UpdateOne(context.TODO(), bson.M{"sn": sn}, update)
 	return err
 }
+

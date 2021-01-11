@@ -25,6 +25,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/ca17/teamsacs/common"
+	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/common/web"
 )
 
@@ -83,7 +84,11 @@ func (m *DataManager) AddData(params web.RequestParams) error {
 		data["_id"] = common.UUID()
 	}
 	data["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
-	coll := m.GetTeamsAcsCollection(params.GetMustString("collname"))
+	collname := params.GetMustString("collname")
+	coll := m.GetTeamsAcsCollection(collname)
+	go func() {
+		_ = m.Elastic.AddData("teamsacs_"+collname, data)
+	}()
 	_, err := coll.InsertOne(context.TODO(), data)
 	return err
 }
@@ -92,6 +97,12 @@ func (m *DataManager) AddData(params web.RequestParams) error {
 func (m *DataManager) AddBatchData(collname string, datas []interface{}) error {
 	coll := m.GetTeamsAcsCollection(collname)
 	_, err := coll.InsertMany(context.TODO(), datas)
+	if err == nil {
+		err2 := m.SyncElkData(collname)
+		if err2 != nil {
+			log.Error(err2)
+		}
+	}
 	return err
 }
 
@@ -102,7 +113,11 @@ func (m *DataManager) UpdateData(params web.RequestParams) error {
 	_id := data.GetMustString("_id")
 	query := bson.M{"_id": _id}
 	update := bson.M{"$set": data}
-	_, err := m.GetTeamsAcsCollection(params.GetMustString("collname")).UpdateOne(context.TODO(), query, update)
+	collname := params.GetMustString("collname")
+	go func() {
+		_ = m.Elastic.UpdateData("teamsacs_"+collname, data)
+	}()
+	_, err := m.GetTeamsAcsCollection(collname).UpdateOne(context.TODO(), query, update)
 	return err
 }
 
@@ -114,12 +129,18 @@ func (m *DataManager) DeleteData(params web.RequestParams) error {
 		idarray := bson.A{}
 		for _, id := range strings.Split(ids, ",") {
 			idarray = append(idarray, id)
+			go func() {
+				_ = m.Elastic.DeleteData("teamsacs_"+collname, id)
+			}()
 		}
 		filter := bson.M{"_id": bson.M{"$in": idarray}}
 		_, err := m.GetTeamsAcsCollection(collname).DeleteMany(context.TODO(), filter)
 		return err
-	}else{
+	} else {
 		_id := params.GetParamMap("data").GetString("_id")
+		go func() {
+			_ = m.Elastic.DeleteData("teamsacs_"+collname, _id)
+		}()
 		_, err := m.GetTeamsAcsCollection(collname).DeleteMany(context.TODO(), bson.M{"_id": _id})
 		return err
 	}
@@ -140,5 +161,5 @@ func (m *DataManager) SaveData(params web.RequestParams) (interface{}, error) {
 		err := m.DeleteData(params)
 		return make(map[string]interface{}), err
 	}
-	return nil, errors.New("Unsupported Operations")
+	return nil, errors.New("unsupported operations")
 }

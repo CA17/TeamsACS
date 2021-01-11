@@ -25,6 +25,7 @@ import (
 	"github.com/olivere/elastic/v7"
 
 	"github.com/ca17/teamsacs/common"
+	"github.com/ca17/teamsacs/common/log"
 )
 
 const IndexPrefix = "teamsacs-log"
@@ -207,27 +208,18 @@ type DeviceSysstat struct {
 }
 
 type DeviceNetstat struct {
-	Interface        string `json:"interface"`
-	Mac              string `json:"mac"`
-	Stattime         string `json:"stattime"`
-	SendBytes        int64  `json:"sendBytes"`
-	RecvBytes        int64  `json:"recvBytes"`
-	SendDrops        int64  `json:"sendDrops"`
-	RecvDrops        int64  `json:"recvDrops"`
-	SendErrors       int64  `json:"sendErrors"`
-	RecvErrors       int64  `json:"recvErrors"`
-	SendPackets      int64  `json:"sendPackets"`
-	RecvPackets      int64  `json:"recvPackets"`
-	SendBytesTotal   int64  `json:"sendBytesTotal"`
-	RecvBytesTotal   int64  `json:"recvBytesTotal"`
-	SendDropsTotal   int64  `json:"sendDropsTotal"`
-	RecvDropsTotal   int64  `json:"recvDropsTotal"`
-	SendErrorsTotal  int64  `json:"sendErrorsTotal"`
-	RecvErrorsTotal  int64  `json:"recvErrorsTotal"`
-	SendPacketsTotal int64  `json:"sendPacketsTotal"`
-	RecvPacketsTotal int64  `json:"recvPacketsTotal"`
+	Interface   string `json:"interface"`
+	Mac         string `json:"mac"`
+	Stattime    string `json:"stattime"`
+	SendBytes   int64  `json:"sendBytes"`
+	RecvBytes   int64  `json:"recvBytes"`
+	SendDrops   int64  `json:"sendDrops"`
+	RecvDrops   int64  `json:"recvDrops"`
+	SendErrors  int64  `json:"sendErrors"`
+	RecvErrors  int64  `json:"recvErrors"`
+	SendPackets int64  `json:"sendPackets"`
+	RecvPackets int64  `json:"recvPackets"`
 }
-
 type Radiuslog struct {
 	Username          string `json:"username"`
 	AcctSessionId     string `json:"acctSessionId"`
@@ -315,4 +307,79 @@ func (e *Elastic) BulkTeamslog(logs ...TeamsacsLog) (*elastic.BulkResponse, erro
 		return nil, err
 	}
 	return bulkResponse, nil
+}
+
+// BulkData
+// sync base data
+func (e *Elastic) BulkData(indexName string, data []map[string]interface{}, deleteIndex bool) (*elastic.BulkResponse, error) {
+	if err := e.checkClient(); err != nil {
+		return nil, err
+	}
+	if deleteIndex {
+		// first delete exists index
+		_, err := e.Client.DeleteIndex(indexName).Do(context.Background())
+		if err != nil {
+			log.Error(err)
+		}
+	}
+
+	bulkRequest := e.Client.Bulk()
+	for _, item := range data {
+		_id, ok := item["id"]
+		if !ok {
+			_id = common.UUID()
+		}
+		req := elastic.NewBulkIndexRequest().Index(indexName).Id(_id.(string)).Doc(item)
+		bulkRequest = bulkRequest.Add(req)
+	}
+	ctx := context.Background()
+	bulkResponse, err := bulkRequest.Do(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return bulkResponse, nil
+}
+
+// AddData
+func (e *Elastic) AddData(indexName string, data map[string]interface{}) error {
+	if err := e.checkClient(); err != nil {
+		return err
+	}
+	_id, ok := data["id"]
+	if !ok {
+		_id = common.UUID()
+	}
+	_, err := e.Client.Index().Index(indexName).Id(_id.(string)).BodyJson(data).Do(context.Background())
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// UpdateData
+func (e *Elastic) UpdateData(indexName string, data map[string]interface{}) error {
+	if err := e.checkClient(); err != nil {
+		return err
+	}
+	_id, ok := data["id"]
+	if !ok {
+		return errors.New("data _id is empty")
+	}
+	_, err := e.Client.Update().Index(indexName).Id(_id.(string)).Doc(data).Do(context.Background())
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// DeleteData
+func (e *Elastic) DeleteData(indexName string, _id string) error {
+	if err := e.checkClient(); err != nil {
+		return err
+	}
+	_, err := e.Client.Delete().Index(indexName).Id(_id).Do(context.Background())
+	if err != nil {
+		return err
+	}
+	return nil
 }

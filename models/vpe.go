@@ -137,6 +137,9 @@ func (m *VpeManager) AddVpeData(params web.RequestParams) error {
 			return err
 		}
 	}
+	go func() {
+		_ = m.Elastic.AddData("teamsacs_vpe", data)
+	}()
 	_, err = coll.InsertOne(context.TODO(), data)
 	return err
 }
@@ -159,6 +162,9 @@ func (m *VpeManager) UpdateVpeData(params web.RequestParams) error {
 	}
 	query := bson.M{"_id": _id}
 	update := bson.M{"$set": data}
+	go func() {
+		_ = m.Elastic.UpdateData("teamsacs_vpe", data)
+	}()
 	_, err = m.GetTeamsAcsCollection(TeamsacsVpe).UpdateOne(context.TODO(), query, update)
 	return err
 }
