@@ -40,6 +40,12 @@ func NewElastic(client *elastic.Client) *Elastic {
 	return e
 }
 
+const _defaultMapping = `{
+  "mappings": {
+      "date_detection": false
+  }
+}`
+
 const _mapping = `
 {
   "order": 0,
@@ -54,6 +60,9 @@ const _mapping = `
     "index.refresh_interval": "5s"
   },
   "mappings": {
+    "_default_": {
+      "date_detection": false
+    },
     "properties": {
       "@timestamp": {
         "type": "date"
@@ -321,6 +330,11 @@ func (e *Elastic) BulkData(indexName string, data []map[string]interface{}, dele
 		if err != nil {
 			log.Error(err)
 		}
+
+		_, err = e.Client.CreateIndex(indexName).BodyString(_defaultMapping).Do(context.Background())
+		if err != nil {
+			log.Error(err)
+		}
 	}
 
 	bulkRequest := e.Client.Bulk()
@@ -329,6 +343,8 @@ func (e *Elastic) BulkData(indexName string, data []map[string]interface{}, dele
 		if !ok {
 			_id = common.UUID()
 		}
+		delete(item, "_id")
+		item["doc_type"] = indexName
 		req := elastic.NewBulkIndexRequest().Index(indexName).Id(_id.(string)).Doc(item)
 		bulkRequest = bulkRequest.Add(req)
 	}
@@ -349,6 +365,8 @@ func (e *Elastic) AddData(indexName string, data map[string]interface{}) error {
 	if !ok {
 		_id = common.UUID()
 	}
+	delete(data, "_id")
+	data["doc_type"] = indexName
 	_, err := e.Client.Index().Index(indexName).Id(_id.(string)).BodyJson(data).Do(context.Background())
 	if err != nil {
 		return err
@@ -365,6 +383,8 @@ func (e *Elastic) UpdateData(indexName string, data map[string]interface{}) erro
 	if !ok {
 		return errors.New("data _id is empty")
 	}
+	delete(data, "_id")
+	data["doc_type"] = indexName
 	_, err := e.Client.Update().Index(indexName).Id(_id.(string)).Doc(data).Do(context.Background())
 	if err != nil {
 		return err

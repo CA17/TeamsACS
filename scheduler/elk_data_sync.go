@@ -50,7 +50,7 @@ func ElkDataSync(manager *models.ModelManager) {
 		if items != nil {
 			_, err := manager.Elastic.BulkData("teamsacs_"+name, *items, true)
 			if err != nil {
-				log.Error(err)
+				log.Errorf("sync elk data %s error %s", name, err.Error())
 			}
 		}
 	}

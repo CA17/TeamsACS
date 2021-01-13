@@ -344,6 +344,7 @@ func (m GenieacsManager) SyncMikrotikDeviceInfo(devinfos []mikrotik.DeviceInfo) 
 			"cpuuse":        dev.CPUUsage,
 			"memuse":        dev.MemoryUsage,
 			"version":       dev.HardwareVersion,
+			"sversion":       dev.SoftwareVersion,
 			"timestamp":     dev.Timestamp,
 			"picture":       picture,
 			"update_time":   ctime,
@@ -384,6 +385,7 @@ func (m GenieacsManager) SyncMikrotikDeviceInfo(devinfos []mikrotik.DeviceInfo) 
 			cpe.Set("product_class", common.EmptyToNA(dev.ProductClass))
 			cpe.Set("manufacturer", common.EmptyToNA(dev.Manufacturer))
 			cpe.Set("version", common.EmptyToNA(dev.HardwareVersion))
+			cpe.Set("sversion", common.EmptyToNA(dev.SoftwareVersion))
 			cpe.Set("oui", common.EmptyToNA(dev.ManufacturerOUI))
 			cpe.Set("model", common.EmptyToNA(dev.ModelName))
 			cpe.Set("cpuuse", int(dev.CPUUsage))
