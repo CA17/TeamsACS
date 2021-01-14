@@ -45,3 +45,18 @@ func (h *HttpHandler) QueryRadiusOnline(c echo.Context) error {
 	return c.JSON(http.StatusOK, data)
 }
 
+
+func (h *HttpHandler) ClearRadiusOnline(c echo.Context) error {
+	params := h.RequestParse(c)
+	err := h.GetManager().GetRadiusManager().BatchDeleteRadiusOnline(params.GetMustString("ids"))
+	common.Must(err)
+	return c.JSON(http.StatusOK, h.RestSucc("Success"))
+}
+
+
+func (h *HttpHandler) TruncateRadiusOnline(c echo.Context) error {
+	err := h.GetManager().GetRadiusManager().TruncateRadiusOnline()
+	common.Must(err)
+	return c.JSON(http.StatusOK, h.RestSucc("Success"))
+}
+

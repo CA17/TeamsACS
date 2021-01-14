@@ -333,6 +333,12 @@ func (m GenieacsManager) SyncMikrotikDeviceInfo(devinfos []mikrotik.DeviceInfo) 
 			picture = "cpe.png"
 		}
 		existVpe := m.GetVpeManager().ExistVpe(sn)
+
+		onlineStatus := "off"
+		if time.Now().Sub(dev.Timestamp.Time()).Minutes() < 5 {
+			onlineStatus = "on"
+		}
+
 		_valmap := map[string]interface{}{
 			"identifier":    dev.X_MIKROTIK_SystemIdentity,
 			"manufacturer":  dev.Manufacturer,
@@ -349,6 +355,7 @@ func (m GenieacsManager) SyncMikrotikDeviceInfo(devinfos []mikrotik.DeviceInfo) 
 			"picture":       picture,
 			"update_time":   ctime,
 			"last_inform":   ctime,
+			"online_status":   onlineStatus,
 		}
 		valmap := make(map[string]interface{})
 		for k, v := range _valmap {
@@ -394,6 +401,7 @@ func (m GenieacsManager) SyncMikrotikDeviceInfo(devinfos []mikrotik.DeviceInfo) 
 			cpe.Set("remark", "tr069 auto join")
 			cpe.Set("status", common.ENABLED)
 			cpe.Set("picture", picture)
+			cpe.Set("online_status", onlineStatus)
 			cpe.Set("create_time", ctime.Format("2006-01-02 15:04:05"))
 
 			err := m.GetCpeManager().AddCpeDataMap(cpe)

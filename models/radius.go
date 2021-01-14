@@ -18,6 +18,7 @@ package models
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -66,7 +67,6 @@ type Accounting struct {
 	AcctStopTime      time.Time `bson:"acct_stop_time,omitempty" json:"acct_stop_time,omitempty"`
 }
 
-
 type RadiusManager struct{ *ModelManager }
 
 func (m *ModelManager) GetRadiusManager() *RadiusManager {
@@ -74,18 +74,15 @@ func (m *ModelManager) GetRadiusManager() *RadiusManager {
 	return store.(*RadiusManager)
 }
 
-
 func (m *RadiusManager) GetOnlineCount(username string) (int64, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsOnline)
 	return coll.CountDocuments(context.TODO(), bson.M{"username": username})
 }
 
-
 func (m *RadiusManager) GetOnlineCountBySessionid(acct_session_id string) (int64, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsOnline)
 	return coll.CountDocuments(context.TODO(), bson.M{"acct_session_id": acct_session_id})
 }
-
 
 func (m *RadiusManager) QueryAccountings(params web.RequestParams) (*web.PageResult, error) {
 	return m.QueryPagerItems(params, TeamsacsAccounting)
@@ -101,7 +98,7 @@ func (m *RadiusManager) QueryOnlines(params web.RequestParams) (*web.PageResult,
 
 func (m *RadiusManager) AddRadiusAuthLog(username string, nasip string, result string, reason string, cast int64) error {
 	authlog := Authlog{
-		ID: common.UUID(),
+		ID:        common.UUID(),
 		Username:  username,
 		NasAddr:   nasip,
 		Result:    result,
@@ -143,6 +140,16 @@ func (m *RadiusManager) DeleteRadiusOnline(sessionid string) error {
 	return err
 }
 
+func (m *RadiusManager) BatchDeleteRadiusOnline(sessionids string) error {
+	_, err := m.GetTeamsAcsCollection(TeamsacsOnline).DeleteMany(context.TODO(),
+		bson.M{"acct_session_id": bson.M{"$in": strings.Split(sessionids, ",")}})
+	return err
+}
+
+func (m *RadiusManager) TruncateRadiusOnline() error {
+	_, err := m.GetTeamsAcsCollection(TeamsacsOnline).DeleteMany(context.TODO(),bson.M{})
+	return err
+}
 
 func (m *RadiusManager) UpdateRadiusOnlineData(acct Accounting) error {
 	data := bson.D{
@@ -163,7 +170,6 @@ func (m *RadiusManager) UpdateRadiusOnlineData(acct Accounting) error {
 	_, err := m.GetTeamsAcsCollection(TeamsacsOnline).UpdateOne(context.TODO(), query, data)
 	return err
 }
-
 
 func getAcctStartTime(sessionTime string) time.Time {
 	m, _ := time.ParseDuration("-" + sessionTime + "s")
@@ -187,7 +193,7 @@ func (m *RadiusManager) UpdateRadiusOnline(form *web.WebForm) error {
 	var sessionId = form.GetVal2("acctSessionId", "")
 	var statusType = form.GetVal2("acctStatusType", "")
 	radOnline := Accounting{
-		ID: common.UUID(),
+		ID:                common.UUID(),
 		Username:          form.GetVal("username"),
 		NasId:             form.GetVal("nasid"),
 		NasAddr:           form.GetVal("nasip"),
@@ -208,7 +214,7 @@ func (m *RadiusManager) UpdateRadiusOnline(form *web.WebForm) error {
 		AcctInputPackets:  form.GetIntVal("acctInputPackets", 0),
 		AcctOutputPackets: form.GetIntVal("acctOutputPackets", 0),
 		AcctStartTime:     getAcctStartTime(form.GetVal2("acctSessionTime", "0")),
-		LastUpdate:       time.Now(),
+		LastUpdate:        time.Now(),
 	}
 	switch statusType {
 	case "Start", "Update", "Alive", "Interim-Update":
