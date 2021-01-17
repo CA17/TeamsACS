@@ -1,4 +1,4 @@
-POST http://{{nbi_url}}//nbi/radius/accounting/query
+POST http://{{nbi_url}}/nbi/radius/accounting/query
 Content-Type: application/json
 authorization: Bearer {{nbi_token}}
 
@@ -6,14 +6,18 @@ authorization: Bearer {{nbi_token}}
 
 ###
 
-GET http://{{nbi_url}}//nbi/radius/accounting/query
+GET http://{{nbi_url}}/nbi/radius/accounting/query
 authorization: Bearer {{nbi_token}}
 ###
 
-GET http://{{nbi_url}}//nbi/radius/authlog/query?qs-reason=success
+GET http://{{nbi_url}}/nbi/radius/authlog/query?qs-reason=success
 authorization: Bearer {{nbi_token}}
 ###
 
-GET http://{{nbi_url}}//nbi/radius/online/query
+GET http://{{nbi_url}}/nbi/radius/online/query
+authorization: Bearer {{nbi_token}}
+###
+
+GET http://{{nbi_url}}/nbi/radius/online/clear?ids=112234
 authorization: Bearer {{nbi_token}}
 ###

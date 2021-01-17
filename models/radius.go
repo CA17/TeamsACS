@@ -140,10 +140,17 @@ func (m *RadiusManager) DeleteRadiusOnline(sessionid string) error {
 	return err
 }
 
+// func (m *RadiusManager) BatchDeleteRadiusOnline(sessionids string) error {
+// 	_, err := m.GetTeamsAcsCollection(TeamsacsOnline).DeleteMany(context.TODO(),
+// 		bson.M{"acct_session_id": bson.M{"$in": strings.Split(sessionids, ",")}})
+// 	return err
+// }
+
 func (m *RadiusManager) BatchDeleteRadiusOnline(sessionids string) error {
-	_, err := m.GetTeamsAcsCollection(TeamsacsOnline).DeleteMany(context.TODO(),
-		bson.M{"acct_session_id": bson.M{"$in": strings.Split(sessionids, ",")}})
-	return err
+	for _, sid := range strings.Split(sessionids, ",") {
+		m.GetTeamsAcsCollection(TeamsacsOnline).DeleteOne(context.TODO(),bson.M{"acct_session_id": sid})
+	}
+	return nil
 }
 
 func (m *RadiusManager) TruncateRadiusOnline() error {

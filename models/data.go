@@ -39,12 +39,25 @@ func (m *ModelManager) GetDataManager() *DataManager {
 	return store.(*DataManager)
 }
 
-// GetDataById
+// GetData
 func (m *DataManager) GetData(params web.RequestParams) (*Attributes, error) {
 	_id := params.GetParamMap("querymap").GetMustString("_id")
 	collname := params.GetMustString("collname")
 	coll := m.GetTeamsAcsCollection(collname)
 	doc := coll.FindOne(context.TODO(), bson.M{"_id": _id})
+	err := doc.Err()
+	if err != nil {
+		return nil, err
+	}
+	var result = new(Attributes)
+	err = doc.Decode(result)
+	return result, err
+}
+
+// GetDataById
+func (m *DataManager) GetDataByAttr(collname,attrname string, attrvalue interface{}) (*Attributes, error) {
+	coll := m.GetTeamsAcsCollection(collname)
+	doc := coll.FindOne(context.TODO(), bson.M{attrname: attrvalue})
 	err := doc.Err()
 	if err != nil {
 		return nil, err

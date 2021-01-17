@@ -62,9 +62,9 @@ func (m *ModelManager) GetCpeManager() *CpeManager {
 	return store.(*CpeManager)
 }
 
-func (m *CpeManager) GetCpeByDeviceId(device_id string) (*Cpe, error) {
+func (m *CpeManager) GetCpeByAttr(name string, value interface{}) (*Cpe, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
-	doc := coll.FindOne(context.TODO(), bson.M{"device_id": device_id})
+	doc := coll.FindOne(context.TODO(), bson.M{name: value})
 	err := doc.Err()
 	if err != nil {
 		return nil, err
@@ -74,16 +74,17 @@ func (m *CpeManager) GetCpeByDeviceId(device_id string) (*Cpe, error) {
 	return result, err
 }
 
+
+func (m *CpeManager) GetCpeById(id string) (*Cpe, error) {
+	return m.GetCpeByAttr("_id", id)
+}
+
+func (m *CpeManager) GetCpeByDeviceId(deviceId string) (*Cpe, error) {
+	return m.GetCpeByAttr("device_id", deviceId)
+}
+
 func (m *CpeManager) GetCpeBySn(sn string) (*Cpe, error) {
-	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
-	doc := coll.FindOne(context.TODO(), bson.M{"sn": sn})
-	err := doc.Err()
-	if err != nil {
-		return nil, err
-	}
-	var result = new(Cpe)
-	err = doc.Decode(result)
-	return result, err
+	return m.GetCpeByAttr("sn", sn)
 }
 
 func (m *CpeManager) QueryCpes(params web.RequestParams) (*web.PageResult, error) {
@@ -174,6 +175,22 @@ func (m *CpeManager) UpdateCpeBySn(sn string, valmap map[string]interface{}) err
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
 	update := bson.M{"$set": valmap}
 	_, err := coll.UpdateOne(context.TODO(), bson.M{"sn": sn}, update)
+	return err
+}
+
+
+// UpdateVpeBySn
+func (m *CpeManager) UpdateCpeSubscribeInfo(id string) error {
+	subs, err := m.GetSubscribeManager().GetSubscribeByCpeid(id)
+	if err != nil {
+		return err
+	}
+	valmap := map[string]interface{}{
+		"subscribe_username": subs.GetUsername(),
+	}
+	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
+	update := bson.M{"$set": valmap}
+	_, err = coll.UpdateOne(context.TODO(), bson.M{"_id": id}, update)
 	return err
 }
 

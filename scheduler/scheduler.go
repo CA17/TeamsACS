@@ -9,12 +9,12 @@ import (
 )
 
 func Start(manager *models.ModelManager) error {
-	s := gocron.NewScheduler(time.UTC)
+	manager.Sched = gocron.NewScheduler(manager.Location)
 	// 日志分发任务
-	_, _ = s.Every(1).Day().StartImmediately().Do(ElkDataSync, manager)
+	_, _ = manager.Sched.Every(1).Day().StartImmediately().Do(ElkDataSync, manager)
 	time.Sleep(time.Second*30)
-	_, _ = s.Every(60).Second().StartImmediately().Do(SyncAcsDeviceInfo, manager)
-	_, _ = s.Every(60).Second().StartImmediately().Do(StatAcsDeviceEif, manager)
+	_, _ = manager.Sched.Every(60).Second().StartImmediately().Do(SyncAcsDeviceInfo, manager)
+	_, _ = manager.Sched.Every(60).Second().StartImmediately().Do(StatAcsDeviceEif, manager)
 	// _, _ = s.Every(10).Minute().Do(CheckAcsScriptTask, manager, "10m")
 	// _, _ = s.Every(30).Minute().Do(CheckAcsScriptTask, manager, "30m")
 	// _, _ = s.Every(60).Minute().Do(CheckAcsScriptTask, manager, "60m")
@@ -24,6 +24,6 @@ func Start(manager *models.ModelManager) error {
 	// _, _ = s.Every(12).Hour().Do(CheckAcsScriptTask, manager, "12h")
 	// _, _ = s.Every(24).Hour().Do(CheckAcsScriptTask, manager, "24")
 	// _, _ = s.Every(60).Seconds().StartImmediately().Do(UpdateSysinfoTask, manager)
-	<-s.Start()
+	<-manager.Sched.Start()
 	return nil
 }

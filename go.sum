@@ -20,6 +20,8 @@ github.com/ahmetb/go-linq v3.0.0+incompatible h1:qQkjjOXKrKOTy83X8OpRmnKflXKQIL/
 github.com/ahmetb/go-linq v3.0.0+incompatible/go.mod h1:PFffvbdbtw+QTB0WKRP0cNht7vnCfnGlEpak/DVg5cY=
 github.com/armon/go-radix v1.0.0 h1:F4z6KzEeeQIMeLFa97iZU6vupzoecKdU5TX24SNppXI=
 github.com/armon/go-radix v1.0.0/go.mod h1:ufUuZ+zHj4x4TnLV4JWEpy2hxWSpsRywHrMgIH9cCH8=
+github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef h1:2JGTg6JapxP9/R33ZaagQtAM4EkkSYnIAlOG5EI8gkM=
+github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef/go.mod h1:JS7hed4L1fj0hXcyEejnW57/7LCetXggd+vwrRnYeII=
 github.com/aws/aws-sdk-go v1.34.28 h1:sscPpn/Ns3i0F4HPEWAVcwdIRaZZCuL7llJ2/60yPIk=
 github.com/aws/aws-sdk-go v1.34.28/go.mod h1:H7NKnBqNVzoTJpGfLrQkkD+ytBA93eiDYi/+8rV9s48=
 github.com/aws/aws-sdk-go v1.35.20 h1:Hs7x9Czh+MMPnZLQqHhsuZKeNFA3Vuf7pdy2r5QlVb0=

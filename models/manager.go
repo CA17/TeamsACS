@@ -29,6 +29,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	evbus "github.com/asaskevich/EventBus"
+
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/azureblob"
 	"github.com/ca17/teamsacs/common/elk"
@@ -70,6 +72,7 @@ type NameValue struct {
 
 type ModelManager struct {
 	Config       *config.AppConfig
+	Bus          evbus.Bus
 	Mongo        *mongo.Client
 	Elastic      *Elastic
 	AzureBlobC   *azureblob.AzureBlob
@@ -86,6 +89,7 @@ type ModelManager struct {
 
 func NewModelManager(appconfig *config.AppConfig, dev bool) *ModelManager {
 	m := &ModelManager{Config: appconfig, Dev: dev}
+	m.Bus = evbus.New();
 	m.ManagerMap = cmap.New()
 	m.DeviceStatCache = cmap.New()
 	_mongodb, err := mongodb.GetMongodbClient(appconfig.Mongodb)
@@ -99,7 +103,6 @@ func NewModelManager(appconfig *config.AppConfig, dev bool) *ModelManager {
 	m.TplRender = tpl.NewCommonTemplate([]string{"/resources/templates"}, m.Dev, m.GetTemplateFuncMap())
 	m.SetupSyslogDB()
 	m.SetupElastic()
-	go m.StartScheduler()
 	return m
 }
 

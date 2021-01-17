@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/maputils"
@@ -116,6 +117,20 @@ func (m *ModelManager) GetSubscribeManager() *SubscribeManager {
 	return store.(*SubscribeManager)
 }
 
+// GetSubscribeByAttr
+func (m *SubscribeManager) GetSubscribeByAttr(name string, value interface{}) (*Subscribe, error) {
+	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
+	doc := coll.FindOne(context.TODO(), bson.M{name: value})
+	err := doc.Err()
+	if err != nil {
+		return nil, err
+	}
+	var result = new(Subscribe)
+	err = doc.Decode(result)
+	return result, err
+}
+
+
 // QuerySubscribes
 func (m *SubscribeManager) QuerySubscribes(params web.RequestParams) (*web.PageResult, error) {
 	return m.QueryPagerItems(params, TeamsacsSubscribe)
@@ -123,28 +138,23 @@ func (m *SubscribeManager) QuerySubscribes(params web.RequestParams) (*web.PageR
 
 // GetSubscribeByUser
 func (m *SubscribeManager) GetSubscribeByUser(username string) (*Subscribe, error) {
-	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
-	doc := coll.FindOne(context.TODO(), bson.M{"username": username})
-	err := doc.Err()
-	if err != nil {
-		return nil, err
-	}
-	var result = new(Subscribe)
-	err = doc.Decode(result)
-	return result, err
+	return m.GetSubscribeByAttr("username", username)
 }
 
 // GetSubscribeByMac
 func (m *SubscribeManager) GetSubscribeByMac(mac string) (*Subscribe, error) {
-	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
-	doc := coll.FindOne(context.TODO(), bson.M{"macaddr": mac})
-	err := doc.Err()
-	if err != nil {
-		return nil, err
-	}
-	var result = new(Subscribe)
-	err = doc.Decode(result)
-	return result, err
+	return m.GetSubscribeByAttr("macaddr", mac)
+}
+
+// GetSubscribeById
+func (m *SubscribeManager) GetSubscribeById(id string) (*Subscribe, error) {
+	return m.GetSubscribeByAttr("_id", id)
+}
+
+// GetSubscribeByCpeid
+func (m *SubscribeManager) GetSubscribeByCpeid(cpeid string) (*Subscribe, error) {
+	filter := bson.D{{"$regex", primitive.Regex{Pattern: cpeid, Options: "i"}}}
+	return m.GetSubscribeByAttr("cpe_ids", filter)
 }
 
 // UpdateSubscribeByUsername
@@ -154,7 +164,9 @@ func (m *SubscribeManager) UpdateSubscribeByUsername(username string, valmap map
 	return err
 }
 
-
+// AddSubscribeData
+// Create an account while the view is synchronized to Elastic
+// If no Elastic configuration is available, the sync will be ignored
 func (m *SubscribeManager) AddSubscribeData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
 	_id := data.GetString("_id")
@@ -165,7 +177,6 @@ func (m *SubscribeManager) AddSubscribeData(params web.RequestParams) error {
 		_ = m.Elastic.AddData("teamsacs_subscribe", data)
 	}()
 	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
-	var err error
-	_, err = coll.InsertOne(context.TODO(), data)
+	_, err := coll.InsertOne(context.TODO(), data)
 	return err
 }
