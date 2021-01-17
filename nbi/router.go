@@ -51,7 +51,8 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	e.Any("/nbi/radius/authlog/query", h.QueryRadiusAuthlog)
 	e.Any("/nbi/radius/online/query", h.QueryRadiusOnline)
 	e.Any("/nbi/radius/online/clear", h.ClearRadiusOnline)
-	e.Any("/nbi/radius/online/disconnect/truncate", h.TruncateRadiusOnline)
+	e.GET("/nbi/radius/online/count/:username", h.GetRadiusOnlineCountText)
+	e.GET("/nbi/radius/online/disconnect/truncate", h.TruncateRadiusOnline)
 
 	// config apis
 	e.POST("/nbi/config/radius/update", h.UpdateRadiusConfigs)
@@ -65,6 +66,9 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	e.Any("/nbi/cpe/policy/mikrotik/runapi", h.RunMikrotikCpeApiPolicy)
 	e.Any("/nbi/cpe/policy/runtr069", h.RunCpeTr069Policy)
 	e.Any("/nbi/cpe/policy/mikrotik/runscript", h.RunMikrotikCpeScriptPolicy)
+	e.Any("/nbi/cpe/policy/mikrotik/tasks", h.GetMikrotikAcsTasks)
+	e.Any("/nbi/cpe/policy/mikrotik/tasks/retry", h.RetryMikrotikAcsTasks)
+	e.Any("/nbi/cpe/policy/mikrotik/tasks/delete", h.DeleteMikrotikAcsTasks)
 	e.POST("/nbi/cpe/backup/upload/:sn", h.UploadCpeBackup)
 
 	e.Any("/nbi/vpe/add", h.AddVpeData)

@@ -19,6 +19,7 @@ package mikrotik_api
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"gopkg.in/routeros.v2"
 
@@ -49,7 +50,7 @@ func GetConnection(apiUser string, apiPwd string, apiAddr string, TLS bool) (*Mi
 
 func (a *MikrotikApi) Connect() error {
 	var err error
-	a.Client, err = routeros.Dial(a.ApiAddr, a.ApiUser, a.ApiPwd)
+	a.Client, err = routeros.DialTimeout(a.ApiAddr, a.ApiUser, a.ApiPwd, time.Second*3)
 	if err != nil {
 		return fmt.Errorf("connect mikrotik device error %s", err.Error())
 	}
@@ -161,4 +162,14 @@ func (a *MikrotikApi) GetSystemResource() (map[string]string, error) {
 		return nil, errors.New("no result")
 	}
 	return reply.Re[0].Map, nil
+}
+
+// AddApiUser
+// add  api user
+func (a *MikrotikApi) AddApiUser(name, password string) error {
+	_, err := a.Client.Run("/user/add", "=name="+name, "=password="+password, "=group=write", "=comment=ApiUser")
+	if err != nil {
+		return fmt.Errorf("AddApiUser Execute Api error %s", err.Error())
+	}
+	return nil
 }

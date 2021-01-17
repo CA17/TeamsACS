@@ -28,13 +28,6 @@ func StatMikrotikDeviceToElastic(manager *models.ModelManager) {
 		}
 	}()
 
-	err := manager.GetDeviceManager().SyncMikrotikDeviceToElastic("cpe");
-	if err != nil {
-		log.Errorf("SyncMikrotikDeviceToElastic(CPE) error %s", err.Error())
-	}
+	manager.GetMikrotikDeviceManager().SyncMikrotikDeviceStatToElastic("cpe", "vpe")
 
-	err = manager.GetDeviceManager().SyncMikrotikDeviceToElastic("vpe");
-	if err != nil {
-		log.Errorf("SyncMikrotikDeviceToElastic(VPE) error %s", err.Error())
-	}
 }

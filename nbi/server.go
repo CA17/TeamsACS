@@ -28,7 +28,6 @@ import (
 	elog "github.com/labstack/gommon/log"
 	"go.elastic.co/apm/module/apmechov4"
 
-	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/common/tpl"
 	"github.com/ca17/teamsacs/models"
@@ -77,14 +76,14 @@ func ListenNBIServer(manager *models.ModelManager) error {
 	manager.TplRender = tpl.NewCommonTemplate([]string{"/resources/templates"}, manager.Dev, manager.GetTemplateFuncMap())
 	e.Renderer = manager.TplRender
 	e.HideBanner = true
-	e.Logger.SetLevel(common.If(manager.Config.NBI.Debug, elog.DEBUG, elog.INFO).(elog.Lvl))
+	e.Logger.SetLevel(elog.INFO)
 	e.Debug = manager.Config.NBI.Debug
 	log.Info("try start tls web server")
 	err := e.StartTLS(fmt.Sprintf("%s:%d", manager.Config.NBI.Host, manager.Config.NBI.Port),
 		path.Join(manager.Config.GetPrivateDir(), "teamsacs-nbi.tls.crt"), path.Join(manager.Config.GetPrivateDir(), "teamsacs-nbi.tls.key"))
 	if err != nil {
 		log.Warningf("start tls server error %s", err)
-		log.Info("start web server")
+		log.Infof("start web server %s:%d", manager.Config.NBI.Host, manager.Config.NBI.Port)
 		err = e.Start(fmt.Sprintf("%s:%d", manager.Config.NBI.Host, manager.Config.NBI.Port))
 	}
 	return err

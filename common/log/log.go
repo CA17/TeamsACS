@@ -39,9 +39,7 @@ func SetupLog(level logging.Level, syslogaddr string, logdir string, module stri
 		`%{color} %{time:15:04:05.000} %{pid} %{shortfile} %{shortfunc} > %{level:.4s} %{id:03x}%{color:reset} %{message}`,
 	)
 	Backends := make([]logging.Backend, 0)
-	backendStderr := logging.NewLogBackend(os.Stderr, "", 0)
-	backendFormatter := logging.NewBackendFormatter(backendStderr, format)
-	Backends = append(Backends, backendFormatter)
+	Backends = append(Backends, logging.NewBackendFormatter(logging.NewLogBackend(os.Stderr, "", 0), format))
 	bs := SetupSyslog(level, syslogaddr, module)
 	bf := FileSyslog(level, logdir, module)
 
@@ -51,6 +49,7 @@ func SetupLog(level logging.Level, syslogaddr string, logdir string, module stri
 	if bf != nil {
 		Backends = append(Backends, bf)
 	}
+
 	logging.SetBackend(Backends...)
 	logging.SetLevel(level, module)
 	log = logging.MustGetLogger(module)
@@ -106,6 +105,11 @@ func FileSyslog(level logging.Level, logdir string, module string) logging.Level
 	return backend1Leveled
 }
 
+type Stdlog struct {}
+func (s Stdlog) Write(p []byte) (n int, err error){
+	log.Info(string(p))
+	return len(p), nil
+}
 
 var (
 	Error    = log.Error
@@ -123,3 +127,4 @@ var (
 		return log.IsEnabledFor(logging.DEBUG)
 	}
 )
+

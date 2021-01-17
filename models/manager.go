@@ -135,7 +135,7 @@ func (m *ModelManager) registerManagers() {
 	m.ManagerMap.Set("GenieacsManager", &GenieacsManager{m})
 	m.ManagerMap.Set("DataManager", &DataManager{m})
 	m.ManagerMap.Set("PolicyManager", &PolicyManager{m})
-	m.ManagerMap.Set("DeviceManager", &DeviceManager{m})
+	m.ManagerMap.Set("MikrotikDeviceManager", &MikrotikDeviceManager{m})
 }
 
 func (m *ModelManager) GetTeamsAcsCollection(coll string) *mongo.Collection {

@@ -18,6 +18,7 @@ package nbi
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 
@@ -36,6 +37,13 @@ func (h *HttpHandler) QueryRadiusAuthlog(c echo.Context) error {
 	data, err := h.GetManager().GetRadiusManager().QueryAuthlogs(params)
 	common.Must(err)
 	return c.JSON(http.StatusOK, data)
+}
+
+func (h *HttpHandler) GetRadiusOnlineCountText(c echo.Context) error {
+	username := c.Param("username")
+	count, err := h.GetManager().GetRadiusManager().GetOnlineCount(username)
+	common.Must(err)
+	return c.String(200, strconv.FormatInt(count, 10))
 }
 
 func (h *HttpHandler) QueryRadiusOnline(c echo.Context) error {

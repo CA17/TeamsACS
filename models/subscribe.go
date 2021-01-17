@@ -119,7 +119,7 @@ func (m *ModelManager) GetSubscribeManager() *SubscribeManager {
 
 // GetSubscribeByAttr
 func (m *SubscribeManager) GetSubscribeByAttr(name string, value interface{}) (*Subscribe, error) {
-	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
+	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
 	doc := coll.FindOne(context.TODO(), bson.M{name: value})
 	err := doc.Err()
 	if err != nil {

@@ -55,12 +55,13 @@ func (h *HttpHandler) RunMikrotikCpeScriptPolicy(c echo.Context) error {
 		log.Error(err)
 	}
 
+	log.Info(busyDeviceIds)
 	// CPE can only perform one task at a time.
 	if busyDeviceIds != nil && len(busyDeviceIds) > 0 && common.InSlice(cpe.GetDeviceId(), busyDeviceIds) {
 		return fmt.Errorf("cpe %s there are still unexecuted tasks, waiting or deleting old ones", cpe.GetDeviceId())
 	}
-
-	filename := fmt.Sprintf("%s-latest-task.alter", cpe.GetDeviceId())
+	deviceUid := common.Md5Hash(cpe.GetDeviceId())
+	filename := fmt.Sprintf("%s-latest-task.alter",deviceUid )
 	fileurl := common.UrlJoin(h.GetManager().Config.Genieacs.NbiUrl, "files/"+filename)
 
 	// Delete old script
@@ -127,7 +128,7 @@ func (h *HttpHandler) RunMikrotikCpeScriptPolicy(c echo.Context) error {
 		return c.JSON(200, h.RestError(fmt.Sprintf("Tr069 Post script task error %s", err.Error())))
 	}
 	if h.GetManager().Config.Genieacs.Debug {
-		log.Infof("Tr069 Post script task resp statusCode:", taskresp.StatusCode)
+		log.Infof("Tr069 Post script task resp statusCode:%d", taskresp.StatusCode)
 	}
 
 	defer taskresp.Body.Close()
@@ -140,7 +141,33 @@ func (h *HttpHandler) RunMikrotikCpeScriptPolicy(c echo.Context) error {
 	if h.GetManager().Config.Genieacs.Debug {
 		log.Info(bodystr)
 	}
+
+	go func() {
+		time.Sleep(time.Second*3)
+		data, _ := h.GetManager().GetGenieacsManager().GetAcsTaskDataList()
+		s, _ := json.MarshalIndent(data, "", "\t")
+		log.Info(string(s))
+	}()
+
 	return c.JSON(200, h.RestResult(bodystr))
 
 }
 
+
+func (h *HttpHandler) GetMikrotikAcsTasks(c echo.Context) error {
+	data, err := h.GetManager().GetGenieacsManager().GetAcsTaskDataList()
+	common.Must(err)
+	return c.JSON(200, data)
+}
+
+func (h *HttpHandler) RetryMikrotikAcsTasks(c echo.Context) error {
+	err := h.GetManager().GetGenieacsManager().RetryAcsTaskData(c.QueryParam("ids"))
+	common.Must(err)
+	return c.JSON(200, h.RestSucc("Success"))
+}
+
+func (h *HttpHandler) DeleteMikrotikAcsTasks(c echo.Context) error {
+	err := h.GetManager().GetGenieacsManager().DeleteAcsTaskData(c.QueryParam("ids"))
+	common.Must(err)
+	return c.JSON(200, h.RestSucc("Success"))
+}

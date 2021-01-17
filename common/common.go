@@ -395,6 +395,11 @@ func Md5HashFile(filePath string) (string, error) {
 	return returnMD5String, nil
 }
 
+func Md5Hash(src string) string {
+	hash := md5.Sum([]byte(src))
+	return hex.EncodeToString(hash[:])
+}
+
 func UrlJoin(hurl string, elm ...string) string {
 	u, err := url.Parse(hurl)
 	Must(err)
@@ -514,5 +519,3 @@ func GetPointTime(s *time.Time) time.Time {
 	}
 	return time.Time{}
 }
-
-

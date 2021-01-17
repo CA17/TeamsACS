@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/ahmetb/go-linq"
@@ -279,6 +280,7 @@ type GenieacsTask struct {
 	FileName  string    `json:"fileName"`
 	FileType  string    `json:"fileType"`
 	Name      string    `json:"name"`
+	Status    string    `json:"status"`
 	Device    string    `json:"device"`
 	Timestamp time.Time `json:"timestamp"`
 }
@@ -308,6 +310,82 @@ func (m *GenieacsManager) GetAcsTaskDeviceIdList() ([]string, error) {
 		result = append(result, r.Device)
 	}
 	return result, nil
+}
+
+func (m *GenieacsManager) GetAcsTaskDataList() ([]GenieacsTask, error) {
+	resp := make([]GenieacsTask, 0)
+
+	hresp, err := http.Get(common.UrlJoin(m.Config.Genieacs.NbiUrl, "/tasks"))
+	if err != nil {
+		return nil, err
+	}
+
+	defer hresp.Body.Close()
+	body, err := ioutil.ReadAll(hresp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read tasks resp error %s", err.Error())
+	}
+
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return nil, fmt.Errorf("read tasks json resp error %s", err.Error())
+	}
+	return resp, nil
+}
+
+func (m *GenieacsManager) RetryAcsTaskData(ids string) error {
+	client := &http.Client{}
+	client.Timeout = time.Second * 30
+	for _, tid := range strings.Split(ids, ",") {
+		url := common.UrlJoin(m.Config.Genieacs.NbiUrl, "/tasks/"+tid+"/retry")
+		req, err := http.NewRequest(http.MethodPost, url, nil)
+		common.Must(err)
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Errorf("RetryAcsTaskData error %s", err.Error())
+			continue
+		}
+		log.Infof("RetryAcsTaskData device:%s %d", tid, resp.StatusCode)
+	}
+	return nil
+}
+
+func (m *GenieacsManager) DeleteAcsTaskData(ids string) error {
+	client := &http.Client{}
+	client.Timeout = time.Second * 30
+	for _, tid := range strings.Split(ids, ",") {
+		url := common.UrlJoin(m.Config.Genieacs.NbiUrl, "/tasks/"+tid+"")
+		req, err := http.NewRequest(http.MethodDelete, url, nil)
+		common.Must(err)
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Errorf("DeleteAcsTaskData error %s", err.Error())
+			continue
+		}
+		log.Infof("DeleteAcsTaskData device:%s %d", tid, resp.StatusCode)
+	}
+	return nil
+}
+
+func (m *GenieacsManager) GetAcsTaskData(taskid string) (*GenieacsTask, error) {
+	resp := new(GenieacsTask)
+
+	hresp, err := http.Get(common.UrlJoin(m.Config.Genieacs.NbiUrl, "/tasks/"+taskid))
+	if err != nil {
+		return nil, err
+	}
+
+	defer hresp.Body.Close()
+	body, err := ioutil.ReadAll(hresp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read tasks resp error %s", err.Error())
+	}
+
+	err = json.Unmarshal(body, resp)
+	if err != nil {
+		return nil, fmt.Errorf("read tasks json resp error %s", err.Error())
+	}
+	return resp, nil
 }
 
 var picmap = map[string]string{
@@ -350,12 +428,12 @@ func (m GenieacsManager) SyncMikrotikDeviceInfo(devinfos []mikrotik.DeviceInfo) 
 			"cpuuse":        dev.CPUUsage,
 			"memuse":        dev.MemoryUsage,
 			"version":       dev.HardwareVersion,
-			"sversion":       dev.SoftwareVersion,
+			"sversion":      dev.SoftwareVersion,
 			"timestamp":     dev.Timestamp,
 			"picture":       picture,
 			"update_time":   ctime,
 			"last_inform":   ctime,
-			"online_status":   onlineStatus,
+			"online_status": onlineStatus,
 		}
 		valmap := make(map[string]interface{})
 		for k, v := range _valmap {
