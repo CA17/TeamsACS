@@ -73,8 +73,6 @@ func (a *MikrotikApi) ExecuteCommand(command string, params string, props string
 	return reply, nil
 }
 
-
-
 // AddSocksUser
 func (a *MikrotikApi) AddSocksUser(name, password, rateLimit string) error {
 	_, err := a.Client.Run("/ip/socks/users/add", "=name="+name, "=password="+password, "=only-one=yes", "=rate-limit="+rateLimit)
@@ -101,7 +99,6 @@ func (a *MikrotikApi) RemoveSocksUser(name string) error {
 	}
 	return nil
 }
-
 
 // AddPPPUser
 // add  ppp user with fix ip
@@ -131,4 +128,22 @@ func (a *MikrotikApi) RemovePPPUser(name string) error {
 	return nil
 }
 
-
+// GetInterfaceStats
+func (a *MikrotikApi) GetInterfaceStats() ([]map[string]string, error) {
+	var result = make([]map[string]string, 0)
+	args := []string{"/interface/print", "stats", "name,rx-byte,tx-byte,rx-packet,tx-packet"}
+	if a.Debug {
+		log.Info(strings.Join(args, " "))
+	}
+	reply, err := a.Client.Run(args...)
+	if err != nil {
+		return nil, fmt.Errorf("GetInterfaceStats error %s", err.Error())
+	}
+	if a.Debug {
+		log.Info(reply.String())
+	}
+	for _, re := range reply.Re {
+		result = append(result, re.Map)
+	}
+	return result, nil
+}
