@@ -98,7 +98,7 @@ func (m *DeviceManager) SyncMikrotikDeviceToElastic(devtype string) error {
 				Tags:      maputils.GetStringValue(dev, "tags", ""),
 				Model:     maputils.GetStringValue(dev, "model", ""),
 				Version:   maputils.GetStringValue(dev, "sversion", ""),
-				Devtype:   "vpe",
+				Devtype:   devtype,
 				Netstat:   &nstat,
 				Sysstat: &elastic.DeviceSysstat{
 					UpTime:     maputils.GetInt64Value(dev, "uptime", 0),
