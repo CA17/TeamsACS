@@ -56,3 +56,29 @@ func TestMikrotikApi_ExecuteCommand(t *testing.T) {
 	}
 	t.Log(r)
 }
+
+func TestMikrotikApi_GetSystemResource(t *testing.T) {
+	api := NewMikrotikApi("apiuser", "apipwd", "192.168.100.1:8728", false)
+	err := api.Connect()
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := api.GetSystemResource()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(r)
+}
+
+func TestMikrotikApi_GetInterfaceStats(t *testing.T) {
+	api := NewMikrotikApi("apiuser", "apipwd", "192.168.100.1:8728", false)
+	err := api.Connect()
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := api.GetInterfaceStats()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(r)
+}

@@ -14,7 +14,7 @@ func Start(manager *models.ModelManager) error {
 	_, _ = manager.Sched.Every(1).Day().StartImmediately().Do(ElkDataSync, manager)
 	time.Sleep(time.Second*30)
 	_, _ = manager.Sched.Every(60).Second().StartImmediately().Do(SyncAcsDeviceInfo, manager)
-	_, _ = manager.Sched.Every(60).Second().StartImmediately().Do(StatAcsDeviceEif, manager)
+	_, _ = manager.Sched.Every(60).Second().StartImmediately().Do(StatMikrotikDeviceToElastic, manager)
 	// _, _ = s.Every(10).Minute().Do(CheckAcsScriptTask, manager, "10m")
 	// _, _ = s.Every(30).Minute().Do(CheckAcsScriptTask, manager, "30m")
 	// _, _ = s.Every(60).Minute().Do(CheckAcsScriptTask, manager, "60m")

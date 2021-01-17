@@ -14,7 +14,7 @@
  *
  */
 
-package models
+package elastic
 
 import (
 	"context"
@@ -109,9 +109,6 @@ const _mapping = `
           "interface": {
             "type": "keyword"
           },
-          "mac": {
-            "type": "keyword"
-          },
 		  "stattime": {
 	        "type": "date"
 	      },
@@ -119,18 +116,6 @@ const _mapping = `
             "type": "long"
           },
           "recvBytes": {
-            "type": "long"
-          },
-          "sendDrops": {
-            "type": "long"
-          },
-          "recvDrops": {
-            "type": "long"
-          },
-          "sendErrors": {
-            "type": "long"
-          },
-          "recvErrors": {
             "type": "long"
           },
           "sendPackets": {
@@ -210,7 +195,6 @@ const _mapping = `
 }`
 
 type DeviceSysstat struct {
-	Stattime   string `json:"stattime"`
 	UpTime     int64  `json:"upTime"`
 	MemPercent int64  `json:"memPercent"`
 	CpuPercent int64  `json:"cpuPercent"`
@@ -218,17 +202,12 @@ type DeviceSysstat struct {
 
 type DeviceNetstat struct {
 	Interface   string `json:"interface"`
-	Mac         string `json:"mac"`
-	Stattime    string `json:"stattime"`
 	SendBytes   int64  `json:"sendBytes"`
 	RecvBytes   int64  `json:"recvBytes"`
-	SendDrops   int64  `json:"sendDrops"`
-	RecvDrops   int64  `json:"recvDrops"`
-	SendErrors  int64  `json:"sendErrors"`
-	RecvErrors  int64  `json:"recvErrors"`
 	SendPackets int64  `json:"sendPackets"`
 	RecvPackets int64  `json:"recvPackets"`
 }
+
 type Radiuslog struct {
 	Username          string `json:"username"`
 	AcctSessionId     string `json:"acctSessionId"`
@@ -256,11 +235,11 @@ type TeamsacsLog struct {
 	Timestamp string         `json:"@timestamp"`
 	Source    string         `json:"source"`
 	Sn        string         `json:"sn"`
-	Name      string         `json:"name"`
+	Name      string         `json:"name,omitempty"`
 	Tags      string         `json:"tags,omitempty"`
-	Model     string         `json:"model"`
-	Version   string         `json:"version"` // ros ver
-	Devtype   string         `json:"devtype"` // cpe | vpe
+	Model     string         `json:"model,omitempty"`
+	Version   string         `json:"version,omitempty"` // ros ver
+	Devtype   string         `json:"devtype,omitempty"` // cpe | vpe
 	Sysstat   *DeviceSysstat `json:"sysstat,omitempty"`
 	Netstat   *DeviceNetstat `json:"netstat,omitempty"`
 	Radiuslog *Radiuslog     `json:"radiuslog,omitempty"`

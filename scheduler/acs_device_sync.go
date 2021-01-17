@@ -16,7 +16,7 @@ func SyncAcsDeviceInfo(manager *models.ModelManager) {
 
 	devinfos, err := manager.GetGenieacsManager().QueryMikrotikDeviceInfo()
 	if err != nil {
-		log.Error("SyncAcsDeviceInfo error, query deviceInfo error", err)
+		log.Errorf("SyncAcsDeviceInfo error, query deviceInfo error %s", err.Error())
 		return
 	}
 

@@ -1,0 +1,670 @@
+{
+  "Re": [
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "ether1"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "176418199832"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "26099616808"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "154145141"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "93550768"
+        }
+      ],
+      "Map": {
+        "name": "ether1",
+        "rx-byte": "176418199832",
+        "rx-packet": "154145141",
+        "tx-byte": "26099616808",
+        "tx-packet": "93550768"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "ether2"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "0"
+        }
+      ],
+      "Map": {
+        "name": "ether2",
+        "rx-byte": "0",
+        "rx-packet": "0",
+        "tx-byte": "0",
+        "tx-packet": "0"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "ether3"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "0"
+        }
+      ],
+      "Map": {
+        "name": "ether3",
+        "rx-byte": "0",
+        "rx-packet": "0",
+        "tx-byte": "0",
+        "tx-packet": "0"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "ether4"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "0"
+        }
+      ],
+      "Map": {
+        "name": "ether4",
+        "rx-byte": "0",
+        "rx-packet": "0",
+        "tx-byte": "0",
+        "tx-packet": "0"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "ether5"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "0"
+        }
+      ],
+      "Map": {
+        "name": "ether5",
+        "rx-byte": "0",
+        "rx-packet": "0",
+        "tx-byte": "0",
+        "tx-packet": "0"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "wlan1"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "10038269"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "190963634"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "56171"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "146239"
+        }
+      ],
+      "Map": {
+        "name": "wlan1",
+        "rx-byte": "10038269",
+        "rx-packet": "56171",
+        "tx-byte": "190963634",
+        "tx-packet": "146239"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "wlan2"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "165360127"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "2395860419"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "1076586"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "1763153"
+        }
+      ],
+      "Map": {
+        "name": "wlan2",
+        "rx-byte": "165360127",
+        "rx-packet": "1076586",
+        "tx-byte": "2395860419",
+        "tx-packet": "1763153"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "wlan3"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "13970067718"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "112788000537"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "55690493"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "95067574"
+        }
+      ],
+      "Map": {
+        "name": "wlan3",
+        "rx-byte": "13970067718",
+        "rx-packet": "55690493",
+        "tx-byte": "112788000537",
+        "tx-packet": "95067574"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "wlan4"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "3435765627"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "52840123485"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "24446913"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "44849440"
+        }
+      ],
+      "Map": {
+        "name": "wlan4",
+        "rx-byte": "3435765627",
+        "rx-packet": "24446913",
+        "tx-byte": "52840123485",
+        "tx-packet": "44849440"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "Home-TO-Office"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "0"
+        }
+      ],
+      "Map": {
+        "name": "Home-TO-Office",
+        "rx-byte": "0",
+        "rx-packet": "0",
+        "tx-byte": "0",
+        "tx-packet": "0"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "Manage_links"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "2076001117"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "6550016214"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "8264915"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "9305983"
+        }
+      ],
+      "Map": {
+        "name": "Manage_links",
+        "rx-byte": "2076001117",
+        "rx-packet": "8264915",
+        "tx-byte": "6550016214",
+        "tx-packet": "9305983"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "UNICOM"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "172314525231"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "23657585710"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "153734434"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "93470210"
+        }
+      ],
+      "Map": {
+        "name": "UNICOM",
+        "rx-byte": "172314525231",
+        "rx-packet": "153734434",
+        "tx-byte": "23657585710",
+        "tx-packet": "93470210"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "ZJ-network"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "0"
+        }
+      ],
+      "Map": {
+        "name": "ZJ-network",
+        "rx-byte": "0",
+        "rx-packet": "0",
+        "tx-byte": "0",
+        "tx-packet": "0"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "a365_vpn"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "5452881167"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "301688030"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "4586372"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "2114040"
+        }
+      ],
+      "Map": {
+        "name": "a365_vpn",
+        "rx-byte": "5452881167",
+        "rx-packet": "4586372",
+        "tx-byte": "301688030",
+        "tx-packet": "2114040"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "alab-network"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "6337461"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "2459711"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "99021"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "16513"
+        }
+      ],
+      "Map": {
+        "name": "alab-network",
+        "rx-byte": "6337461",
+        "rx-packet": "99021",
+        "tx-byte": "2459711",
+        "tx-packet": "16513"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "bridge_a365"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "17280363287"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "167923273682"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "79887745"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "138619775"
+        }
+      ],
+      "Map": {
+        "name": "bridge_a365",
+        "rx-byte": "17280363287",
+        "rx-packet": "79887745",
+        "tx-byte": "167923273682",
+        "tx-packet": "138619775"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "bridge_wan"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "175944977775"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "28329222137"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "155259853"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "95423900"
+        }
+      ],
+      "Map": {
+        "name": "bridge_wan",
+        "rx-byte": "175944977775",
+        "rx-packet": "155259853",
+        "tx-byte": "28329222137",
+        "tx-packet": "95423900"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "ipip-tunnel1"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "4158420"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "99010"
+        }
+      ],
+      "Map": {
+        "name": "ipip-tunnel1",
+        "rx-byte": "0",
+        "rx-packet": "0",
+        "tx-byte": "4158420",
+        "tx-packet": "99010"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "local-test"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "0"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "0"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "0"
+        }
+      ],
+      "Map": {
+        "name": "local-test",
+        "rx-byte": "0",
+        "rx-packet": "0",
+        "tx-byte": "0",
+        "tx-packet": "0"
+      }
+    },
+    {
+      "Word": "!re",
+      "Tag": "",
+      "List": [
+        {
+          "Key": "name",
+          "Value": "pptpsms"
+        },
+        {
+          "Key": "rx-byte",
+          "Value": "336397"
+        },
+        {
+          "Key": "tx-byte",
+          "Value": "2661717"
+        },
+        {
+          "Key": "rx-packet",
+          "Value": "5572"
+        },
+        {
+          "Key": "tx-packet",
+          "Value": "21360"
+        }
+      ],
+      "Map": {
+        "name": "pptpsms",
+        "rx-byte": "336397",
+        "rx-packet": "5572",
+        "tx-byte": "2661717",
+        "tx-packet": "21360"
+      }
+    }
+  ],
+  "Done": {
+    "Word": "!done",
+    "Tag": "",
+    "List": null,
+    "Map": {}
+  }
+}

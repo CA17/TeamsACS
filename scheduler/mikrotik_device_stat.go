@@ -21,17 +21,20 @@ import (
 	"github.com/ca17/teamsacs/models"
 )
 
-func StatAcsDeviceEif(manager *models.ModelManager) {
+func StatMikrotikDeviceToElastic(manager *models.ModelManager) {
 	defer func() {
 		if err := recover(); err != nil {
 			log.Error(err)
 		}
 	}()
 
-	err := manager.GetGenieacsManager().StatMikrotikEthernetInterface("")
+	err := manager.GetDeviceManager().SyncMikrotikDeviceToElastic("cpe");
 	if err != nil {
-		log.Error("StatAcsDeviceEif error", err)
-		return
+		log.Errorf("SyncMikrotikDeviceToElastic(CPE) error %s", err.Error())
 	}
 
+	err = manager.GetDeviceManager().SyncMikrotikDeviceToElastic("vpe");
+	if err != nil {
+		log.Errorf("SyncMikrotikDeviceToElastic(VPE) error %s", err.Error())
+	}
 }

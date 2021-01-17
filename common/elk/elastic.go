@@ -24,7 +24,6 @@ import (
 	"github.com/olivere/elastic/v7"
 )
 
-
 // GetClient
 // urls: elasticsearch service address, with multiple service addresses separated by commas
 // // account and password based on http base auth authentication mechanism
@@ -35,7 +34,7 @@ func NewElasticClient(user, pwd string, urls ...string) (*elastic.Client, error)
 		elastic.SetGzip(true),
 		elastic.SetHealthcheckInterval(10*time.Second),
 		// elastic.SetMaxRetries(5),
-		elastic.SetRetrier(elastic.NewBackoffRetrier(elastic.NewConstantBackoff(5 * time.Second))),
+		elastic.SetRetrier(elastic.NewBackoffRetrier(elastic.NewConstantBackoff(5*time.Second))),
 		elastic.SetErrorLog(log.New(os.Stderr, "ELASTIC ", log.LstdFlags)),
 		elastic.SetInfoLog(log.New(os.Stdout, "", log.LstdFlags)),
 		elastic.SetTraceLog(log.New(os.Stdout, "", log.LstdFlags)))
@@ -46,12 +45,11 @@ func NewElasticClient(user, pwd string, urls ...string) (*elastic.Client, error)
 	return client, nil
 }
 
-
 // GetClient
 // urls: elasticsearch service address, with multiple service addresses separated by commas
 // // account and password based on http base auth authentication mechanism
 func NewSimpleElasticClient(user, pwd string, urls ...string) (*elastic.Client, error) {
-	client, err := elastic.NewSimpleClient(
+	opts := []elastic.ClientOptionFunc{
 		elastic.SetURL(urls...),
 		elastic.SetBasicAuth(user, pwd),
 		elastic.SetGzip(true),
@@ -60,12 +58,13 @@ func NewSimpleElasticClient(user, pwd string, urls ...string) (*elastic.Client, 
 		elastic.SetRetrier(elastic.NewBackoffRetrier(elastic.NewConstantBackoff(5 * time.Second))),
 		elastic.SetErrorLog(log.New(os.Stderr, "ELASTIC ", log.LstdFlags)),
 		elastic.SetInfoLog(log.New(os.Stdout, "", log.LstdFlags)),
-		elastic.SetTraceLog(log.New(os.Stdout, "", log.LstdFlags)))
-
+	}
+	if os.Getenv("TEAMSACS_ELASTIC_DEBUG") == "true" {
+		opts = append(opts, elastic.SetTraceLog(log.New(os.Stdout, "", log.LstdFlags)))
+	}
+	client, err := elastic.NewSimpleClient(opts...)
 	if err != nil {
 		return nil, err
 	}
 	return client, nil
 }
-
-

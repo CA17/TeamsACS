@@ -107,3 +107,26 @@ func GetDateObject(d map[string]interface{}, key string, defval time.Time) time.
 }
 
 
+func GetSIntValue(d map[string]string, key string, defval int) int {
+	val, ok := d[key]
+	if ok {
+		v, err := common.ParseInt64(val)
+		if err != nil {
+			return defval
+		}
+		return int(v)
+	}
+	return defval
+}
+
+func GetSInt64Value(d map[string]string, key string, defval int64) int64 {
+	val, ok := d[key]
+	if ok {
+		v, err := common.ParseInt64(val)
+		if err != nil {
+			return defval
+		}
+		return v
+	}
+	return defval
+}

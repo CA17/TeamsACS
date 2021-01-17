@@ -17,8 +17,8 @@
 package mikrotik_api
 
 import (
+	"errors"
 	"fmt"
-	"strings"
 
 	"gopkg.in/routeros.v2"
 
@@ -38,6 +38,15 @@ func NewMikrotikApi(apiUser string, apiPwd string, apiAddr string, TLS bool) *Mi
 	return &MikrotikApi{ApiUser: apiUser, ApiPwd: apiPwd, ApiAddr: apiAddr, TLS: TLS}
 }
 
+func GetConnection(apiUser string, apiPwd string, apiAddr string, TLS bool) (*MikrotikApi,error) {
+	api := &MikrotikApi{ApiUser: apiUser, ApiPwd: apiPwd, ApiAddr: apiAddr, TLS: TLS}
+	err := api.Connect()
+	if err != nil {
+		return nil ,err
+	}
+	return api, nil
+}
+
 func (a *MikrotikApi) Connect() error {
 	var err error
 	a.Client, err = routeros.Dial(a.ApiAddr, a.ApiUser, a.ApiPwd)
@@ -48,14 +57,13 @@ func (a *MikrotikApi) Connect() error {
 }
 
 // ExecuteCommand
+// command: /interface/print
+// params: "?xx=a?,yy=b"
 func (a *MikrotikApi) ExecuteCommand(command string, params string, props string) (*routeros.Reply, error) {
 	args := make([]string, 0)
 	args = append(args, command)
-	for _, p := range strings.Split(params, ",") {
-		if p == "" {
-			continue
-		}
-		args = append(args, p)
+	if params != "" {
+		args = append(args, params)
 	}
 	if props != "" {
 		args = append(args, "=.proplist="+props)
@@ -129,21 +137,28 @@ func (a *MikrotikApi) RemovePPPUser(name string) error {
 }
 
 // GetInterfaceStats
+// item map:  "Map": { "name": "ether1",  "rx-byte": "176418199832", "rx-packet": "154145141","tx-byte": "26099616808","tx-packet": "93550768" }
 func (a *MikrotikApi) GetInterfaceStats() ([]map[string]string, error) {
 	var result = make([]map[string]string, 0)
-	args := []string{"/interface/print", "stats", "name,rx-byte,tx-byte,rx-packet,tx-packet"}
-	if a.Debug {
-		log.Info(strings.Join(args, " "))
-	}
-	reply, err := a.Client.Run(args...)
+	reply, err := a.ExecuteCommand("/interface/print", "stats", "name,rx-byte,tx-byte,rx-packet,tx-packet")
 	if err != nil {
 		return nil, fmt.Errorf("GetInterfaceStats error %s", err.Error())
-	}
-	if a.Debug {
-		log.Info(reply.String())
 	}
 	for _, re := range reply.Re {
 		result = append(result, re.Map)
 	}
 	return result, nil
+}
+
+// GetSystemResource
+func (a *MikrotikApi) GetSystemResource() (map[string]string, error) {
+	reply, err := a.ExecuteCommand("/system/resource/print", "",
+		"uptime,version,free-memory,total-memory,cpu-load,free-hdd-space,total-hdd-space")
+	if err != nil {
+		return nil, fmt.Errorf("GetSystemResource error %s", err.Error())
+	}
+	if len(reply.Re) == 0 {
+		return nil, errors.New("no result")
+	}
+	return reply.Re[0].Map, nil
 }

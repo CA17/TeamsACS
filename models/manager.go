@@ -38,6 +38,7 @@ import (
 	"github.com/ca17/teamsacs/common/mongodb"
 	"github.com/ca17/teamsacs/common/tpl"
 	"github.com/ca17/teamsacs/config"
+	"github.com/ca17/teamsacs/models/elastic"
 )
 
 const (
@@ -74,7 +75,7 @@ type ModelManager struct {
 	Config       *config.AppConfig
 	Bus          evbus.Bus
 	Mongo        *mongo.Client
-	Elastic      *Elastic
+	Elastic      *elastic.Elastic
 	AzureBlobC   *azureblob.AzureBlob
 	Sched        *gocron.Scheduler
 	TplRender    *tpl.CommonTemplate
@@ -121,7 +122,7 @@ func (m *ModelManager) SetupElastic() {
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "SetupElastic error, "+err.Error())
 	}
-	m.Elastic = NewElastic(_elastic)
+	m.Elastic = elastic.NewElastic(_elastic)
 }
 
 func (m *ModelManager) registerManagers() {
@@ -134,6 +135,7 @@ func (m *ModelManager) registerManagers() {
 	m.ManagerMap.Set("GenieacsManager", &GenieacsManager{m})
 	m.ManagerMap.Set("DataManager", &DataManager{m})
 	m.ManagerMap.Set("PolicyManager", &PolicyManager{m})
+	m.ManagerMap.Set("DeviceManager", &DeviceManager{m})
 }
 
 func (m *ModelManager) GetTeamsAcsCollection(coll string) *mongo.Collection {
