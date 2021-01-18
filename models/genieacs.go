@@ -333,19 +333,27 @@ func (m *GenieacsManager) GetAcsTaskDataList() ([]GenieacsTask, error) {
 	return resp, nil
 }
 
-func (m *GenieacsManager) RetryAcsTaskData(ids string) error {
+func (m *GenieacsManager) RetryAcsTaskData(ids string, async bool) error {
 	client := &http.Client{}
 	client.Timeout = time.Second * 30
 	for _, tid := range strings.Split(ids, ",") {
-		url := common.UrlJoin(m.Config.Genieacs.NbiUrl, "/tasks/"+tid+"/retry")
-		req, err := http.NewRequest(http.MethodPost, url, nil)
-		common.Must(err)
-		resp, err := client.Do(req)
-		if err != nil {
-			log.Errorf("RetryAcsTaskData error %s", err.Error())
-			continue
-		}
-		log.Infof("RetryAcsTaskData device:%s %d", tid, resp.StatusCode)
+		_tid := tid
+		go func() {
+			connParamStr := fmt.Sprintf("?timeout=%d&connection_request", 5000)
+			if async {
+				connParamStr = ""
+			}
+			url := common.UrlJoin2(m.Config.Genieacs.NbiUrl, fmt.Sprintf("/tasks/%s/retry%s", _tid, connParamStr))
+			log.Info(url)
+			req, err := http.NewRequest(http.MethodPost, url, nil)
+			common.Must(err)
+			resp, err := client.Do(req)
+			if err != nil {
+				log.Errorf("RetryAcsTaskData taskid:%s error %s", _tid, err.Error())
+			} else {
+				log.Infof("RetryAcsTaskData taskid:%s %d", _tid, resp.StatusCode)
+			}
+		}()
 	}
 	return nil
 }
@@ -354,7 +362,8 @@ func (m *GenieacsManager) DeleteAcsTaskData(ids string) error {
 	client := &http.Client{}
 	client.Timeout = time.Second * 30
 	for _, tid := range strings.Split(ids, ",") {
-		url := common.UrlJoin(m.Config.Genieacs.NbiUrl, "/tasks/"+tid+"")
+		url := common.UrlJoin(m.Config.Genieacs.NbiUrl, "/tasks/"+tid)
+		log.Info(url)
 		req, err := http.NewRequest(http.MethodDelete, url, nil)
 		common.Must(err)
 		resp, err := client.Do(req)
@@ -362,7 +371,7 @@ func (m *GenieacsManager) DeleteAcsTaskData(ids string) error {
 			log.Errorf("DeleteAcsTaskData error %s", err.Error())
 			continue
 		}
-		log.Infof("DeleteAcsTaskData device:%s %d", tid, resp.StatusCode)
+		log.Infof("DeleteAcsTaskData taskid:%s %d", tid, resp.StatusCode)
 	}
 	return nil
 }

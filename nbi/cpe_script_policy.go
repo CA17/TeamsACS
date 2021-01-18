@@ -161,7 +161,7 @@ func (h *HttpHandler) GetMikrotikAcsTasks(c echo.Context) error {
 }
 
 func (h *HttpHandler) RetryMikrotikAcsTasks(c echo.Context) error {
-	err := h.GetManager().GetGenieacsManager().RetryAcsTaskData(c.QueryParam("ids"))
+	err := h.GetManager().GetGenieacsManager().RetryAcsTaskData(c.QueryParam("ids"), c.QueryParam("async")=="true")
 	common.Must(err)
 	return c.JSON(200, h.RestSucc("Success"))
 }
