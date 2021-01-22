@@ -243,18 +243,12 @@ func (m *RadiusManager) UpdateRadiusOnline(form *web.WebForm) error {
 }
 
 func (m *RadiusManager) ClearExpireOnline() (int, error) {
-	onlines, err := m.QueryItems(web.EmptyRequestParams, TeamsacsOnline)
+	ctime := time.Now()
+	before := ctime.Add(time.Second * 120 * -1)
+	filter := bson.M{"last_update": bson.M{"$gte": before, "$lte": ctime}}
+	dr, err := m.GetTeamsAcsCollection(TeamsacsOnline).DeleteMany(context.TODO(), filter)
 	if err != nil {
 		return 0, err
 	}
-	ids := make([]string, 0)
-	for _, online := range *onlines {
-		last := online["last_update"].(primitive.DateTime)
-		if time.Now().Sub(last.Time()).Minutes() > 3 {
-			ids = append(ids, online["_id"].(string))
-		}
-	}
-	filter := bson.M{"_id": bson.M{"$in": ids}}
-	_, err = m.GetTeamsAcsCollection(TeamsacsOnline).DeleteMany(context.TODO(), filter)
-	return len(ids), err
+	return int(dr.DeletedCount), nil
 }

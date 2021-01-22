@@ -52,29 +52,38 @@ fastpub:
 	make upx
 	echo 'FROM alpine' > .build
 	echo 'ARG CACHEBUST="$(shell date "+%F %T")"' >> .build
-	echo 'COPY ./release/teamsacs /teamsacs' >> .build
+	echo 'COPY ./teamsacs /teamsacs' >> .build
 	echo 'RUN chmod +x /teamsacs' >> .build
 	echo 'EXPOSE 1979 1980 1981 1812/udp 1813/udp 1914/udp 1924/udp 1914/udp' >> .build
 	echo 'ENTRYPOINT ["/teamsacs"]' >> .build
-	docker build -t teamsacs . -f .build
+	scp ${RELEASE_DIR}/${BUILD_NAME} DockerServer:/tmp/teamsacs
+	scp .build DockerServer:/tmp/.teamsacsbuild
+	ssh DockerServer "cd /tmp \
+	&& sudo docker build -t teamsacs . -f .teamsacsbuild \
+	&& sudo docker tag teamsacs alab.189csp.cn:5000/teamsacs:latest \
+	&& sudo docker push alab.189csp.cn:5000/teamsacs:latest \
+	&& rm -f /tmp/teamsacs \
+	&& rm -f /tmp/.teamsacsbuild "
 	rm -f .build
-#	docker tag teamsacs docker.pkg.github.com/ca17/teamsacs/teamsacs:latest
-#	docker push docker.pkg.github.com/ca17/teamsacs/teamsacs:latest
-	docker tag teamsacs alab.189csp.cn:5000/teamsacs:latest
-	docker push alab.189csp.cn:5000/teamsacs:latest
 
 github:
+	make build-linux
+	make upx
 	echo 'FROM alpine' > .build
 	echo 'ARG CACHEBUST="$(shell date "+%F %T")"' >> .build
-	echo 'COPY ./release/teamsacs /teamsacs' >> .build
+	echo 'COPY ./teamsacs /teamsacs' >> .build
 	echo 'RUN chmod +x /teamsacs' >> .build
 	echo 'EXPOSE 1979 1980 1981 1812/udp 1813/udp 1914/udp 1924/udp 1914/udp' >> .build
 	echo 'ENTRYPOINT ["/teamsacs"]' >> .build
-	docker build -t teamsacs . -f .build
+	scp ${RELEASE_DIR}/${BUILD_NAME} DockerServer:/tmp/teamsacs
+	scp .build DockerServer:/tmp/.teamsacsbuild
+	ssh DockerServer "cd /tmp \
+	&& sudo docker build -t teamsacs . -f .teamsacsbuild \
+	&& sudo docker tag teamsacs docker.pkg.github.com/ca17/teamsacs/teamsacs:latest \
+	&& sudo docker push docker.pkg.github.com/ca17/teamsacs/teamsacs:latest \
+	&& rm -f /tmp/teamsacs \
+	&& rm -f /tmp/.teamsacsbuild "
 	rm -f .build
-	docker tag teamsacs docker.pkg.github.com/ca17/teamsacs/teamsacs:latest
-	docker push docker.pkg.github.com/ca17/teamsacs/teamsacs:latest
-
 
 upx:
 	upx ${RELEASE_DIR}/${BUILD_NAME}
