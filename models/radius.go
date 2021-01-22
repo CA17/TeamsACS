@@ -148,13 +148,13 @@ func (m *RadiusManager) DeleteRadiusOnline(sessionid string) error {
 
 func (m *RadiusManager) BatchDeleteRadiusOnline(sessionids string) error {
 	for _, sid := range strings.Split(sessionids, ",") {
-		m.GetTeamsAcsCollection(TeamsacsOnline).DeleteOne(context.TODO(),bson.M{"acct_session_id": sid})
+		m.GetTeamsAcsCollection(TeamsacsOnline).DeleteOne(context.TODO(), bson.M{"acct_session_id": sid})
 	}
 	return nil
 }
 
 func (m *RadiusManager) TruncateRadiusOnline() error {
-	_, err := m.GetTeamsAcsCollection(TeamsacsOnline).DeleteMany(context.TODO(),bson.M{})
+	_, err := m.GetTeamsAcsCollection(TeamsacsOnline).DeleteMany(context.TODO(), bson.M{})
 	return err
 }
 
@@ -240,4 +240,21 @@ func (m *RadiusManager) UpdateRadiusOnline(form *web.WebForm) error {
 	}
 
 	return nil
+}
+
+func (m *RadiusManager) ClearExpireOnline() (int, error) {
+	onlines, err := m.QueryItems(web.EmptyRequestParams, TeamsacsOnline)
+	if err != nil {
+		return 0, err
+	}
+	ids := make([]string, 0)
+	for _, online := range *onlines {
+		last := online["last_update"].(primitive.DateTime)
+		if time.Now().Sub(last.Time()).Minutes() > 3 {
+			ids = append(ids, online["_id"].(string))
+		}
+	}
+	filter := bson.M{"_id": bson.M{"$in": ids}}
+	_, err = m.GetTeamsAcsCollection(TeamsacsOnline).DeleteMany(context.TODO(), filter)
+	return len(ids), err
 }

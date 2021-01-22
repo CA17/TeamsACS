@@ -18,7 +18,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"time"
 
@@ -156,36 +155,6 @@ func (m *MikrotikDeviceManager) SyncMikrotikDeviceNetstatToElastic(devtype strin
 			nsesult := make([]elastic.TeamsacsLog, 0)
 			for _, stmap := range ifstats {
 				_interface := stmap["name"]
-				_txByte := maputils.GetSInt64Value(stmap, "tx-byte", 0)
-				_rxByte := maputils.GetSInt64Value(stmap, "rx-byte", 0)
-				_txPacket := maputils.GetSInt64Value(stmap, "tx-packet", 0)
-				_rxPacket := maputils.GetSInt64Value(stmap, "rx-packet", 0)
-
-				cachekey := fmt.Sprintf("%s-%s", sn, _interface)
-				oldCache, ok := m.DeviceStatCache.Get(cachekey)
-				m.DeviceStatCache.Set(cachekey, elastic.DeviceNetstat{
-					Interface:   _interface,
-					SendBytes:   _txByte,
-					RecvBytes:   _rxByte,
-					SendPackets: _txPacket,
-					RecvPackets: _rxPacket,
-				})
-
-				if !ok {
-					continue
-				}
-
-				var oldCacheStat = oldCache.(elastic.DeviceNetstat)
-				_SendBytes := _ifLtZeroInt64(_txByte-oldCacheStat.SendBytes, 0)
-				_RecvBytes := _ifLtZeroInt64(_rxByte-oldCacheStat.RecvBytes, 0)
-				_SendPackets := _ifLtZeroInt64(_txPacket-oldCacheStat.SendPackets, 0)
-				_RecvPackets := _ifLtZeroInt64(_rxPacket-oldCacheStat.RecvPackets, 0)
-
-				// Ignore empty traffic flow
-				if _SendBytes+_RecvBytes+_SendPackets+_RecvPackets == 0 {
-					continue
-				}
-
 				nsesult = append(nsesult, elastic.TeamsacsLog{
 					Timestamp: time.Now().Format(time.RFC3339),
 					Source:    m.Config.System.Appid,
@@ -197,10 +166,10 @@ func (m *MikrotikDeviceManager) SyncMikrotikDeviceNetstatToElastic(devtype strin
 					Devtype:   devtype,
 					Netstat: &elastic.DeviceNetstat{
 						Interface:   _interface,
-						SendBytes:   _SendBytes,
-						RecvBytes:   _RecvBytes,
-						SendPackets: _SendPackets,
-						RecvPackets: _RecvPackets,
+						SendBytes:   maputils.GetSInt64Value(stmap, "tx-byte", 0),
+						RecvBytes:   maputils.GetSInt64Value(stmap, "rx-byte", 0),
+						SendPackets: maputils.GetSInt64Value(stmap, "tx-packet", 0),
+						RecvPackets: maputils.GetSInt64Value(stmap, "rx-packet", 0),
 					},
 				})
 			}

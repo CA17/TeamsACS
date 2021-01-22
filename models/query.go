@@ -131,10 +131,7 @@ func (m *ModelManager) QueryItemOptions(params web.RequestParams, collatiion str
 	if optionId == "" {
 		optionId = "_id"
 	}
-	var q = bson.D{}
-	for qname, val := range params.GetParamMap("filtermap") {
-		q = append(q, bson.E{Key: qname, Value: val})
-	}
+	q := processQueryParams(params, findOptions)
 	logQueryParams(q)
 	cur, err := coll.Find(context.TODO(), q, findOptions)
 	if err != nil {
