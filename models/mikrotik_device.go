@@ -93,7 +93,7 @@ func (m *MikrotikDeviceManager) GetMikrotikApi(devmap map[string]interface{}) (*
 		if err != nil {
 			return nil, errors.New("GetMikrotikApi error, device conn error " + err.Error())
 		}
-		log.Infof("connect to mikrotik device %s success", apiAddr)
+		log.Infof("new connect to mikrotik device %s success", apiAddr)
 		m.DeviceConnPool.Set(apiAddr, api)
 		return api, nil
 	}
