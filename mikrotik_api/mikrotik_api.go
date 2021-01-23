@@ -57,6 +57,27 @@ func (a *MikrotikApi) Connect() error {
 	return nil
 }
 
+func (a *MikrotikApi) ReConnect() error {
+	if a.Client!= nil {
+		a.Client.Close()
+		a.Client = nil
+	}
+	var err error
+	a.Client, err = routeros.DialTimeout(a.ApiAddr, a.ApiUser, a.ApiPwd, time.Second*3)
+	if err != nil {
+		return fmt.Errorf("reconnect mikrotik device error %s", err.Error())
+	}
+	return nil
+}
+
+func (a *MikrotikApi) CheckConnection() bool {
+	reply, err := a.Client.Run("/put","=message=1")
+	if err != nil {
+		return false
+	}
+	return reply.Done.Word == "!done"
+}
+
 // ExecuteCommand
 // command: /interface/print
 // params: "?xx=a?,yy=b"

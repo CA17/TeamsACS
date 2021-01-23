@@ -82,3 +82,23 @@ func TestMikrotikApi_GetInterfaceStats(t *testing.T) {
 	}
 	t.Log(r)
 }
+
+func TestMikrotikApi_CheckConnection(t *testing.T) {
+	api := NewMikrotikApi("apiuser", "apipwd", "192.168.100.1:8728", false)
+	err := api.Connect()
+		if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(api.CheckConnection())
+}
+
+func TestMikrotikApi_ReConnect(t *testing.T) {
+	api := NewMikrotikApi("apiuser", "apipwd", "192.168.100.1:8728", false)
+	err := api.Connect()
+		if err != nil {
+		t.Fatal(err)
+	}
+	api.Client.Close()
+	t.Log(api.ReConnect())
+	t.Log(api.CheckConnection())
+}

@@ -18,6 +18,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"time"
 
@@ -66,19 +67,36 @@ func (m *MikrotikDeviceManager) GetMikrotikApi(devmap map[string]interface{}) (*
 		var err error
 		apiPwd, err = aes.DecryptFromB64(maputils.GetStringValue(devmap, "api_pwd", ""), m.Config.System.Aeskey)
 		if err != nil {
-			return nil, errors.New("StatMikrotikInterface error, api passwd is invalid")
+			return nil, errors.New("GetMikrotikApi error, api passwd is invalid")
 		}
 	}
 
 	if apiUser == "" || apiPwd == "" {
-		return nil, errors.New("StatMikrotikInterface error, auth data is invalid")
+		return nil, errors.New("GetMikrotikApi error, auth data is invalid")
 	}
 
-	api, err := mikrotik_api.GetConnection(apiUser, apiPwd, apiAddr, false)
-	if err != nil {
-		return nil, errors.New("StatMikrotikInterface error, device conn error " + err.Error())
+	if _api, ok := m.DeviceConnPool.Get(apiAddr); ok {
+		api := _api.(*mikrotik_api.MikrotikApi)
+		if !api.CheckConnection() {
+			log.Infof("reconnect to mikrotik device %s", apiAddr)
+			api.ApiUser = apiUser
+			api.ApiPwd = apiPwd
+			api.ApiAddr = apiAddr
+			rerr := api.ReConnect()
+			if rerr != nil {
+				return nil, fmt.Errorf("reconnect to mikrotik device %s fail %s", apiAddr, rerr.Error())
+			}
+		}
+		return api, nil
+	} else {
+		api, err := mikrotik_api.GetConnection(apiUser, apiPwd, apiAddr, false)
+		if err != nil {
+			return nil, errors.New("GetMikrotikApi error, device conn error " + err.Error())
+		}
+		log.Infof("connect to mikrotik device %s success", apiAddr)
+		m.DeviceConnPool.Set(apiAddr, api)
+		return api, nil
 	}
-	return api, nil
 }
 
 // SyncMikrotikDeviceSysstatToElastic
