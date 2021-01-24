@@ -7,3 +7,5 @@ release
 /common/static/static.go
 /common/resources/resources.go
 /Dockerfile.local
+/abfs
+/labfs

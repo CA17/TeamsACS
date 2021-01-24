@@ -184,10 +184,10 @@ func (m *MikrotikDeviceManager) SyncMikrotikDeviceNetstatToElastic(devtype strin
 					Devtype:   devtype,
 					Netstat: &elastic.DeviceNetstat{
 						Interface:   _interface,
-						SendBytes:   maputils.GetSInt64Value(stmap, "tx-byte", 0),
-						RecvBytes:   maputils.GetSInt64Value(stmap, "rx-byte", 0),
-						SendPackets: maputils.GetSInt64Value(stmap, "tx-packet", 0),
-						RecvPackets: maputils.GetSInt64Value(stmap, "rx-packet", 0),
+						SendBytes:   maputils.GetSInt64Value(stmap, "tx-byte", 0) * 8,
+						RecvBytes:   maputils.GetSInt64Value(stmap, "rx-byte", 0) * 8,
+						SendPackets: maputils.GetSInt64Value(stmap, "tx-packet", 0) * 8,
+						RecvPackets: maputils.GetSInt64Value(stmap, "rx-packet", 0) * 8,
 					},
 				})
 			}

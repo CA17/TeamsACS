@@ -178,6 +178,14 @@ func (m *CpeManager) UpdateCpeBySn(sn string, valmap map[string]interface{}) err
 	return err
 }
 
+// UpdateCpeById
+func (m *CpeManager) UpdateCpeById(id string, valmap map[string]interface{}) error {
+	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
+	update := bson.M{"$set": valmap}
+	_, err := coll.UpdateOne(context.TODO(), bson.M{"_id": id}, update)
+	return err
+}
+
 
 // UpdateVpeBySn
 func (m *CpeManager) UpdateCpeSubscribeInfo(id string) error {

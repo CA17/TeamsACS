@@ -97,6 +97,12 @@ push:
 	git ci -am "$(shell date "+%F %T") $${cimsg}"
 	git push origin main
 
+build-abfs:
+	CGO_ENABLED=0 go build -a -ldflags '-s -w -extldflags "-static"' -o abfs commands/abfs/abfs.go
+
+build-labfs:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-s -w -extldflags "-static"' -o labfs commands/abfs/abfs.go
+
 .PHONY: clean build rpccert webcert
 
 
