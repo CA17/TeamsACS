@@ -47,7 +47,7 @@ build-linux:
 	' \
     -o ${RELEASE_DIR}/${BUILD_NAME} ${SOURCE}
 
-fastpub:
+pubbuild-pre:
 	make build-linux
 	make upx
 	echo 'FROM alpine' > .build
@@ -58,6 +58,19 @@ fastpub:
 	echo 'ENTRYPOINT ["/teamsacs"]' >> .build
 	scp ${RELEASE_DIR}/${BUILD_NAME} DockerServer:/tmp/teamsacs
 	scp .build DockerServer:/tmp/.teamsacsbuild
+
+pubdev:
+	make pubbuild-pre
+	ssh DockerServer "cd /tmp \
+	&& sudo docker build -t teamsacs . -f .teamsacsbuild \
+	&& sudo docker tag teamsacs alab.189csp.cn:5000/teamsacs:dev \
+	&& sudo docker push alab.189csp.cn:5000/teamsacs:dev \
+	&& rm -f /tmp/teamsacs \
+	&& rm -f /tmp/.teamsacsbuild "
+	rm -f .build
+
+fastpub:
+	make pubbuild-pre
 	ssh DockerServer "cd /tmp \
 	&& sudo docker build -t teamsacs . -f .teamsacsbuild \
 	&& sudo docker tag teamsacs alab.189csp.cn:5000/teamsacs:latest \
@@ -67,16 +80,7 @@ fastpub:
 	rm -f .build
 
 github:
-	make build-linux
-	make upx
-	echo 'FROM alpine' > .build
-	echo 'ARG CACHEBUST="$(shell date "+%F %T")"' >> .build
-	echo 'COPY ./teamsacs /teamsacs' >> .build
-	echo 'RUN chmod +x /teamsacs' >> .build
-	echo 'EXPOSE 1979 1980 1981 1812/udp 1813/udp 1914/udp 1924/udp 1914/udp' >> .build
-	echo 'ENTRYPOINT ["/teamsacs"]' >> .build
-	scp ${RELEASE_DIR}/${BUILD_NAME} DockerServer:/tmp/teamsacs
-	scp .build DockerServer:/tmp/.teamsacsbuild
+	make pubbuild-pre
 	ssh DockerServer "cd /tmp \
 	&& sudo docker build -t teamsacs . -f .teamsacsbuild \
 	&& sudo docker tag teamsacs docker.pkg.github.com/ca17/teamsacs/teamsacs:latest \
