@@ -14,22 +14,4 @@
  *
  */
 
-package scheduler
-
-import (
-	"github.com/ca17/teamsacs/common/log"
-	"github.com/ca17/teamsacs/models"
-)
-
-// Regularly count Mikrotik device traffic and send it to ElasticSearch
-// Here, the API method is used for the traffic statistics of Mikrotik devices
-func StatMikrotikDeviceToElastic(manager *models.ModelManager) {
-	defer func() {
-		if err := recover(); err != nil {
-			log.Error(err)
-		}
-	}()
-
-	manager.GetMikrotikDeviceManager().SyncMikrotikDeviceStatToElastic("cpe", "vpe")
-
-}
+package models

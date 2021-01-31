@@ -182,6 +182,7 @@ func (m *MikrotikDeviceManager) SyncMikrotikDeviceNetstatToElastic(devtype strin
 					Model:     maputils.GetStringValue(gdev, "model", ""),
 					Version:   maputils.GetStringValue(gdev, "sversion", ""),
 					Devtype:   devtype,
+					// Conversion unit byte to bit
 					Netstat: &elastic.DeviceNetstat{
 						Interface:   _interface,
 						SendBytes:   maputils.GetSInt64Value(stmap, "tx-byte", 0) * 8,
