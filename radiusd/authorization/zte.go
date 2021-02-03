@@ -27,4 +27,3 @@ func ZteAuthorization(prof Profile, accept *radius.Packet) {
 		zte.ZTEContextName_SetString(accept, domain)
 	}
 }
-

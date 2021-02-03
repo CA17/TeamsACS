@@ -46,7 +46,6 @@ func (s *AuthService) CheckMacBind(user *models.Subscribe, vendorReq *radparser.
 	return nil
 }
 
-
 // UpdateBind
 // update mac or vlan
 func (s *AuthService) UpdateBind(user *models.Subscribe, vendorReq *radparser.VendorRequest) {

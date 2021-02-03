@@ -34,7 +34,7 @@ func (h *HttpHandler) RequestToken(c echo.Context) error {
 	apisecret := params.GetMustString("apisecret")
 	opr, err := h.GetManager().GetOpsManager().GetOperator(username)
 	common.Must(err)
-	if opr.ApiSecret != apisecret{
+	if opr.ApiSecret != apisecret {
 		return h.GetInternalError("apisecret error")
 	}
 	t, err := h.CreateAuthToken(opr)
@@ -43,7 +43,6 @@ func (h *HttpHandler) RequestToken(c echo.Context) error {
 		"token": t,
 	}))
 }
-
 
 func (h *HttpHandler) CreateAuthToken(operator *models.Operator) (string, error) {
 	// Create token
@@ -62,7 +61,6 @@ func (h *HttpHandler) CreateAuthToken(operator *models.Operator) (string, error)
 	}
 	return t, nil
 }
-
 
 func (h *HttpHandler) Status(c echo.Context) error {
 	return c.NoContent(200)

@@ -82,4 +82,3 @@ func TestUnicode(t *testing.T) {
 func TestUUID(t *testing.T) {
 	t.Log(UUID())
 }
-

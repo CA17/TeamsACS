@@ -12,9 +12,9 @@ import (
 func ListenRadiusAuthServer(manager *models.ModelManager) error {
 	service := NewAuthService(NewRadiusService(manager))
 	server := radius.PacketServer{
-		Addr: fmt.Sprintf("%s:%d", manager.Config.Radiusd.Host, manager.Config.Radiusd.AuthPort),
-		Handler:      service,
-		SecretSource: service,
+		Addr:               fmt.Sprintf("%s:%d", manager.Config.Radiusd.Host, manager.Config.Radiusd.AuthPort),
+		Handler:            service,
+		SecretSource:       service,
 		InsecureSkipVerify: true,
 	}
 
@@ -25,13 +25,12 @@ func ListenRadiusAuthServer(manager *models.ModelManager) error {
 func ListenRadiusAcctServer(manager *models.ModelManager) error {
 	service := NewAcctService(NewRadiusService(manager))
 	server := radius.PacketServer{
-		Addr: fmt.Sprintf("%s:%d", manager.Config.Radiusd.Host, manager.Config.Radiusd.AcctPort),
-		Handler:      service,
-		SecretSource: service,
+		Addr:               fmt.Sprintf("%s:%d", manager.Config.Radiusd.Host, manager.Config.Radiusd.AcctPort),
+		Handler:            service,
+		SecretSource:       service,
 		InsecureSkipVerify: true,
 	}
 
 	log.Infof("Starting Radius Acct server on %s", server.Addr)
 	return server.ListenAndServe()
 }
-

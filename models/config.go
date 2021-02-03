@@ -33,7 +33,6 @@ type Config struct {
 	Value string `bson:"value" json:"value,omitempty"`
 }
 
-
 type ConfigManager struct{ *ModelManager }
 
 func (m *ModelManager) GetConfigManager() *ConfigManager {

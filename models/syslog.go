@@ -27,21 +27,19 @@ import (
 )
 
 type Syslog struct {
-	ID  string `bson:"_id,omitempty" json:"id,omitempty"`
-	Logtype string `bson:"logtype,omitempty" json:"logtype,omitempty"`
-	Attrs      Attributes `bson:"attrs" json:"attrs,omitempty" `
-	Timestamp time.Time `bson:"timestamp,omitempty" json:"timestamp,omitempty"`
+	ID        string     `bson:"_id,omitempty" json:"id,omitempty"`
+	Logtype   string     `bson:"logtype,omitempty" json:"logtype,omitempty"`
+	Attrs     Attributes `bson:"attrs" json:"attrs,omitempty" `
+	Timestamp time.Time  `bson:"timestamp,omitempty" json:"timestamp,omitempty"`
 }
 
-
-func (m *OperatorManager) AddSyslog(item *Syslog)  {
+func (m *OperatorManager) AddSyslog(item *Syslog) {
 	coll := m.GetTeamsAcsCollection(TeamsacsSyslog)
 	_, err := coll.InsertOne(context.TODO(), item)
 	if err != nil {
 		log.Error(err)
 	}
 }
-
 
 func (m *OperatorManager) QuerySyslog(params web.RequestParams) (*web.PageResult, error) {
 	var findOptions = options.Find()

@@ -37,7 +37,7 @@ func (h *HttpHandler) QuerySubscribes(c echo.Context) error {
 		trmap["end_value"] = time.Now().Add(time.Hour * 24 * time.Duration(expireDays)).Format("2006-01-02 15:04:05")
 	}
 
-	keyword :=  params.GetQueryMap().GetString("keyword")
+	keyword := params.GetQueryMap().GetString("keyword")
 	if keyword != "" {
 		filtermap := params.GetFilterMap()
 		filtermap["filter[remark]"] = keyword
@@ -54,4 +54,3 @@ func (h *HttpHandler) AddSubscribeData(c echo.Context) error {
 	common.Must(h.GetManager().GetSubscribeManager().AddSubscribeData(params))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
-

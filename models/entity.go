@@ -73,7 +73,6 @@ func (d DataObject) GetInt64Value(key string, defval int64) int64 {
 	return defval
 }
 
-
 func (d DataObject) GetFloat64Value(key string, defval float64) float64 {
 	val, ok := d[key]
 	if ok {
@@ -86,7 +85,6 @@ func (d DataObject) GetFloat64Value(key string, defval float64) float64 {
 	return defval
 }
 
-
 func (d DataObject) GetDateValue(key string, defval time.Time) time.Time {
 	val, ok := d[key]
 	if ok {
@@ -97,7 +95,7 @@ func (d DataObject) GetDateValue(key string, defval time.Time) time.Time {
 		}
 		if len(val) == 19 {
 			result, err = time.Parse("2006-01-02 15:04:05", val)
-		}else{
+		} else {
 			result, err = time.Parse("2006-01-02 15:04:05 Z0700 MST", val)
 		}
 		if err != nil {
@@ -107,5 +105,3 @@ func (d DataObject) GetDateValue(key string, defval time.Time) time.Time {
 	}
 	return defval
 }
-
-

@@ -21,8 +21,10 @@ require (
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
 	github.com/pkg/errors v0.9.1
+	github.com/vmihailenco/msgpack/v5 v5.1.4
 	go.elastic.co/apm/module/apmechov4 v1.8.0
 	go.mongodb.org/mongo-driver v1.4.2
+	go.nanomsg.org/mangos/v3 v3.1.3
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/text v0.3.3
 	google.golang.org/grpc v1.33.0

@@ -75,12 +75,12 @@ func (s SyslogServer) HandleRfc3164(remoteaddr net.Addr, data []byte) {
 		"Appname":         "N/A",
 	}
 	if slog.Appname != nil {
-		attrs["Appname"]=  *slog.Appname
+		attrs["Appname"] = *slog.Appname
 	}
 
 	s.Manager.GetOpsManager().AddSyslog(&models.Syslog{
 		Logtype:   "rfc3164",
-		Attrs:attrs,
+		Attrs:     attrs,
 		Timestamp: time.Now(),
 	})
 }

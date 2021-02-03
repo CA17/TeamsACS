@@ -41,7 +41,7 @@ func (s *MailSender) SendMail(mailTo []string, subject string, body string, file
 	m := gomail.NewMessage()
 	m.SetHeader("From", m.FormatAddress(s.Usernam, s.Alias))
 	if mailTo == nil || len(mailTo) == 0 {
-		if s.Mailtos == nil || len(s.Mailtos) ==0 {
+		if s.Mailtos == nil || len(s.Mailtos) == 0 {
 			return fmt.Errorf("Mail receiver not configured")
 		}
 		m.SetHeader("To", s.Mailtos...)

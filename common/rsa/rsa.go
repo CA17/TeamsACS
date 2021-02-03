@@ -39,8 +39,6 @@ func split(buf []byte, lim int) [][]byte {
 	return chunks
 }
 
-
-
 func RsaEncrypt(origData []byte, pubkey string) (string, error) {
 	block, _ := pem.Decode([]byte(pubkey))
 	if block == nil {
@@ -64,7 +62,6 @@ func RsaEncrypt(origData []byte, pubkey string) (string, error) {
 	return base64.RawURLEncoding.EncodeToString(buffer.Bytes()), nil
 }
 
-
 func RsaDecrypt(encrypted string, prikey string, oubklen int) (string, error) {
 	block, _ := pem.Decode([]byte(prikey))
 	if block == nil {
@@ -75,15 +72,15 @@ func RsaDecrypt(encrypted string, prikey string, oubklen int) (string, error) {
 		return "", err
 	}
 	partLen := oubklen / 8
-    raw, err := base64.RawURLEncoding.DecodeString(encrypted)
-    chunks := split(raw, partLen)
-    buffer := bytes.NewBufferString("")
-    for _, chunk := range chunks {
-        decrypted, err := _rsa.DecryptPKCS1v15(rand.Reader, privateKey, chunk)
-        if err != nil {
-            return "", err
-        }
-        buffer.Write(decrypted)
-    }
-    return buffer.String(), err
+	raw, err := base64.RawURLEncoding.DecodeString(encrypted)
+	chunks := split(raw, partLen)
+	buffer := bytes.NewBufferString("")
+	for _, chunk := range chunks {
+		decrypted, err := _rsa.DecryptPKCS1v15(rand.Reader, privateKey, chunk)
+		if err != nil {
+			return "", err
+		}
+		buffer.Write(decrypted)
+	}
+	return buffer.String(), err
 }

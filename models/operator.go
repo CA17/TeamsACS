@@ -130,7 +130,7 @@ func (m *OperatorManager) AddOperator(operator *Operator) (string, error) {
 
 // initSuper
 func (m *OperatorManager) InitSuper(username string) (string, error) {
-    secret := common.UUID()
+	secret := common.UUID()
 	if !m.ExistOperator(username) {
 		sopr := new(Operator)
 		sopr.Username = username

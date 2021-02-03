@@ -116,9 +116,9 @@ func (h *HttpHandler) FreeradiusAuthorize(c echo.Context) error {
 	// Set address pool or static IP
 	var userip = user.GetIpaddr()
 	var addrpool = user.GetAddrPool()
-	if common.IsNotEmptyAndNA(userip) && validutil.IsIP(userip){
+	if common.IsNotEmptyAndNA(userip) && validutil.IsIP(userip) {
 		resp["Framed-IP-Address"] = userip
-	} else if common.IsNotEmptyAndNA(addrpool){
+	} else if common.IsNotEmptyAndNA(addrpool) {
 		resp["Framed-Pool"] = addrpool
 	}
 

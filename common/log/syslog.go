@@ -1,4 +1,3 @@
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -72,5 +71,3 @@ func (b *SyslogBackend) Log(level logging.Level, calldepth int, rec *logging.Rec
 	}
 	panic("unhandled log level")
 }
-
-

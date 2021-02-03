@@ -41,7 +41,7 @@ func (h *HttpHandler) QueryOperator(c echo.Context) error {
 
 // AddOperator
 func (h *HttpHandler) AddOperator(c echo.Context) error {
-	if !h.IsManager(c) && !strings.HasPrefix(c.Request().RemoteAddr, "127.0.0.1")  {
+	if !h.IsManager(c) && !strings.HasPrefix(c.Request().RemoteAddr, "127.0.0.1") {
 		return c.NoContent(http.StatusForbidden)
 	}
 	item := new(models.Operator)
@@ -53,10 +53,9 @@ func (h *HttpHandler) AddOperator(c echo.Context) error {
 	return c.JSON(200, h.RestSucc("Success"))
 }
 
-
 // UpdateOperator
 func (h *HttpHandler) UpdateOperator(c echo.Context) error {
-	if !h.IsManager(c)  {
+	if !h.IsManager(c) {
 		return c.NoContent(http.StatusForbidden)
 	}
 	item := new(models.Operator)
@@ -76,6 +75,3 @@ func (h *HttpHandler) DeleteOperator(c echo.Context) error {
 	common.Must(h.GetManager().GetOpsManager().DeleteOperator(username))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
-
-
-

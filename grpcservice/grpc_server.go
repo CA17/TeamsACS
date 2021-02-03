@@ -35,10 +35,8 @@ type server struct {
 
 func (s *server) GetConfig(ctx context.Context, request *GetConfigRequest) (*GetConfigReply, error) {
 	value := s.manager.GetConfigManager().GetConfigValue(request.Type, request.Name)
-	return &GetConfigReply{Code: 0,Message: "Success",Value: value}, nil
+	return &GetConfigReply{Code: 0, Message: "Success", Value: value}, nil
 }
-
-
 
 func StartGrpcServer(manager *models.ModelManager) error {
 	appconfig := manager.Config

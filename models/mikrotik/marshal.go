@@ -24,7 +24,7 @@ func (d EthernetInterfaceItem) MarshalJSON() ([]byte, error) {
 		Alias
 		Timestamp string `db:"timestamp" json:"timestamp" form:"-" query:"-"  `
 	}{
-		Alias:      (Alias)(d),
+		Alias:     (Alias)(d),
 		Timestamp: d.Timestamp.Time().Format("2006-01-02 15:04:05"),
 	})
 }
@@ -35,7 +35,7 @@ func (d DnsClientServerItem) MarshalJSON() ([]byte, error) {
 		Alias
 		Timestamp string `db:"timestamp" json:"timestamp" form:"-" query:"-"  `
 	}{
-		Alias:      (Alias)(d),
+		Alias:     (Alias)(d),
 		Timestamp: d.Timestamp.Time().Format("2006-01-02 15:04:05"),
 	})
 }
@@ -46,7 +46,7 @@ func (d DeviceRouterItem) MarshalJSON() ([]byte, error) {
 		Alias
 		Timestamp string `db:"timestamp" json:"timestamp" form:"-" query:"-"  `
 	}{
-		Alias:      (Alias)(d),
+		Alias:     (Alias)(d),
 		Timestamp: d.Timestamp.Time().Format("2006-01-02 15:04:05"),
 	})
 }
@@ -57,7 +57,7 @@ func (d IpInterfaceItemIpv4AddressItem) MarshalJSON() ([]byte, error) {
 		Alias
 		Timestamp string `db:"timestamp" json:"timestamp" form:"-" query:"-"  `
 	}{
-		Alias:      (Alias)(d),
+		Alias:     (Alias)(d),
 		Timestamp: d.Timestamp.Time().Format("2006-01-02 15:04:05"),
 	})
 }
@@ -68,7 +68,7 @@ func (d IpInterfaceItem) MarshalJSON() ([]byte, error) {
 		Alias
 		Timestamp string `db:"timestamp" json:"timestamp" form:"-" query:"-"  `
 	}{
-		Alias:      (Alias)(d),
+		Alias:     (Alias)(d),
 		Timestamp: d.Timestamp.Time().Format("2006-01-02 15:04:05"),
 	})
 }
@@ -79,7 +79,7 @@ func (d PPPInterfaceItem) MarshalJSON() ([]byte, error) {
 		Alias
 		Timestamp string `db:"timestamp" json:"timestamp" form:"-" query:"-"  `
 	}{
-		Alias:      (Alias)(d),
+		Alias:     (Alias)(d),
 		Timestamp: d.Timestamp.Time().Format("2006-01-02 15:04:05"),
 	})
 }

@@ -26,7 +26,6 @@ type Profile interface {
 	GetDownLimitPolicy() string
 }
 
-
 func UpdateAuthorization(profile Profile, vendorCode string, accept *radius.Packet) {
 	DefaultAuthorization(profile, accept)
 	switch vendorCode {
@@ -46,7 +45,6 @@ func UpdateAuthorization(profile Profile, vendorCode string, accept *radius.Pack
 		IkuaiAuthorization(profile, accept)
 	}
 }
-
 
 func DefaultAuthorization(prof Profile, accept *radius.Packet) {
 	var timeout = int64(prof.GetExpireTime().Sub(time.Now()).Seconds())

@@ -27,11 +27,11 @@ import (
 )
 
 type DeviceInterface struct {
-	Name  string `json:"name"`
-	Index int64  `json:"index"`
-	Type  int64  `json:"type"`
-	InOctets int64 `json:"in_octets"`
-	OutOctets int64 `json:"out_octets"`
+	Name      string `json:"name"`
+	Index     int64  `json:"index"`
+	Type      int64  `json:"type"`
+	InOctets  int64  `json:"in_octets"`
+	OutOctets int64  `json:"out_octets"`
 }
 
 type SnmpV2Client struct {
@@ -106,7 +106,7 @@ func (c *SnmpV2Client) QueryInterfaces() (map[int64]*DeviceInterface, error) {
 
 }
 
-func (c *SnmpV2Client) QueryInterfacesInOctets  (ifmap map[int64]*DeviceInterface) error {
+func (c *SnmpV2Client) QueryInterfacesInOctets(ifmap map[int64]*DeviceInterface) error {
 	bytes, err := c.Snmpc.BulkWalkAll(ifmib.IF_MIB_ifInOctets_OID)
 	if err != nil {
 		return err
@@ -125,7 +125,7 @@ func (c *SnmpV2Client) QueryInterfacesInOctets  (ifmap map[int64]*DeviceInterfac
 	return nil
 }
 
-func (c *SnmpV2Client) QueryInterfacesOutOctets  (ifmap map[int64]*DeviceInterface) error {
+func (c *SnmpV2Client) QueryInterfacesOutOctets(ifmap map[int64]*DeviceInterface) error {
 	bytes, err := c.Snmpc.BulkWalkAll(ifmib.IF_MIB_ifOutOctets_OID)
 	if err != nil {
 		return err
@@ -143,7 +143,6 @@ func (c *SnmpV2Client) QueryInterfacesOutOctets  (ifmap map[int64]*DeviceInterfa
 	}
 	return nil
 }
-
 
 // Connect to device
 func (c *SnmpV2Client) Connect() error {

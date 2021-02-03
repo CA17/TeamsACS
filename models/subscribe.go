@@ -49,7 +49,7 @@ func (a Subscribe) GetIpaddr() string {
 }
 
 func (a Subscribe) GetUpRateKbps() int {
-	return maputils.GetIntValue(a,"up_rate", 0)
+	return maputils.GetIntValue(a, "up_rate", 0)
 }
 
 func (a Subscribe) GetDownRateKbps() int {
@@ -57,57 +57,56 @@ func (a Subscribe) GetDownRateKbps() int {
 }
 
 func (a Subscribe) GetDomain() string {
-	return maputils.GetStringValue(a,"domain", constant.NA)
+	return maputils.GetStringValue(a, "domain", constant.NA)
 }
 
 func (a Subscribe) GetLimitPolicy() string {
-	return maputils.GetStringValue(a,"limit_policy", constant.NA)
+	return maputils.GetStringValue(a, "limit_policy", constant.NA)
 }
 
 func (a Subscribe) GetUpLimitPolicy() string {
-	return maputils.GetStringValue(a,"up_limit_policy", constant.NA)
+	return maputils.GetStringValue(a, "up_limit_policy", constant.NA)
 }
 
 func (a Subscribe) GetDownLimitPolicy() string {
-	return maputils.GetStringValue(a,"down_limit_policy", constant.NA)
+	return maputils.GetStringValue(a, "down_limit_policy", constant.NA)
 }
 
-
 func (a Subscribe) GetMacAddr() string {
-	return maputils.GetStringValue(a,"mac_addr", constant.NA)
+	return maputils.GetStringValue(a, "mac_addr", constant.NA)
 }
 
 func (a Subscribe) GetPassword() string {
-	return maputils.GetStringValue(a,"password", constant.NA)
+	return maputils.GetStringValue(a, "password", constant.NA)
 }
 
 func (a Subscribe) GetUsername() string {
-	return maputils.GetStringValue(a,"username", constant.NA)
+	return maputils.GetStringValue(a, "username", constant.NA)
 }
 
 func (a Subscribe) GetActiveNum() int {
-	return maputils.GetIntValue(a,"active_num", 0)
+	return maputils.GetIntValue(a, "active_num", 0)
 }
 
 func (a Subscribe) GetStatus() string {
-	return maputils.GetStringValue(a,"status", constant.ENABLED)
+	return maputils.GetStringValue(a, "status", constant.ENABLED)
+}
+
+func (a Subscribe) GetUserType() string {
+	return maputils.GetStringValue(a, "user_type", constant.NA)
 }
 
 func (a Subscribe) GetBindVlan() int {
-	return maputils.GetIntValue(a,"bind_vlan", 0)
+	return maputils.GetIntValue(a, "bind_vlan", 0)
 }
 
-
 func (a Subscribe) GetVlan1() int {
-	return maputils.GetIntValue(a,"vlanid1", 0)
+	return maputils.GetIntValue(a, "vlanid1", 0)
 }
 
 func (a Subscribe) GetVlan2() int {
-	return maputils.GetIntValue(a,"vlanid2", 0)
+	return maputils.GetIntValue(a, "vlanid2", 0)
 }
-
-
-
 
 // SubscribeManager
 type SubscribeManager struct{ *ModelManager }
@@ -129,7 +128,6 @@ func (m *SubscribeManager) GetSubscribeByAttr(name string, value interface{}) (*
 	err = doc.Decode(result)
 	return result, err
 }
-
 
 // QuerySubscribes
 func (m *SubscribeManager) QuerySubscribes(params web.RequestParams) (*web.PageResult, error) {

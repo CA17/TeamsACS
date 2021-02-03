@@ -54,7 +54,7 @@ func ListenNBIServer(manager *models.ModelManager) error {
 		SigningKey:    []byte(manager.Config.NBI.JwtSecret),
 		Skipper: func(c echo.Context) bool {
 			if strings.HasPrefix(c.Path(), "/nbi/status") ||
-			strings.HasPrefix(c.Path(), "/nbi/cpe/backup/upload") ||
+				strings.HasPrefix(c.Path(), "/nbi/cpe/backup/upload") ||
 				strings.HasPrefix(c.Path(), "/nbi/token") {
 				return true
 			}

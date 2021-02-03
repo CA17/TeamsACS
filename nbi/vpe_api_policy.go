@@ -65,4 +65,3 @@ func (h *HttpHandler) RunMikrotikVpeApiPolicy(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, h.RestResult(reply.Done))
 }
-

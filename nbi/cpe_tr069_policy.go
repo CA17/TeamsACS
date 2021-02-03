@@ -87,4 +87,3 @@ func (h *HttpHandler) RunCpeTr069Policy(c echo.Context) error {
 	}
 	return c.JSON(200, h.RestResult(bodystr))
 }
-

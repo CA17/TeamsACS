@@ -35,7 +35,7 @@ const (
 )
 
 type RadiusService struct {
-	Manager   *models.ModelManager
+	Manager *models.ModelManager
 }
 
 func NewRadiusService(manager *models.ModelManager) *RadiusService {
@@ -95,7 +95,6 @@ func (s *RadiusService) GetUser(username string, macauth bool) (*models.Subscrib
 	}
 	return user, nil
 }
-
 
 // 获取用户, 不判断用户过期等状态
 func (s *RadiusService) GetUserForAcct(username string) (*models.Subscribe, error) {

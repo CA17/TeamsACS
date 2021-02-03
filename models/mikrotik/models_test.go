@@ -86,11 +86,10 @@ func Benchmark(b *testing.B) {
 func TestTimestamp(t *testing.T) {
 	tt := primitive.NewDateTimeFromTime(time.Now())
 	jsons, err := tt.MarshalJSON()
-	t.Log(string(jsons),err)
+	t.Log(string(jsons), err)
 	val := map[string]interface{}{
 		"_timestamp": tt,
 	}
 	vv := val["_timestamp"].(primitive.DateTime)
 	t.Log(vv)
 }
-

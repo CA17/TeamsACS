@@ -107,9 +107,6 @@ func (a *AzureBlob) UploadFileObject(containerName, targetFilepath string, file 
 	return r, nil
 }
 
-
-
-
 type FileItem struct {
 	Container        string
 	Filename         string
@@ -122,7 +119,6 @@ type FileItem struct {
 	IsCurrentVersion bool
 	Metadata         map[string]string
 }
-
 
 // ListFiles
 // Query the list of all file objects
@@ -147,16 +143,16 @@ func (a *AzureBlob) ListFiles(containerName string) ([]FileItem, error) {
 		// Process the blobs returned in this result segment (if the segment is empty, the loop body won't execute)
 		for _, blobInfo := range listBlob.Segment.BlobItems {
 			fitem := FileItem{
-				Container:       containerName,
-				Filename:        blobInfo.Name,
-				ContentType:     common.GetPointString(blobInfo.Properties.ContentType),
-				ContentLength:   common.GetPointInt64(blobInfo.Properties.ContentLength),
-				ContentEncoding: common.GetPointString(blobInfo.Properties.ContentEncoding),
-				CreationTime:    common.GetPointTime(blobInfo.Properties.CreationTime),
-				VersionID:       common.GetPointString(blobInfo.VersionID),
+				Container:        containerName,
+				Filename:         blobInfo.Name,
+				ContentType:      common.GetPointString(blobInfo.Properties.ContentType),
+				ContentLength:    common.GetPointInt64(blobInfo.Properties.ContentLength),
+				ContentEncoding:  common.GetPointString(blobInfo.Properties.ContentEncoding),
+				CreationTime:     common.GetPointTime(blobInfo.Properties.CreationTime),
+				VersionID:        common.GetPointString(blobInfo.VersionID),
 				IsCurrentVersion: common.GetPointBool(blobInfo.IsCurrentVersion),
-				LastModified:    blobInfo.Properties.LastModified,
-				Metadata:        blobInfo.Metadata,
+				LastModified:     blobInfo.Properties.LastModified,
+				Metadata:         blobInfo.Metadata,
 			}
 			result = append(result, fitem)
 		}
@@ -185,4 +181,3 @@ func (a *AzureBlob) GetContainerURL(ctx context.Context, containerName string) (
 	}
 	return &containerURL, nil
 }
-

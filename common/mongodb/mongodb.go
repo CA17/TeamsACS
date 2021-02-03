@@ -38,4 +38,3 @@ func GetMongodbClient(cfg config.MongodbConfig) (*mongo.Client, error) {
 	}
 	return client, nil
 }
-

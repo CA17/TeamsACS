@@ -47,7 +47,3 @@ func TestAes2(t *testing.T) {
 	res, _ := Decrypt(dest, key)
 	t.Log(res, string(res))
 }
-
-
-
-

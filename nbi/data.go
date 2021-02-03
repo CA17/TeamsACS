@@ -36,7 +36,7 @@ func (h *HttpHandler) QueryData(c echo.Context) error {
 	params := h.RequestParse(c)
 	params.GetParamMap("sortmap")["update_time"] = "desc"
 	params["collname"] = c.Param("collname")
-	data, err := h.GetManager().GetDataManager().QueryItems(params,c.Param("collname"))
+	data, err := h.GetManager().GetDataManager().QueryItems(params, c.Param("collname"))
 	common.Must(err)
 	return c.JSON(http.StatusOK, data)
 }
@@ -102,7 +102,6 @@ func (h *HttpHandler) DeleteData(c echo.Context) error {
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
 
-
 // SaveAction
 func (h *HttpHandler) SaveAction(c echo.Context) error {
 	params := h.RequestParse(c)
@@ -111,7 +110,6 @@ func (h *HttpHandler) SaveAction(c echo.Context) error {
 	common.Must(err)
 	return c.JSON(http.StatusOK, r)
 }
-
 
 // ImportData
 func (h *HttpHandler) ImportData(c echo.Context) error {
@@ -156,7 +154,7 @@ func (h *HttpHandler) ExportData(c echo.Context) error {
 			for k, _ := range item {
 				names = append(names, k)
 			}
-			sort.Slice(names, func(i, j int)bool{
+			sort.Slice(names, func(i, j int) bool {
 				return names[i] == "_id"
 			})
 			for j, name := range names {

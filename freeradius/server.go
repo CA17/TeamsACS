@@ -58,7 +58,7 @@ func ListenFreeRADIUSServer(manager *models.ModelManager) error {
 
 	var servaddr = fmt.Sprintf("%s:%d", manager.Config.Freeradius.Host, manager.Config.Freeradius.Port)
 	log.Info("try start tls web server")
-	err := e.StartTLS(servaddr,path.Join(manager.Config.GetPrivateDir(), "freeradius-api.tls.crt"), path.Join(manager.Config.GetPrivateDir(), "freeradius-api.tls.key"))
+	err := e.StartTLS(servaddr, path.Join(manager.Config.GetPrivateDir(), "freeradius-api.tls.crt"), path.Join(manager.Config.GetPrivateDir(), "freeradius-api.tls.key"))
 	if err != nil {
 		log.Warningf("start tls server error %s", err)
 		log.Infof("start web server %s", servaddr)

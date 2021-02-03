@@ -65,7 +65,6 @@ func main() {
 		return
 	}
 
-
 	ab := azureblob.NewAzureBlob(os.Getenv("TEAMSACS_AZURE_STORAGE_ACCOUNT"), os.Getenv("TEAMSACS_AZURE_STORAGE_ACCESS_KEY"))
 	r, err := ab.UploadFile(*container, *target, *src)
 	if err != nil {
@@ -73,6 +72,6 @@ func main() {
 		return
 	}
 
-	fmt.Fprintln(os.Stdout, "upload status "+ r.Response().Status)
+	fmt.Fprintln(os.Stdout, "upload status "+r.Response().Status)
 
 }

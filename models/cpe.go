@@ -74,7 +74,6 @@ func (m *CpeManager) GetCpeByAttr(name string, value interface{}) (*Cpe, error) 
 	return result, err
 }
 
-
 func (m *CpeManager) GetCpeById(id string) (*Cpe, error) {
 	return m.GetCpeByAttr("_id", id)
 }
@@ -186,7 +185,6 @@ func (m *CpeManager) UpdateCpeById(id string, valmap map[string]interface{}) err
 	return err
 }
 
-
 // UpdateVpeBySn
 func (m *CpeManager) UpdateCpeSubscribeInfo(id string) error {
 	subs, err := m.GetSubscribeManager().GetSubscribeByCpeid(id)
@@ -201,4 +199,3 @@ func (m *CpeManager) UpdateCpeSubscribeInfo(id string) error {
 	_, err = coll.UpdateOne(context.TODO(), bson.M{"_id": id}, update)
 	return err
 }
-

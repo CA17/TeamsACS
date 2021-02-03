@@ -21,7 +21,6 @@ import (
 	"github.com/ca17/teamsacs/models"
 )
 
-
 func ElkDataSync(manager *models.ModelManager) {
 	defer func() {
 		if err := recover(); err != nil {

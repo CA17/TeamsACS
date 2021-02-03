@@ -105,8 +105,9 @@ func FileSyslog(level logging.Level, logdir string, module string) logging.Level
 	return backend1Leveled
 }
 
-type Stdlog struct {}
-func (s Stdlog) Write(p []byte) (n int, err error){
+type Stdlog struct{}
+
+func (s Stdlog) Write(p []byte) (n int, err error) {
 	log.Info(string(p))
 	return len(p), nil
 }
@@ -127,4 +128,3 @@ var (
 		return log.IsEnabledFor(logging.DEBUG)
 	}
 )
-

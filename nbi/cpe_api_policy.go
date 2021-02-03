@@ -49,8 +49,8 @@ func (h *HttpHandler) RunMikrotikCpeApiPolicy(c echo.Context) error {
 		return c.JSON(200, h.RestError(fmt.Sprintf("Api Password Decrypt error %s", err.Error())))
 	}
 	apiCommand := common.Must2(policy.GetApiCommand()).(string)
-	apiParams,_ := policy.GetApiParams()
-	apiProps,_ := policy.GetApiProps()
+	apiParams, _ := policy.GetApiParams()
+	apiProps, _ := policy.GetApiProps()
 
 	// connect to cpe
 	api := mikrotik_api.NewMikrotikApi(apiUser, apiPwd, apiAddr, false)
@@ -66,4 +66,3 @@ func (h *HttpHandler) RunMikrotikCpeApiPolicy(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, h.RestResult(reply))
 }
-

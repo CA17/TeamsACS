@@ -19,4 +19,3 @@ func CiscoAuthorization(prof Profile, accept *radius.Packet) {
 		cisco.CiscoAVPair_Add(accept, []byte(fmt.Sprintf("sub-qos-policy-out=%s", downLimitPolicy)))
 	}
 }
-

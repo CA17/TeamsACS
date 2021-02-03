@@ -85,12 +85,12 @@ type ModelManager struct {
 	ManagerMap   cmap.ConcurrentMap
 	// acs device stat cache
 	DeviceConnPool cmap.ConcurrentMap
-	Dev          bool
+	Dev            bool
 }
 
 func NewModelManager(appconfig *config.AppConfig, dev bool) *ModelManager {
 	m := &ModelManager{Config: appconfig, Dev: dev}
-	m.Bus = evbus.New();
+	m.Bus = evbus.New()
 	m.ManagerMap = cmap.New()
 	m.DeviceConnPool = cmap.New()
 	_mongodb, err := mongodb.GetMongodbClient(appconfig.Mongodb)
@@ -153,7 +153,6 @@ func (m *ModelManager) GetTemplateFuncMap() map[string]interface{} {
 		},
 	}
 }
-
 
 // UpdateVpeBySn
 func (m *ModelManager) SyncElkData(name string) error {

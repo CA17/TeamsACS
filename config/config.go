@@ -94,6 +94,11 @@ type SyslogdConfig struct {
 	Debug       bool   `yaml:"debug" json:"debug"`
 }
 
+type MessagedConfig struct {
+	Address string `yaml:"address" json:"address"`
+	Debug   bool   `yaml:"debug" json:"debug"`
+}
+
 type AppConfig struct {
 	System       SysConfig          `yaml:"system" json:"system"`
 	NBI          NBIConfig          `yaml:"nbi" json:"nbi"`
@@ -104,6 +109,7 @@ type AppConfig struct {
 	Radiusd      RadiusdConfig      `yaml:"radiusd" json:"radiusd"`
 	Elastic      ElasticConfig      `yaml:"elastic" json:"elastic"`
 	Syslogd      SyslogdConfig      `yaml:"syslogd" json:"syslogd"`
+	Messaged     MessagedConfig     `yaml:"messaged" json:"messaged"`
 	AzureStorage AzureStorageConfig `yaml:"azure_storage"`
 }
 
@@ -188,6 +194,10 @@ var DefaultAppConfig = &AppConfig{
 		TextlogPort: 1934,
 		MaxRecodes:  100000,
 		Debug:       true,
+	},
+	Messaged: MessagedConfig{
+		Address: "tcp://0.0.0.0:1935",
+		Debug:   true,
 	},
 	Mongodb: MongodbConfig{
 		Url:    "mongodb://127.0.0.1:27017",

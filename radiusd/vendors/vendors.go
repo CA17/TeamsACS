@@ -9,4 +9,3 @@ const (
 	VendorRadback  = "2352"
 	VendorCisco    = "9"
 )
-

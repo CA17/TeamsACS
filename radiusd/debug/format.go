@@ -35,12 +35,10 @@ var uInt32Format = func(src []byte) string {
 	return strconv.Itoa(int(binary.BigEndian.Uint32(src)))
 }
 
-
 // Formatting IPv4 Properties
 var ipv4Format = func(src []byte) string {
 	return net.IPv4(src[0], src[1], src[2], src[3]).String()
 }
-
 
 // Register dictionary properties for quick access to string names.
 var radiusTypeMap = map[radius.Type]string{
@@ -135,7 +133,6 @@ var radiusTypeMap = map[radius.Type]string{
 	rfc2868.TunnelServerAuthID_Type:     "TunnelServerAuthID",
 }
 
-
 // Register common formatting functions for quick property formatting.
 var radiusTypeFuncMap = map[radius.Type]func(s []byte) string{
 	rfc2865.UserName_Type:               stringFormat,
@@ -229,7 +226,6 @@ var radiusTypeFuncMap = map[radius.Type]func(s []byte) string{
 	rfc2868.TunnelServerAuthID_Type:     hexFormat,
 }
 
-
 // Formatting Type
 func formatType(t radius.Type) string {
 	v, ok := radiusTypeMap[t]
@@ -261,7 +257,6 @@ func FmtResponse(p *radius.Packet, RemoteAddr net.Addr) string {
 	buff.WriteString(FormatPacket(p))
 	return buff.String()
 }
-
 
 // Formatting radius packet, e.g.
 //
@@ -317,7 +312,6 @@ func FormatPacket(p *radius.Packet) string {
 	}
 	return buff.String()
 }
-
 
 func Length(p *radius.Packet) int {
 	if p == nil {

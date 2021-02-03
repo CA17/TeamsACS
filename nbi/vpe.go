@@ -48,4 +48,3 @@ func (h *HttpHandler) UpdateVpeData(c echo.Context) error {
 	common.Must(h.GetManager().GetVpeManager().UpdateVpeData(params))
 	return c.JSON(http.StatusOK, h.RestSucc("Success"))
 }
-

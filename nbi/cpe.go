@@ -37,7 +37,7 @@ func (h *HttpHandler) QueryCpes(c echo.Context) error {
 		common.Must(err)
 		return c.JSON(http.StatusOK, data)
 	} else {
-		params.Set("limit",100)
+		params.Set("limit", 100)
 		data, err := h.GetManager().GetCpeManager().QueryCpeList(params)
 		common.Must(err)
 		return c.JSON(http.StatusOK, data)

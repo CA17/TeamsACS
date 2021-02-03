@@ -5,8 +5,6 @@ import (
 	"github.com/ca17/teamsacs/models"
 )
 
-
-
 func SyncAcsDeviceInfo(manager *models.ModelManager) {
 	defer func() {
 		if err := recover(); err != nil {

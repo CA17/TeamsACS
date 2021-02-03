@@ -50,7 +50,7 @@ func (h *HttpHandler) UploadCpeBackup(c echo.Context) error {
 	common.Must(err)
 
 	containerName := "cpebackup"
-	targetFilepath := fmt.Sprintf("%s/%s.backup", time.Now().Format("20060102"), cpesn )
+	targetFilepath := fmt.Sprintf("%s/%s.backup", time.Now().Format("20060102"), cpesn)
 	r, err := h.GetManager().AzureBlobC.UploadFileObject(containerName, targetFilepath, dstfile)
 
 	common.Must(err)

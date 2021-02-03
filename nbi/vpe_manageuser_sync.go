@@ -56,15 +56,15 @@ func (h *HttpHandler) SyncManageUser(c echo.Context) error {
 	cpe, err := h.GetManager().GetCpeManager().GetCpeBySn(cpeSn)
 	log.Info("SyncManageUser Start -> parse params")
 	// api params
-	apiAddr,err := vpe.GetApiAddr()
+	apiAddr, err := vpe.GetApiAddr()
 	if err != nil {
 		return errorResult(err)
 	}
-	apiUser,err := vpe.GetApiUser()
+	apiUser, err := vpe.GetApiUser()
 	if err != nil {
 		return errorResult(err)
 	}
-	pwdencrypt,err := vpe.GetApiPwd()
+	pwdencrypt, err := vpe.GetApiPwd()
 	if err != nil {
 		return errorResult(err)
 	}

@@ -75,7 +75,6 @@ func (p PolicyVariable) GetClassify() (string, error) {
 	return maputils.GetStringValueWithErr(p, "classify")
 }
 
-
 type PolicyManager struct{ *ModelManager }
 
 func (m *ModelManager) GetPolicyManager() *PolicyManager {
@@ -110,7 +109,6 @@ func (m *PolicyManager) GetPolicyByPid(collname, pid string) (*Policy, error) {
 	err = doc.Decode(result)
 	return result, err
 }
-
 
 // QueryAllVars
 func (m *PolicyManager) QueryAllVars() ([]PolicyVariable, error) {

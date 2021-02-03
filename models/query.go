@@ -95,7 +95,7 @@ func processQueryParams(params web.RequestParams, findOptions *options.FindOptio
 func (m *ModelManager) QueryItems(params web.RequestParams, collatiion string) (*web.QueryResult, error) {
 	var findOptions = options.Find()
 	limit := params.GetInt64WithDefval("limit", 0)
-	if limit >0 {
+	if limit > 0 {
 		findOptions.SetLimit(limit)
 	}
 	coll := m.GetTeamsAcsCollection(collatiion)

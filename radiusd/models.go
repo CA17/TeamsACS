@@ -54,5 +54,3 @@ func (a AuthorizationProfile) GetUpLimitPolicy() string {
 func (a AuthorizationProfile) GetDownLimitPolicy() string {
 	return a.DownLimitPolicy
 }
-
-

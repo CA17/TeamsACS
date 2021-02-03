@@ -18,7 +18,7 @@ import (
 	"github.com/ca17/teamsacs/radiusd/vendors/microsoft"
 )
 
-func (s *AuthService) GetLocalPassword(user *models.Subscribe, isMacAuth bool) (string,error) {
+func (s *AuthService) GetLocalPassword(user *models.Subscribe, isMacAuth bool) (string, error) {
 	if isMacAuth {
 		return user.GetMacAddr(), nil
 	}

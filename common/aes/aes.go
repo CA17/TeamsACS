@@ -26,7 +26,6 @@ import (
 	"github.com/ca17/teamsacs/common/log"
 )
 
-
 func Encrypt(orig []byte, key string) ([]byte, error) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -88,7 +87,6 @@ func DecryptFromB64(cryted string, key string) (string, error) {
 	}
 	return string(bs2), nil
 }
-
 
 func PKCS7Padding(ciphertext []byte, blocksize int) []byte {
 	padding := blocksize - len(ciphertext)%blocksize

@@ -12,7 +12,7 @@ func Start(manager *models.ModelManager) error {
 	manager.Sched = gocron.NewScheduler(manager.Location)
 	// 日志分发任务
 	_, _ = manager.Sched.Every(1).Day().StartImmediately().Do(ElkDataSync, manager)
-	time.Sleep(time.Second*10)
+	time.Sleep(time.Second * 10)
 	_, _ = manager.Sched.Every(60).Second().StartImmediately().Do(SyncAcsDeviceInfo, manager)
 	_, _ = manager.Sched.Every(60).Second().StartImmediately().Do(StatMikrotikDeviceToElastic, manager)
 	_, _ = manager.Sched.Every(120).Second().StartImmediately().Do(ClearExpireOnline, manager)

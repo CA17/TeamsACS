@@ -21,4 +21,3 @@ func IkuaiAuthorization(prof Profile, accept *radius.Packet) {
 	ikuai.RPUpstreamSpeedLimit_Set(accept, ikuai.RPUpstreamSpeedLimit(up))
 	ikuai.RPDownstreamSpeedLimit_Set(accept, ikuai.RPDownstreamSpeedLimit(down))
 }
-

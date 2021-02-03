@@ -16,16 +16,15 @@ import (
 	"github.com/ca17/teamsacs/radiusd/radparser"
 )
 
-func (s *AcctService) processAcctStart(r *radius.Request, vr *radparser.VendorRequest,  username string, vpe *models.Vpe, nasrip string) {
+func (s *AcctService) processAcctStart(r *radius.Request, vr *radparser.VendorRequest, username string, vpe *models.Vpe, nasrip string) {
 	online := GetRadiusOnlineFromRequest(r, vr, vpe, nasrip)
 	err := s.Manager.GetRadiusManager().AddRadiusOnline(online)
-	if err!= nil {
+	if err != nil {
 		radlog.Errorf("AddRadiusOnline user:%s error %s", username, err.Error())
 	}
 }
 
-
-func (s *AcctService) processAcctUpdateBefore(r *radius.Request, vr *radparser.VendorRequest,  user *models.Subscribe, vpe *models.Vpe, nasrip string) {
+func (s *AcctService) processAcctUpdateBefore(r *radius.Request, vr *radparser.VendorRequest, user *models.Subscribe, vpe *models.Vpe, nasrip string) {
 	// 用户状态变更为停用后触发下线
 	var username = user.GetUsername()
 	if user.GetStatus() == constant.DISABLED {
@@ -40,8 +39,7 @@ func (s *AcctService) processAcctUpdateBefore(r *radius.Request, vr *radparser.V
 	s.processAcctUpdate(r, vr, username, vpe, nasrip)
 }
 
-
-func (s *AcctService) processAcctUpdate(r *radius.Request, vr *radparser.VendorRequest,  username string, vpe *models.Vpe, nasrip string) {
+func (s *AcctService) processAcctUpdate(r *radius.Request, vr *radparser.VendorRequest, username string, vpe *models.Vpe, nasrip string) {
 	online := GetRadiusOnlineFromRequest(r, vr, vpe, nasrip)
 	// 更新在线信息
 	err := s.Manager.GetRadiusManager().UpdateRadiusOnlineData(online)
@@ -51,17 +49,15 @@ func (s *AcctService) processAcctUpdate(r *radius.Request, vr *radparser.VendorR
 
 }
 
-
-func (s *AcctService) processAcctStop(r *radius.Request, vr *radparser.VendorRequest,  username string, vpe *models.Vpe, nasrip string) {
+func (s *AcctService) processAcctStop(r *radius.Request, vr *radparser.VendorRequest, username string, vpe *models.Vpe, nasrip string) {
 	online := GetRadiusOnlineFromRequest(r, vr, vpe, nasrip)
-	if err := s.Manager.GetRadiusManager().AddRadiusAccounting(online); err!=nil {
+	if err := s.Manager.GetRadiusManager().AddRadiusAccounting(online); err != nil {
 		radlog.Errorf("AddRadiusAccounting user:%s error %s ", username, err.Error())
 	}
 	if err := s.Manager.GetRadiusManager().DeleteRadiusOnline(online.AcctSessionId); err != nil {
 		radlog.Errorf("DeleteRadiusOnline user:%s error %s ", username, err.Error())
 	}
 }
-
 
 func (s *AcctService) processAcctNasOn(r *radius.Request) {
 	err := s.Manager.GetRadiusManager().BatchClearRadiusOnlineDataByNas(
@@ -82,7 +78,6 @@ func (s *AcctService) processAcctNasOff(r *radius.Request) {
 		radlog.Errorf("BatchClearRadiusOnlineDataByNas error, %s", err.Error())
 	}
 }
-
 
 func (s *AcctService) processAcctDisconnect(r *radius.Request, vpe *models.Vpe, username, nasrip string) {
 	packet := radius.New(radius.CodeDisconnectRequest, []byte(vpe.GetSecret()))

@@ -39,11 +39,11 @@ func NewMikrotikApi(apiUser string, apiPwd string, apiAddr string, TLS bool) *Mi
 	return &MikrotikApi{ApiUser: apiUser, ApiPwd: apiPwd, ApiAddr: apiAddr, TLS: TLS}
 }
 
-func GetConnection(apiUser string, apiPwd string, apiAddr string, TLS bool) (*MikrotikApi,error) {
+func GetConnection(apiUser string, apiPwd string, apiAddr string, TLS bool) (*MikrotikApi, error) {
 	api := &MikrotikApi{ApiUser: apiUser, ApiPwd: apiPwd, ApiAddr: apiAddr, TLS: TLS}
 	err := api.Connect()
 	if err != nil {
-		return nil ,err
+		return nil, err
 	}
 	return api, nil
 }
@@ -58,7 +58,7 @@ func (a *MikrotikApi) Connect() error {
 }
 
 func (a *MikrotikApi) ReConnect() error {
-	if a.Client!= nil {
+	if a.Client != nil {
 		a.Client.Close()
 		a.Client = nil
 	}
@@ -71,7 +71,7 @@ func (a *MikrotikApi) ReConnect() error {
 }
 
 func (a *MikrotikApi) CheckConnection() bool {
-	reply, err := a.Client.Run("/put","=message=1")
+	reply, err := a.Client.Run("/put", "=message=1")
 	if err != nil {
 		return false
 	}

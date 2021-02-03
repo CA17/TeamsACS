@@ -61,7 +61,7 @@ func (h *HttpHandler) RunMikrotikCpeScriptPolicy(c echo.Context) error {
 		return fmt.Errorf("cpe %s there are still unexecuted tasks, waiting or deleting old ones", cpe.GetDeviceId())
 	}
 	deviceUid := common.Md5Hash(cpe.GetDeviceId())
-	filename := fmt.Sprintf("%s-latest-task.alter",deviceUid )
+	filename := fmt.Sprintf("%s-latest-task.alter", deviceUid)
 	fileurl := common.UrlJoin(h.GetManager().Config.Genieacs.NbiUrl, "files/"+filename)
 
 	// Delete old script
@@ -143,7 +143,7 @@ func (h *HttpHandler) RunMikrotikCpeScriptPolicy(c echo.Context) error {
 	}
 
 	go func() {
-		time.Sleep(time.Second*3)
+		time.Sleep(time.Second * 3)
 		data, _ := h.GetManager().GetGenieacsManager().GetAcsTaskDataList()
 		s, _ := json.MarshalIndent(data, "", "\t")
 		log.Info(string(s))
@@ -153,7 +153,6 @@ func (h *HttpHandler) RunMikrotikCpeScriptPolicy(c echo.Context) error {
 
 }
 
-
 func (h *HttpHandler) GetMikrotikAcsTasks(c echo.Context) error {
 	data, err := h.GetManager().GetGenieacsManager().GetAcsTaskDataList()
 	common.Must(err)
@@ -161,7 +160,7 @@ func (h *HttpHandler) GetMikrotikAcsTasks(c echo.Context) error {
 }
 
 func (h *HttpHandler) RetryMikrotikAcsTasks(c echo.Context) error {
-	err := h.GetManager().GetGenieacsManager().RetryAcsTaskData(c.QueryParam("ids"), c.QueryParam("async")=="true")
+	err := h.GetManager().GetGenieacsManager().RetryAcsTaskData(c.QueryParam("ids"), c.QueryParam("async") == "true")
 	common.Must(err)
 	return c.JSON(200, h.RestSucc("Success"))
 }

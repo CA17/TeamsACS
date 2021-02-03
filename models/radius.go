@@ -18,6 +18,7 @@ package models
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -27,6 +28,7 @@ import (
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/common/web"
+	"github.com/ca17/teamsacs/constant"
 )
 
 type Authlog struct {
@@ -197,6 +199,10 @@ func getOutputTotal(form *web.WebForm) int64 {
 
 // 更新记账信息
 func (m *RadiusManager) UpdateRadiusOnline(form *web.WebForm) error {
+	user, err := m.GetSubscribeManager().GetSubscribeByUser(form.GetVal("username"))
+	if err != nil {
+		return fmt.Errorf("user %s not exists", form.GetVal("username"))
+	}
 	var sessionId = form.GetVal2("acctSessionId", "")
 	var statusType = form.GetVal2("acctStatusType", "")
 	radOnline := Accounting{
@@ -223,8 +229,14 @@ func (m *RadiusManager) UpdateRadiusOnline(form *web.WebForm) error {
 		AcctStartTime:     getAcctStartTime(form.GetVal2("acctSessionTime", "0")),
 		LastUpdate:        time.Now(),
 	}
+
 	switch statusType {
 	case "Start", "Update", "Alive", "Interim-Update":
+		// public cpe update event
+		if user.GetUserType() == "cpe" {
+			m.Bus.Publish(constant.EventMosdnsCpeUpdate, radOnline.FramedIpaddr, radOnline.MacAddr)
+		}
+
 		ocount, _ := m.GetOnlineCountBySessionid(sessionId)
 		if ocount == 0 {
 			log.Infof("Add radius online %+v", radOnline)
@@ -235,8 +247,16 @@ func (m *RadiusManager) UpdateRadiusOnline(form *web.WebForm) error {
 		}
 	case "Stop":
 		log.Infof("Update radius cdr %+v", radOnline)
+		// public cpe update event
+		if user.GetUserType() == "cpe" {
+			m.Bus.Publish(constant.EventMosdnsCpeRemove, radOnline.FramedIpaddr)
+		}
 		_ = m.AddRadiusAccounting(radOnline)
 		return m.DeleteRadiusOnline(sessionId)
+	case "Accounting-On", "Accounting-Off":
+		if user.GetUserType() == "cpe" {
+			m.Bus.Publish(constant.EventMosdnsCpeClean, radOnline.FramedIpaddr)
+		}
 	}
 
 	return nil

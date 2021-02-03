@@ -31,8 +31,8 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	// opr apis
 	e.Any("/nbi/opr/query", h.QueryOperator)
 	e.Any("/nbi/opr/delete", h.DeleteOperator)
-	e.POST( "/nbi/opr/add",h.AddOperator)
-	e.POST( "/nbi/opr/update", h.UpdateOperator)
+	e.POST("/nbi/opr/add", h.AddOperator)
+	e.POST("/nbi/opr/update", h.UpdateOperator)
 
 	// opr apis
 	e.Any("/nbi/data/:collname/query", h.QueryData)
@@ -40,11 +40,11 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	e.Any("/nbi/data/:collname/get", h.GetData)
 	e.Any("/nbi/data/:collname/itemvalues", h.GetDataValues)
 	e.Any("/nbi/data/:collname/delete", h.DeleteData)
-	e.POST( "/nbi/data/:collname/add",h.AddData)
-	e.POST( "/nbi/data/:collname/save",h.SaveAction)
-	e.POST( "/nbi/data/:collname/update", h.UpdateData)
-	e.POST( "/nbi/data/:collname/import", h.ImportData)
-	e.Any( "/nbi/data/:collname/export", h.ExportData)
+	e.POST("/nbi/data/:collname/add", h.AddData)
+	e.POST("/nbi/data/:collname/save", h.SaveAction)
+	e.POST("/nbi/data/:collname/update", h.UpdateData)
+	e.POST("/nbi/data/:collname/import", h.ImportData)
+	e.Any("/nbi/data/:collname/export", h.ExportData)
 
 	// radius apis
 	e.Any("/nbi/radius/accounting/query", h.QueryRadiusAccounting)
@@ -81,6 +81,6 @@ func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	e.Any("/nbi/subscribe/query", h.QuerySubscribes)
 
 	// token
-	e.POST( "/nbi/token", h.RequestToken)
-	e.Any( "/nbi/status", h.Status)
+	e.POST("/nbi/token", h.RequestToken)
+	e.Any("/nbi/status", h.Status)
 }

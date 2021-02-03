@@ -31,7 +31,7 @@ const (
 
 var (
 	// ShangHaiLOC, _ = time.LoadLocation("Asia/Shanghai")
-	EmptyTime, _   = time.Parse("2006-01-02 15:04:05 Z0700 MST", "1979-11-30 00:00:00 +0000 GMT")
+	EmptyTime, _ = time.Parse("2006-01-02 15:04:05 Z0700 MST", "1979-11-30 00:00:00 +0000 GMT")
 )
 
 // yyyy-MM-dd hh:mm:ss 年-月-日 时:分:秒
@@ -64,7 +64,6 @@ func FmtDatetime6String(t time.Time) string {
 	return t.Format(Datetime6Layout)
 }
 
-
 func ComputeEndTime(times int, unit string) time.Time {
 	ctime := time.Now()
 	switch unit {
@@ -86,4 +85,3 @@ func ComputeEndTime(times int, unit string) time.Time {
 		return ctime
 	}
 }
-

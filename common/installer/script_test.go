@@ -22,6 +22,6 @@ import (
 )
 
 func TestOS(t *testing.T) {
-	s,_ := os.Getwd()
+	s, _ := os.Getwd()
 	t.Log(s)
 }

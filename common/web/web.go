@@ -161,13 +161,12 @@ type JsonOptions struct {
 
 type QueryResult []map[string]interface{}
 
-
 // 通用查询参数
 type RequestParams map[string]interface{}
 
 var EmptyRequestParams = make(RequestParams)
 
-func (jp RequestParams) Set(key string, value interface{} ) {
+func (jp RequestParams) Set(key string, value interface{}) {
 	jp[key] = value
 }
 

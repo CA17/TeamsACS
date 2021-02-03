@@ -71,7 +71,6 @@ func GetInt64Value(d map[string]interface{}, key string, defval int64) int64 {
 	return defval
 }
 
-
 func GetFloat64Value(d map[string]interface{}, key string, defval float64) float64 {
 	val, ok := d[key]
 	if ok {
@@ -84,7 +83,6 @@ func GetFloat64Value(d map[string]interface{}, key string, defval float64) float
 	return defval
 }
 
-
 func GetDateObject(d map[string]interface{}, key string, defval time.Time) time.Time {
 	val, ok := d[key]
 	if ok {
@@ -95,7 +93,7 @@ func GetDateObject(d map[string]interface{}, key string, defval time.Time) time.
 		}
 		if len(val) == 19 {
 			result, err = time.Parse("2006-01-02 15:04:05", val)
-		}else{
+		} else {
 			result, err = time.Parse("2006-01-02 15:04:05 Z0700 MST", val)
 		}
 		if err != nil {
@@ -105,7 +103,6 @@ func GetDateObject(d map[string]interface{}, key string, defval time.Time) time.
 	}
 	return defval
 }
-
 
 func GetSIntValue(d map[string]string, key string, defval int) int {
 	val, ok := d[key]

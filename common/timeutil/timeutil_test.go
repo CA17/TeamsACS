@@ -21,7 +21,6 @@ import (
 	"time"
 )
 
-
 func TestFormatLenTime(t *testing.T) {
 	t.Log(FmtDatetime14String(time.Now()))
 	t.Log(FmtDatetime8String(time.Now()))
@@ -30,7 +29,6 @@ func TestFormatLenTime(t *testing.T) {
 	t.Log(FmtDatetimeString(time.Now()))
 	t.Log(FmtDatetimeMString(time.Now()))
 }
-
 
 func TestTZ(t *testing.T) {
 	tz, err := time.LoadLocation("Etc/UTC")

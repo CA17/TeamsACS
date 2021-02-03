@@ -27,9 +27,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 
+	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/web"
-	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/ca17/teamsacs/config"
 	"github.com/ca17/teamsacs/constant"
 	"github.com/ca17/teamsacs/models"
@@ -167,7 +167,6 @@ func (h *HttpHandler) ParseJsonBody(c echo.Context) (web.RequestParams, error) {
 	return query, err
 }
 
-
 // 解析查询参数
 func (h *HttpHandler) RequestParseGet(c echo.Context) web.RequestParams {
 	query := make(web.RequestParams)
@@ -178,7 +177,7 @@ func (h *HttpHandler) RequestParseGet(c echo.Context) web.RequestParams {
 	timerangemap := make(map[string]interface{})
 	sortmap := make(map[string]interface{})
 	for k, vs := range c.QueryParams() {
-		switch  {
+		switch {
 		case common.InSlice(k, []string{"start", "count"}):
 			// 分页参数
 			query[k] = vs[0]
@@ -187,11 +186,11 @@ func (h *HttpHandler) RequestParseGet(c echo.Context) web.RequestParams {
 			filtermap[k[7:len(k)-1]] = vs[0]
 		case strings.HasPrefix(k, "timerange_start[") && vs[0] != "":
 			// 时间范围起始参数
-			timerangemap["start"] = k[16:len(k)-1]
+			timerangemap["start"] = k[16 : len(k)-1]
 			timerangemap["start_value"] = vs[0]
 		case strings.HasPrefix(k, "timerange_end[") && vs[0] != "":
 			// 时间范围结束参数
-			timerangemap["end"] = k[14:len(k)-1]
+			timerangemap["end"] = k[14 : len(k)-1]
 			timerangemap["end_value"] = vs[0]
 		case strings.HasPrefix(k, "equal[") && vs[0] != "":
 			// 全部匹配参数
@@ -216,7 +215,6 @@ func (h *HttpHandler) RequestParseGet(c echo.Context) web.RequestParams {
 	return query
 }
 
-
 // 解析表单提交参数
 func (h *HttpHandler) RequestParseForm(c echo.Context) web.RequestParams {
 	params := make(web.RequestParams)
@@ -225,7 +223,7 @@ func (h *HttpHandler) RequestParseForm(c echo.Context) web.RequestParams {
 	for k, vs := range posts {
 		if k != "webix_operation" {
 			data[k] = vs[0]
-		}else{
+		} else {
 			params[k] = vs[0]
 		}
 	}
@@ -244,7 +242,7 @@ func (h *HttpHandler) RequestParse(c echo.Context) web.RequestParams {
 		if ctype == "application/json" {
 			params, err = h.ParseJsonBody(c)
 			common.Must(err)
-		}else if ctype == "application/x-www-form-urlencoded" {
+		} else if ctype == "application/x-www-form-urlencoded" {
 			params = h.RequestParseForm(c)
 		}
 	}
@@ -268,7 +266,6 @@ func NewHTTPError(code int, message ...interface{}) *HTTPError {
 func (e *HTTPError) Error() string {
 	return fmt.Sprintf("%d:%s", e.Code, e.Message)
 }
-
 
 func (h *HttpHandler) FetchExcelData(c echo.Context, sheet string) ([]map[string]string, error) {
 	file, err := c.FormFile("upload")
@@ -306,5 +303,3 @@ func (h *HttpHandler) FetchExcelData(c echo.Context, sheet string) ([]map[string
 
 	return data, nil
 }
-
-

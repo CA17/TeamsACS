@@ -32,6 +32,7 @@ import (
 	"github.com/ca17/teamsacs/config"
 	"github.com/ca17/teamsacs/freeradius"
 	"github.com/ca17/teamsacs/grpcservice"
+	"github.com/ca17/teamsacs/message"
 	"github.com/ca17/teamsacs/models"
 	"github.com/ca17/teamsacs/nbi"
 	"github.com/ca17/teamsacs/radiusd"
@@ -66,7 +67,7 @@ var (
 	dev             = flag.Bool("dev", false, "run develop mode")
 	port            = flag.Int("p", 0, "web port")
 	install         = flag.Bool("install", false, "run install")
-	startRadius = flag.Bool("radiusd", false, "run radius server")
+	startRadius     = flag.Bool("radiusd", false, "run radius server")
 	startFreeradius = flag.Bool("freeradius-api", true, "run freeradius api")
 	startNbi        = flag.Bool("nbi-service", true, "run northbound interface api")
 	startRfc3164    = flag.Bool("syslog-rfc3164", false, "run rfc3164 syslog server")
@@ -75,6 +76,7 @@ var (
 	initcfg         = flag.Bool("initcfg", false, "write default config > /etc/teamsacs.yaml")
 	initAdmin       = flag.Bool("init-admin", false, "init admin api secret")
 	adminName       = flag.String("admin", "admin", "init admin api secret with username ")
+	messaged        = flag.Bool("messaged", true, "listen message pub server")
 )
 
 // Print version information
@@ -188,13 +190,13 @@ func main() {
 
 	manager := models.NewModelManager(appconfig, *dev)
 
-	if *initAdmin && *adminName != ""{
+	if *initAdmin && *adminName != "" {
 		apisecret, err := manager.GetOpsManager().InitSuper(*adminName)
 		if err != nil {
 			fmt.Fprintln(os.Stdout, err.Error())
 			os.Exit(0)
 		}
-		fmt.Fprintln(os.Stdout, *adminName + " "+ apisecret)
+		fmt.Fprintln(os.Stdout, *adminName+" "+apisecret)
 		return
 	}
 
@@ -213,7 +215,6 @@ func main() {
 			return radiusd.ListenRadiusAcctServer(manager)
 		})
 	}
-
 
 	time.Sleep(time.Millisecond * 50)
 
@@ -263,6 +264,13 @@ func main() {
 	})
 
 	time.Sleep(time.Millisecond * 50)
+
+	if *messaged {
+		g.Go(func() error {
+			log.Info("Start Message publish Server ...")
+			return message.NewPubSubService(manager).StartPubServer()
+		})
+	}
 
 	if err := g.Wait(); err != nil {
 		log.Fatal(err)

@@ -195,9 +195,9 @@ const _mapping = `
 }`
 
 type DeviceSysstat struct {
-	UpTime     int64  `json:"upTime"`
-	MemPercent int64  `json:"memPercent"`
-	CpuPercent int64  `json:"cpuPercent"`
+	UpTime     int64 `json:"upTime"`
+	MemPercent int64 `json:"memPercent"`
+	CpuPercent int64 `json:"cpuPercent"`
 }
 
 type DeviceNetstat struct {

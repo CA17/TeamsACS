@@ -31,4 +31,3 @@ func (h *HttpHandler) QuerySyslog(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, data)
 }
-

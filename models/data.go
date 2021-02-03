@@ -55,7 +55,7 @@ func (m *DataManager) GetData(params web.RequestParams) (*Attributes, error) {
 }
 
 // GetDataById
-func (m *DataManager) GetDataByAttr(collname,attrname string, attrvalue interface{}) (*Attributes, error) {
+func (m *DataManager) GetDataByAttr(collname, attrname string, attrvalue interface{}) (*Attributes, error) {
 	coll := m.GetTeamsAcsCollection(collname)
 	doc := coll.FindOne(context.TODO(), bson.M{attrname: attrvalue})
 	err := doc.Err()

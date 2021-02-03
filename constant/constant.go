@@ -17,12 +17,15 @@
 package constant
 
 const (
-	NA = "N/A"
-	ENABLED = "enabled"
+	NA       = "N/A"
+	ENABLED  = "enabled"
 	DISABLED = "disabled"
 
 	NBIAdminLevel = "admin"
 	NBISuperLevel = "super"
-	NBIOprLevel = "opr"
-)
+	NBIOprLevel   = "opr"
 
+	EventMosdnsCpeUpdate = "Event:EventMosdnsCpeUpdate"
+	EventMosdnsCpeRemove = "Event:EventMosdnsCpeRemove"
+	EventMosdnsCpeClean = "Event:EventMosdnsCpeClean"
+)

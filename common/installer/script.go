@@ -68,7 +68,7 @@ func InitConfig(config *config.AppConfig) error {
 }
 
 func Install(config *config.AppConfig) error {
-	if !common.FileExists("/etc/teamsacs.yaml"){
+	if !common.FileExists("/etc/teamsacs.yaml") {
 		_ = InitConfig(config)
 	}
 	script := strings.ReplaceAll(InstallScript, "{{workdir}}", config.System.Workdir)

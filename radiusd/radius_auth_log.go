@@ -17,7 +17,7 @@ func (s *RadiusService) addAuthlog(start time.Time, username string, nasip strin
 	}
 }
 
-func (s *RadiusService) CheckRadAuthError(start time.Time,username, nasip string, err error) {
+func (s *RadiusService) CheckRadAuthError(start time.Time, username, nasip string, err error) {
 	if err != nil {
 		logLevel := s.GetStringConfig(constant.RadiusAuthlogLevel, RadiusAuthlogAll)
 		if logLevel != RadiusAuthlogNone && (logLevel == RadiusAuthlogAll || logLevel == RadiusAuthFailure) {
@@ -31,10 +31,9 @@ func (s *RadiusService) CheckRadAuthError(start time.Time,username, nasip string
 	}
 }
 
-func (s *RadiusService) LogAuthSucess(start time.Time,username, nasip string) {
+func (s *RadiusService) LogAuthSucess(start time.Time, username, nasip string) {
 	logLevel := s.GetStringConfig(constant.RadiusAuthlogLevel, RadiusAuthlogAll)
 	if logLevel != RadiusAuthlogNone && (logLevel == RadiusAuthlogAll || logLevel == RadiusAuthSucces) {
 		s.addAuthlog(start, username, nasip, RadiusAuthSucces, RadiusAuthSucces)
 	}
 }
-

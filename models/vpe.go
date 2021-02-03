@@ -31,22 +31,22 @@ import (
 
 // Vpe
 // VPE is also a BRAS system
-type Vpe  map[string]interface{}
+type Vpe map[string]interface{}
 
 func (v Vpe) GetSecret() string {
-	return maputils.GetStringValue(v, "secret",constant.NA)
+	return maputils.GetStringValue(v, "secret", constant.NA)
 }
 
 func (v Vpe) GetVendorCode() string {
-	return maputils.GetStringValue(v, "vendor_code",constant.NA)
+	return maputils.GetStringValue(v, "vendor_code", constant.NA)
 }
 
 func (v Vpe) GetIpaddr() string {
-	return maputils.GetStringValue(v, "ipaddr",constant.NA)
+	return maputils.GetStringValue(v, "ipaddr", constant.NA)
 }
 
 func (v Vpe) GetCoaPort() int {
-	return maputils.GetIntValue(v, "coa_port",3799)
+	return maputils.GetIntValue(v, "coa_port", 3799)
 }
 
 func (v Vpe) GetApiUser() (string, error) {
@@ -69,11 +69,9 @@ func (m *ModelManager) GetVpeManager() *VpeManager {
 	return store.(*VpeManager)
 }
 
-
 func (m *VpeManager) QueryVpes(params web.RequestParams) (*web.PageResult, error) {
 	return m.QueryPagerItems(params, TeamsacsVpe)
 }
-
 
 // GetVpeByIpaddr
 func (m *VpeManager) GetVpeByIpaddr(ip string) (*Vpe, error) {
@@ -106,7 +104,6 @@ func (m *VpeManager) ExistVpe(sn string) bool {
 	count, _ := coll.CountDocuments(context.TODO(), bson.M{"sn": sn})
 	return count > 0
 }
-
 
 func (m *VpeManager) GetVpeBySn(sn string) (*Cpe, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsVpe)
@@ -157,7 +154,7 @@ func (m *VpeManager) UpdateVpeData(params web.RequestParams) error {
 		if err != nil {
 			return err
 		}
-	}else{
+	} else {
 		delete(data, "api_pwd")
 	}
 	query := bson.M{"_id": _id}
