@@ -95,7 +95,8 @@ type SyslogdConfig struct {
 }
 
 type MessagedConfig struct {
-	Address string `yaml:"address" json:"address"`
+	PubAddress string `yaml:"address" json:"pub_address"`
+	SubAddress string `yaml:"address" json:"sub_address"`
 	Debug   bool   `yaml:"debug" json:"debug"`
 }
 
@@ -196,7 +197,8 @@ var DefaultAppConfig = &AppConfig{
 		Debug:       true,
 	},
 	Messaged: MessagedConfig{
-		Address: "tcp://0.0.0.0:1935",
+		PubAddress: "tcp://0.0.0.0:1935",
+		SubAddress: "tcp://0.0.0.0:1936",
 		Debug:   true,
 	},
 	Mongodb: MongodbConfig{
@@ -321,6 +323,14 @@ func LoadConfig(cfile string) *AppConfig {
 
 	setEnvValue("TEAMSACS_ELASTIC_DEBUG", func(v string) {
 		cfg.Elastic.Debug = v == "true"
+	})
+
+	// Messaged Config
+	setEnvValue("TEAMSACS_MESSAGE_PUB_ADDRESS", func(v string) {
+		cfg.Messaged.PubAddress = v
+	})
+	setEnvValue("TEAMSACS_MESSAGE_SUB_ADDRESS", func(v string) {
+		cfg.Messaged.SubAddress = v
 	})
 
 	// AzureStorage Config

@@ -30,26 +30,7 @@ import (
 	_ "go.nanomsg.org/mangos/v3/transport/all"
 )
 
-const (
-	// mosdns message define
-	MosdnsUpdateTeamsacsCpe   = 0x1e
-	MosdnsRemoveTeamsacsCpe   = 0x1f
-	MosdnsCleanTeamsacsCpe   = 0x20
-	MosdnsTeamsacsCpeTunnelIP = "TunnelIP"
-	MosdnsTeamsacsCpeIspIp    = "IspIP"
-	MosdnsTopic               = "mosdns"
-)
 
-type NnMessage struct {
-	Uid     string
-	Command byte
-	Attrs   map[string]interface{}
-}
-
-type PubSubService struct {
-	Manager *models.ModelManager
-	PubSock mangos.Socket
-}
 
 func NewPubSubService(manager *models.ModelManager) *PubSubService {
 	serv := &PubSubService{Manager: manager}
@@ -57,12 +38,12 @@ func NewPubSubService(manager *models.ModelManager) *PubSubService {
 }
 
 // public the message
-func (t *PubSubService) PublishToMosdns(msg *NnMessage) error {
+func (t *PubSubService) PublishToTeamsDNS(msg *NnMessage) error {
 	_msg, err := msgpack.Marshal(msg)
 	if err != nil {
 		return err
 	}
-	var buff = bytes.NewBuffer([]byte(MosdnsTopic))
+	var buff = bytes.NewBuffer([]byte(TeamsDNSCPETopic))
 	buff.Write(_msg)
 	return t.PubSock.Send(buff.Bytes())
 }
@@ -73,12 +54,12 @@ func (t *PubSubService) StartPubServer() error {
 	if sock, err = pub.NewSocket(); err != nil {
 		return err
 	}
-	if err = sock.Listen(t.Manager.Config.Messaged.Address); err != nil {
+	if err = sock.Listen(t.Manager.Config.Messaged.PubAddress); err != nil {
 		log.Errorf("%+v", errors.WithStack(err))
 		return err
 	}
 	t.PubSock = sock
-	log.Infof("PubServer listen %s...", t.Manager.Config.Messaged.Address)
+	log.Infof("PubServer listen %s...", t.Manager.Config.Messaged.PubAddress)
 	t.SetupEventBus()
 	return nil
 }

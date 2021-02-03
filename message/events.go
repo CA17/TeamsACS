@@ -29,12 +29,12 @@ func (t *PubSubService) SetupEventBus() {
 	// Post new CPE IP， Notify mosdns to add an IP
 	_ = t.Manager.Bus.Subscribe(constant.EventMosdnsCpeUpdate, func(tunnelIP, ispIP string) {
 		log.Infof("Receive event: %s (%s,%s)", constant.EventMosdnsCpeUpdate, tunnelIP, ispIP)
-		_ = t.PublishToMosdns(&NnMessage{
+		_ = t.PublishToTeamsDNS(&NnMessage{
 			Uid:     strconv.FormatInt(common.UUIDint64(), 10),
-			Command: MosdnsUpdateTeamsacsCpe,
+			Command: TeamsDNSUpdateCpe,
 			Attrs: map[string]interface{}{
-				MosdnsTeamsacsCpeTunnelIP: tunnelIP,
-				MosdnsTeamsacsCpeIspIp:    ispIP,
+				TeamsDNSCpeTunnelIP: tunnelIP,
+				TeamsDNSCpeIspIp:    ispIP,
 			},
 		})
 	})
@@ -42,11 +42,11 @@ func (t *PubSubService) SetupEventBus() {
 	// Delete CPE IP， Notify mosdns to update IP
 	_ = t.Manager.Bus.Subscribe(constant.EventMosdnsCpeRemove, func(tunnelIP string) {
 		log.Infof("Receive event: %s (%s)", constant.EventMosdnsCpeUpdate, tunnelIP)
-		_ = t.PublishToMosdns(&NnMessage{
+		_ = t.PublishToTeamsDNS(&NnMessage{
 			Uid:     strconv.FormatInt(common.UUIDint64(), 10),
-			Command: MosdnsRemoveTeamsacsCpe,
+			Command: TeamsDNSRemoveCpe,
 			Attrs: map[string]interface{}{
-				MosdnsTeamsacsCpeTunnelIP: tunnelIP,
+				TeamsDNSCpeTunnelIP: tunnelIP,
 			},
 		})
 	})
@@ -54,10 +54,10 @@ func (t *PubSubService) SetupEventBus() {
 	// Clean CPE IP， Notify mosdns to clear the IP List
 	_ = t.Manager.Bus.Subscribe(constant.EventMosdnsCpeClean, func() {
 		log.Infof("Receive event: %s", constant.EventMosdnsCpeUpdate)
-		_ = t.PublishToMosdns(&NnMessage{
+		_ = t.PublishToTeamsDNS(&NnMessage{
 			Uid:     strconv.FormatInt(common.UUIDint64(), 10),
-			Command: MosdnsCleanTeamsacsCpe,
-			Attrs: map[string]interface{}{},
+			Command: TeamsDNSCleanCpe,
+			Attrs:   map[string]interface{}{},
 		})
 	})
 

@@ -28,7 +28,8 @@ import (
 	"github.com/ca17/teamsacs/common/log"
 )
 
-const IndexPrefix = "teamsacs-log"
+const IndexTeamslogPrefix = "teamsacs-log"
+const IndexTeamsDnslogPrefix = "teamsdns-log"
 
 type Elastic struct {
 	Client *elastic.Client
@@ -37,6 +38,7 @@ type Elastic struct {
 func NewElastic(client *elastic.Client) *Elastic {
 	e := &Elastic{Client: client}
 	go e.InitTemplate()
+	go e.InitDnslogTemplate()
 	return e
 }
 
@@ -194,6 +196,58 @@ const _mapping = `
   }
 }`
 
+const _dnslogmapping = `
+{
+  "order": 0,
+  "index_patterns": [
+    "teamsdns-log-*"
+  ],
+  "settings": {
+    "number_of_shards": "3",
+    "number_of_replicas": "0",
+    "auto_expand_replicas": "0-1",
+    "codec": "best_compression",
+    "index.refresh_interval": "5s"
+  },
+  "mappings": {
+    "_default_": {
+      "date_detection": false
+    },
+    "properties": {
+      "@timestamp": {
+        "type": "date"
+      },
+      "time": {
+        "type": "long"
+      },
+      "cpe_name": {
+        "type": "keyword"
+      },
+      "cpe_sn": {
+        "type": "keyword"
+      },
+      "Ecs": {
+        "type": "keyword"
+      },
+      "src": {
+        "type": "keyword"
+      },
+      "dest": {
+        "type": "keyword"
+      },
+      "result": {
+        "type": "nested"
+      },
+      "tags": {
+        "type": "keyword"
+      },
+      "error": {
+        "type": "keyword"
+      }
+    }
+  }
+}`
+
 type DeviceSysstat struct {
 	UpTime     int64 `json:"upTime"`
 	MemPercent int64 `json:"memPercent"`
@@ -245,17 +299,37 @@ type TeamsacsLog struct {
 	Radiuslog *Radiuslog     `json:"radiuslog,omitempty"`
 }
 
-func GetCurrentIndexName() string {
+type TeamsDnsLog struct {
+	Timestamp string   `json:"@timestamp"`
+	Time      int64    `json:"time"`
+	CpeName string `json:"cpe_name,omitempty"`
+	CpeSn string `json:"cpe_sn,omitempty"`
+	Src       string   `json:"src"`
+	Dest      []string `json:"dest"`
+	Ecs       string   `json:"ecs,omitempty"`
+	Tags      []string `json:"tags"`
+	Result    []map[string]interface{} `json:"result"`
+	Error string `json:"error,omitempty"`
+}
+
+
+func GetCurrentTeamslogIndexName() string {
 	suffix := time.Now().Format("20060102")
-	indexName := fmt.Sprintf("%s-%s", IndexPrefix, suffix)
+	indexName := fmt.Sprintf("%s-%s", IndexTeamslogPrefix, suffix)
 	return indexName
 }
 
-func GetSearchIndexOfMonth() string {
-	suffix := time.Now().Format("200601")
-	indexName := fmt.Sprintf("%s-%s", IndexPrefix, suffix)
+func GetCurrentTeamsDnslogIndexName() string {
+	suffix := time.Now().Format("20060102")
+	indexName := fmt.Sprintf("%s-%s", IndexTeamsDnslogPrefix, suffix)
 	return indexName
 }
+
+// func GetSearchIndexOfMonth() string {
+// 	suffix := time.Now().Format("200601")
+// 	indexName := fmt.Sprintf("%s-%s", IndexTeamslogPrefix, suffix)
+// 	return indexName
+// }
 
 func (e *Elastic) checkClient() error {
 	switch {
@@ -279,6 +353,18 @@ func (e *Elastic) InitTemplate() error {
 	return nil
 }
 
+func (e *Elastic) InitDnslogTemplate() error {
+	if err := e.checkClient(); err != nil {
+		return err
+	}
+	ctx := context.Background()
+	_, err := e.Client.IndexPutTemplate("teamsdns-log-template").BodyJson(_dnslogmapping).Do(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // BulkTeamslog
 func (e *Elastic) BulkTeamslog(logs ...TeamsacsLog) (*elastic.BulkResponse, error) {
 	if err := e.checkClient(); err != nil {
@@ -286,7 +372,7 @@ func (e *Elastic) BulkTeamslog(logs ...TeamsacsLog) (*elastic.BulkResponse, erro
 	}
 	bulkRequest := e.Client.Bulk()
 	for _, log := range logs {
-		req := elastic.NewBulkIndexRequest().Index(GetCurrentIndexName()).Id(common.UUID()).Doc(log)
+		req := elastic.NewBulkIndexRequest().Index(GetCurrentTeamslogIndexName()).Id(common.UUID()).Doc(log)
 		bulkRequest = bulkRequest.Add(req)
 	}
 	ctx := context.Background()
@@ -296,6 +382,26 @@ func (e *Elastic) BulkTeamslog(logs ...TeamsacsLog) (*elastic.BulkResponse, erro
 	}
 	return bulkResponse, nil
 }
+
+// BulkTeamsdnsLog
+// Batch send dnslog
+func (e *Elastic) BulkTeamsDnslog(logs ...TeamsDnsLog) (*elastic.BulkResponse, error) {
+	if err := e.checkClient(); err != nil {
+		return nil, err
+	}
+	bulkRequest := e.Client.Bulk()
+	for _, _log := range logs {
+		req := elastic.NewBulkIndexRequest().Index(GetCurrentTeamsDnslogIndexName()).Id(common.UUID()).Doc(_log)
+		bulkRequest = bulkRequest.Add(req)
+	}
+	ctx := context.Background()
+	bulkResponse, err := bulkRequest.Do(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return bulkResponse, nil
+}
+
 
 // BulkData
 // sync base data
