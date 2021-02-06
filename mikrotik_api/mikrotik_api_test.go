@@ -16,7 +16,18 @@
 
 package mikrotik_api
 
-import "testing"
+import (
+	"testing"
+)
+
+func getTestConn()  (*MikrotikApi, error){
+	api := NewMikrotikApi("apiuser", "apipwd", "192.168.100.1:8728", false)
+	err := api.Connect()
+	if err != nil {
+		return nil, err
+	}
+	return api, nil
+}
 
 func TestMikrotikApi_RemoveSocksUser(t *testing.T) {
 
@@ -101,4 +112,35 @@ func TestMikrotikApi_ReConnect(t *testing.T) {
 	api.Client.Close()
 	t.Log(api.ReConnect())
 	t.Log(api.CheckConnection())
+}
+
+func TestMikrotikApi_GetInterfaceList(t *testing.T) {
+	api, err := getTestConn()
+	if err != nil {
+		t.Fatal(err)
+	}
+	ifs, err := api.GetInterfaceList()
+	for _, l := range ifs {
+		t.Logf("%+v", l)
+	}
+}
+
+func TestMikrotikApi_GetIpRoutes(t *testing.T) {
+	api, err := getTestConn()
+	if err != nil {
+		t.Fatal(err)
+	}
+	ifs, err := api.GetIpRoutes()
+	for _, l := range ifs {
+		t.Logf("%+v", l)
+	}
+}
+
+func TestMikrotikApi_GetIpDnsInfos(t *testing.T) {
+	api, err := getTestConn()
+	if err != nil {
+		t.Fatal(err)
+	}
+	info, err := api.GetIpDnsInfo()
+	t.Logf("%+v", info)
 }

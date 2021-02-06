@@ -47,12 +47,36 @@ func _ifLtZeroInt64(s, defval int64) int64 {
 	return s
 }
 
+// GetMikrotikApiBySN Get API according to SN
+func (m *MikrotikDeviceManager) GetMikrotikApiBySN(sn, devtype string) (*mikrotik_api.MikrotikApi, error) {
+	if sn == "" {
+		return nil, fmt.Errorf("sn param  empty")
+	}
+	switch devtype {
+	case "cpe":
+		cpe, err := m.GetCpeManager().GetCpeBySn(sn)
+		if err != nil {
+			return nil, err
+		}
+		return m.GetMikrotikApi(devtype, *cpe)
+	case "vpe":
+		vpe, err := m.GetVpeManager().GetVpeBySn(sn)
+		if err != nil {
+			return nil, err
+		}
+		return m.GetMikrotikApi(devtype, *vpe)
+	}
+	return nil, fmt.Errorf("not support")
+
+}
+
 // GetMikrotikApi Get an API long connection, support automatic reconnection
 // parammap: {api_addr:"xxx", api_user:"xxx", api_pwd:"xxx"}
-func (m *MikrotikDeviceManager) GetMikrotikApi(devmap map[string]interface{}) (*mikrotik_api.MikrotikApi, error) {
+func (m *MikrotikDeviceManager) GetMikrotikApi(devtype string, devmap map[string]interface{}) (*mikrotik_api.MikrotikApi, error) {
+
 	apiAddr := maputils.GetStringValue(devmap, "api_addr", "")
 	if common.InSlice(apiAddr, []string{"", "N/A"}) {
-		switch devmap["devtype"] {
+		switch devtype {
 		case "cpe":
 			apiAddr = maputils.GetStringValue(devmap, "rd_ipaddr", "") + ":8728"
 		case "vpe":
@@ -132,7 +156,6 @@ func (m *MikrotikDeviceManager) SyncMikrotikDeviceSysstatToElastic(devtype strin
 		if sn == "" {
 			continue
 		}
-		dev["devtype"] = devtype
 		sysstatlog := elastic.TeamsacsLog{
 			Timestamp: time.Now().Format(time.RFC3339),
 			Source:    m.Config.System.Appid,
@@ -166,7 +189,7 @@ func (m *MikrotikDeviceManager) SyncMikrotikDeviceNetstatToElastic(devtype strin
 			continue
 		}
 		go func(gdev map[string]interface{}) {
-			api, err := m.GetMikrotikApi(gdev)
+			api, err := m.GetMikrotikApi(devtype, gdev)
 			if err != nil {
 				return
 			}
@@ -203,4 +226,28 @@ func (m *MikrotikDeviceManager) SyncMikrotikDeviceNetstatToElastic(devtype strin
 			}
 		}(dev)
 	}
+}
+
+func (m *MikrotikDeviceManager) QueryDeviceInterfaceList(sn, devtype string) ([]map[string]string, error) {
+	api, err := m.GetMikrotikApiBySN(sn, devtype)
+	if err != nil {
+		return nil, err
+	}
+	return api.GetInterfaceList()
+}
+
+func (m *MikrotikDeviceManager) QueryDeviceRoutes(sn, devtype string) ([]map[string]string, error) {
+	api, err := m.GetMikrotikApiBySN(sn, devtype)
+	if err != nil {
+		return nil, err
+	}
+	return api.GetIpRoutes()
+}
+
+func (m *MikrotikDeviceManager) QueryDeviceDnsinfo(sn, devtype string) (map[string]string, error) {
+	api, err := m.GetMikrotikApiBySN(sn, devtype)
+	if err != nil {
+		return nil, err
+	}
+	return api.GetIpDnsInfo()
 }

@@ -96,10 +96,10 @@ func ServerRecover(debug bool) echo.MiddlewareFunc {
 				if r := recover(); r != nil {
 					err, ok := r.(error)
 					if !ok {
-						err = fmt.Errorf("%v", r)
+						err = fmt.Errorf("%+v", r)
 					}
 					if debug {
-						log.Errorf("%+v", r)
+						log.Errorf("%+v", err)
 					}
 					c.Error(echo.NewHTTPError(http.StatusInternalServerError, err.Error()))
 				}

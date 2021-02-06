@@ -1,0 +1,17 @@
+POST http://{{nbi_url}}/nbi/mikrotik/device/interfaces?sn=i8TqFHmQnNG
+Content-Type: application/json
+authorization: Bearer {{nbi_token}}
+
+###
+
+POST http://{{nbi_url}}/nbi/mikrotik/device/routers?sn=i8TqFHmQnNG
+Content-Type: application/json
+authorization: Bearer {{nbi_token}}
+
+###
+
+POST http://{{nbi_url}}/nbi/mikrotik/device/dns?sn=i8TqFHmQnNG
+Content-Type: application/json
+authorization: Bearer {{nbi_token}}
+
+###

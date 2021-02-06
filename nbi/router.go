@@ -23,10 +23,8 @@ import (
 func (h *HttpHandler) InitAllRouter(e *echo.Echo) {
 	// mikrotik cpe query apis
 	e.Any("/nbi/mikrotik/device/interfaces", h.QueryMikrotikDeviceInterfaces)
-	e.Any("/nbi/mikrotik/device/pppinterfaces", h.QueryMikrotikDevicePPPInterfaces)
-	e.Any("/nbi/mikrotik/device/ipinterfaces", h.QueryMikrotikDeviceIpInterfaces)
 	e.Any("/nbi/mikrotik/device/routers", h.QueryMikrotikDeviceRouters)
-	e.Any("/nbi/mikrotik/device/dns", h.QueryMikrotikDeviceDnsClientServer)
+	e.Any("/nbi/mikrotik/device/dns", h.QueryMikrotikDeviceDnsInfo)
 
 	// opr apis
 	e.Any("/nbi/opr/query", h.QueryOperator)

@@ -19,6 +19,8 @@ package mikrotik_api
 import (
 	"errors"
 	"fmt"
+	"strings"
+	"sync"
 	"time"
 
 	"gopkg.in/routeros.v2"
@@ -32,6 +34,7 @@ type MikrotikApi struct {
 	ApiAddr string
 	TLS     bool
 	Debug   bool
+	lock sync.Mutex
 	Client  *routeros.Client
 }
 
@@ -49,6 +52,8 @@ func GetConnection(apiUser string, apiPwd string, apiAddr string, TLS bool) (*Mi
 }
 
 func (a *MikrotikApi) Connect() error {
+	a.lock.Lock()
+	defer a.lock.Unlock()
 	var err error
 	a.Client, err = routeros.DialTimeout(a.ApiAddr, a.ApiUser, a.ApiPwd, time.Second*3)
 	if err != nil {
@@ -58,6 +63,8 @@ func (a *MikrotikApi) Connect() error {
 }
 
 func (a *MikrotikApi) ReConnect() error {
+	a.lock.Lock()
+	defer a.lock.Unlock()
 	if a.Client != nil {
 		a.Client.Close()
 		a.Client = nil
@@ -71,6 +78,8 @@ func (a *MikrotikApi) ReConnect() error {
 }
 
 func (a *MikrotikApi) CheckConnection() bool {
+	a.lock.Lock()
+	defer a.lock.Unlock()
 	reply, err := a.Client.Run("/put", "=message=1")
 	if err != nil {
 		return false
@@ -82,6 +91,8 @@ func (a *MikrotikApi) CheckConnection() bool {
 // command: /interface/print
 // params: "?xx=a?,yy=b"
 func (a *MikrotikApi) ExecuteCommand(command string, params string, props string) (*routeros.Reply, error) {
+	a.lock.Lock()
+	defer a.lock.Unlock()
 	args := make([]string, 0)
 	args = append(args, command)
 	if params != "" {
@@ -105,6 +116,8 @@ func (a *MikrotikApi) ExecuteCommand(command string, params string, props string
 
 // AddSocksUser
 func (a *MikrotikApi) AddSocksUser(name, password, rateLimit string) error {
+	a.lock.Lock()
+	defer a.lock.Unlock()
 	_, err := a.Client.Run("/ip/socks/users/add", "=name="+name, "=password="+password, "=only-one=yes", "=rate-limit="+rateLimit)
 	if err != nil {
 		return fmt.Errorf("AddSocksUser Execute Api error %s", err.Error())
@@ -114,6 +127,8 @@ func (a *MikrotikApi) AddSocksUser(name, password, rateLimit string) error {
 
 // RemoveSocksUser
 func (a *MikrotikApi) RemoveSocksUser(name string) error {
+	a.lock.Lock()
+	defer a.lock.Unlock()
 	reply, err := a.Client.Run("/ip/socks/users/getall", "?name="+name, "=.proplist=.id")
 	if err != nil {
 		return fmt.Errorf("RemoveSocksUser find error %s", err.Error())
@@ -133,6 +148,8 @@ func (a *MikrotikApi) RemoveSocksUser(name string) error {
 // AddPPPUser
 // add  ppp user with fix ip
 func (a *MikrotikApi) AddPPPUser(name, password, ip, gateway, remark string) error {
+	a.lock.Lock()
+	defer a.lock.Unlock()
 	_, err := a.Client.Run("/ppp/secret/add", "=name="+name, "=password="+password, "=local-address="+gateway, "=comment="+remark, "=remote-address="+ip)
 	if err != nil {
 		return fmt.Errorf("AddPPPUser Execute Api error %s", err.Error())
@@ -142,6 +159,8 @@ func (a *MikrotikApi) AddPPPUser(name, password, ip, gateway, remark string) err
 
 // RemovePPPUser
 func (a *MikrotikApi) RemovePPPUser(name string) error {
+	a.lock.Lock()
+	defer a.lock.Unlock()
 	reply, err := a.Client.Run("/ppp/secret/getall", "?name="+name, "=.proplist=.id")
 	if err != nil {
 		return fmt.Errorf("RemovePPPUser find error %s", err.Error())
@@ -188,9 +207,59 @@ func (a *MikrotikApi) GetSystemResource() (map[string]string, error) {
 // AddApiUser
 // add  api user
 func (a *MikrotikApi) AddApiUser(name, password string) error {
+	a.lock.Lock()
+	defer a.lock.Unlock()
 	_, err := a.Client.Run("/user/add", "=name="+name, "=password="+password, "=group=write", "=comment=ApiUser")
 	if err != nil {
 		return fmt.Errorf("AddApiUser Execute Api error %s", err.Error())
 	}
 	return nil
+}
+
+func warpMapItem(srcmap map[string]string) map[string]string{
+	var item = make(map[string]string)
+	for k, v := range srcmap {
+		item[strings.ReplaceAll(k, "-", "_")] = v
+	}
+	if _id, ok := item[".id"]; ok {
+		item["id"] = strings.ReplaceAll(_id, "*", "")
+		delete(item, ".id")
+	}
+	return item
+}
+
+func (a *MikrotikApi) GetInterfaceList() ([]map[string]string, error) {
+	var result = make([]map[string]string, 0)
+	reply, err := a.ExecuteCommand("/interface/print", "without-paging", "")
+	if err != nil {
+		return nil, fmt.Errorf("GetInterfaceList error %s", err.Error())
+	}
+	for _, re := range reply.Re {
+		result = append(result, warpMapItem(re.Map))
+	}
+	return result, nil
+}
+
+func (a *MikrotikApi) GetIpRoutes() ([]map[string]string, error) {
+	var result = make([]map[string]string, 0)
+	reply, err := a.ExecuteCommand("/ip/route/print", "without-paging", "")
+	if err != nil {
+		return nil, fmt.Errorf("GetIpRoutes error %s", err.Error())
+	}
+	for _, re := range reply.Re {
+		result = append(result, warpMapItem(re.Map))
+	}
+	return result, nil
+}
+
+func (a *MikrotikApi) GetIpDnsInfo() (map[string]string, error) {
+	reply, err := a.ExecuteCommand("/ip/dns/print", "", "")
+	if err != nil {
+		return nil, fmt.Errorf("GetIpDnsInfo error %s", err.Error())
+	}
+
+	if len(reply.Re) > 0 {
+		return warpMapItem(reply.Re[0].Map), nil
+	}
+	return nil, fmt.Errorf("no result")
 }

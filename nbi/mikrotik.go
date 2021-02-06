@@ -27,22 +27,14 @@ import (
 // QueryMikrotikDeviceInterfaces
 func (h *HttpHandler) QueryMikrotikDeviceInterfaces(c echo.Context) error {
 	var result = make(map[string]interface{})
-	data, err := h.GetManager().GetGenieacsManager().QueryMikrotikEthernetInterface(c.QueryParam("sn"))
-	common.Must(err)
-	if data != nil {
-		result["data"] = data.Items
-	} else {
-		result["data"] = common.EmptyList
+	sn := c.QueryParam("sn")
+	dev := c.QueryParam("dev")
+	data, err := h.GetManager().GetMikrotikDeviceManager().QueryDeviceInterfaceList(sn, dev)
+	if err != nil {
+		return c.JSON(http.StatusOK, h.RestError(err.Error()))
 	}
-	return c.JSON(http.StatusOK, result)
-}
-
-func (h *HttpHandler) QueryMikrotikDevicePPPInterfaces(c echo.Context) error {
-	var result = make(map[string]interface{})
-	data, err := h.GetManager().GetGenieacsManager().QueryMikrotikPPPInterface(c.QueryParam("sn"))
-	common.Must(err)
 	if data != nil {
-		result["data"] = data.Items
+		result["data"] = data
 	} else {
 		result["data"] = common.EmptyList
 	}
@@ -51,34 +43,30 @@ func (h *HttpHandler) QueryMikrotikDevicePPPInterfaces(c echo.Context) error {
 
 func (h *HttpHandler) QueryMikrotikDeviceRouters(c echo.Context) error {
 	var result = make(map[string]interface{})
-	data, err := h.GetManager().GetGenieacsManager().QueryMikrotikRouters(c.QueryParam("sn"))
-	common.Must(err)
+	sn := c.QueryParam("sn")
+	dev := c.QueryParam("dev")
+	data, err := h.GetManager().GetMikrotikDeviceManager().QueryDeviceRoutes(sn, dev)
+	if err != nil {
+		return c.JSON(http.StatusOK, h.RestError(err.Error()))
+	}
 	if data != nil {
-		result["data"] = data.Items
+		result["data"] = data
 	} else {
 		result["data"] = common.EmptyList
 	}
 	return c.JSON(http.StatusOK, result)
 }
 
-func (h *HttpHandler) QueryMikrotikDeviceDnsClientServer(c echo.Context) error {
+func (h *HttpHandler) QueryMikrotikDeviceDnsInfo(c echo.Context) error {
 	var result = make(map[string]interface{})
-	data, err := h.GetManager().GetGenieacsManager().QueryMikrotikDnsServer(c.QueryParam("sn"))
-	common.Must(err)
-	if data != nil {
-		result["data"] = data.Items
-	} else {
-		result["data"] = common.EmptyList
+	sn := c.QueryParam("sn")
+	dev := c.QueryParam("dev")
+	data, err := h.GetManager().GetMikrotikDeviceManager().QueryDeviceDnsinfo(sn, dev)
+	if err != nil {
+		return c.JSON(http.StatusOK, h.RestError(err.Error()))
 	}
-	return c.JSON(http.StatusOK, result)
-}
-
-func (h *HttpHandler) QueryMikrotikDeviceIpInterfaces(c echo.Context) error {
-	var result = make(map[string]interface{})
-	data, err := h.GetManager().GetGenieacsManager().QueryMikrotikIpInterface(c.QueryParam("sn"))
-	common.Must(err)
 	if data != nil {
-		result["data"] = data.Items
+		result["data"] = data
 	} else {
 		result["data"] = common.EmptyList
 	}

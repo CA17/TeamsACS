@@ -492,6 +492,15 @@ func ToGbkHexString(src string) (string, error) {
 	return buf.String(), nil
 }
 
+func ToGbkString(src string) (string, error) {
+	reader := transform.NewReader(bytes.NewReader([]byte(src)), simplifiedchinese.GBK.NewEncoder())
+	data, e := ioutil.ReadAll(reader)
+	if e != nil {
+		return "", e
+	}
+	return string(data), nil
+}
+
 func GetPointString(s *string) string {
 	if s != nil {
 		return *s
