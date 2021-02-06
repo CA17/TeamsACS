@@ -226,22 +226,25 @@ const _dnslogmapping = `
       "cpe_sn": {
         "type": "keyword"
       },
-      "Ecs": {
+      "ecs": {
+        "type": "keyword"
+      },
+      "ecs_city": {
+        "type": "keyword"
+      },
+      "ecs_country": {
         "type": "keyword"
       },
       "src": {
         "type": "keyword"
       },
-      "dest": {
-        "type": "keyword"
+      "question": {
+        "type": "nested"
       },
       "result": {
         "type": "nested"
       },
       "tags": {
-        "type": "keyword"
-      },
-      "error": {
         "type": "keyword"
       }
     }
@@ -300,18 +303,18 @@ type TeamsacsLog struct {
 }
 
 type TeamsDnsLog struct {
-	Timestamp string   `json:"@timestamp"`
-	Time      int64    `json:"time"`
-	CpeName string `json:"cpe_name,omitempty"`
-	CpeSn string `json:"cpe_sn,omitempty"`
-	Src       string   `json:"src"`
-	Dest      []string `json:"dest"`
-	Ecs       string   `json:"ecs,omitempty"`
-	Tags      []string `json:"tags"`
-	Result    []map[string]interface{} `json:"result"`
-	Error string `json:"error,omitempty"`
+	Timestamp  string                   `json:"@timestamp"`
+	Time       int64                    `json:"time"`
+	CpeName    string                   `json:"cpe_name,omitempty"`
+	CpeSn      string                   `json:"cpe_sn,omitempty"`
+	Src        string                   `json:"src"`
+	Ecs        string                   `json:"ecs,omitempty"`
+	EcsCity    string                   `json:"ecs_city,omitempty"`
+	EcsCountry string                   `json:"ecs_country,omitempty"`
+	Tags       []string                 `json:"tags"`
+	Question     []map[string]interface{} `json:"question"`
+	Result     []map[string]interface{} `json:"result"`
 }
-
 
 func GetCurrentTeamslogIndexName() string {
 	suffix := time.Now().Format("20060102")
@@ -401,7 +404,6 @@ func (e *Elastic) BulkTeamsDnslog(logs ...TeamsDnsLog) (*elastic.BulkResponse, e
 	}
 	return bulkResponse, nil
 }
-
 
 // BulkData
 // sync base data

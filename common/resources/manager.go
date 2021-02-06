@@ -23,3 +23,11 @@ func ReadResource(file string) (string, error) {
 	}
 	return string(c), nil
 }
+
+func ReadResourceBytes(file string) ([]byte, error) {
+	c, err := FSByte(false, file)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
+}

@@ -31,6 +31,8 @@ import (
 	"github.com/ca17/teamsacs/models/elastic"
 )
 
+// Mikrotik Api method collection
+
 type MikrotikDeviceManager struct{ *ModelManager }
 
 func (m *ModelManager) GetMikrotikDeviceManager() *MikrotikDeviceManager {
@@ -45,7 +47,7 @@ func _ifLtZeroInt64(s, defval int64) int64 {
 	return s
 }
 
-// GetMikrotikApi
+// GetMikrotikApi Get an API long connection, support automatic reconnection
 // parammap: {api_addr:"xxx", api_user:"xxx", api_pwd:"xxx"}
 func (m *MikrotikDeviceManager) GetMikrotikApi(devmap map[string]interface{}) (*mikrotik_api.MikrotikApi, error) {
 	apiAddr := maputils.GetStringValue(devmap, "api_addr", "")
@@ -100,6 +102,7 @@ func (m *MikrotikDeviceManager) GetMikrotikApi(devmap map[string]interface{}) (*
 }
 
 // SyncMikrotikDeviceSysstatToElastic
+// Mikrotik device  data statistics are transferred to Elasticsearch
 func (m *MikrotikDeviceManager) SyncMikrotikDeviceStatToElastic(devtypes ...string) {
 	for _, devtype := range devtypes {
 		var devices = new(web.QueryResult)
@@ -121,6 +124,7 @@ func (m *MikrotikDeviceManager) SyncMikrotikDeviceStatToElastic(devtypes ...stri
 }
 
 // SyncMikrotikDeviceSysstatToElastic
+// Mikrotik device system data statistics are transferred to Elasticsearch
 func (m *MikrotikDeviceManager) SyncMikrotikDeviceSysstatToElastic(devtype string, devices *web.QueryResult) {
 	result := make([]elastic.TeamsacsLog, 0)
 	for _, dev := range *devices {
@@ -153,6 +157,7 @@ func (m *MikrotikDeviceManager) SyncMikrotikDeviceSysstatToElastic(devtype strin
 }
 
 // SyncMikrotikDeviceNetstatToElastic
+// Mikrotik device network data statistics are transferred to Elasticsearch
 func (m *MikrotikDeviceManager) SyncMikrotikDeviceNetstatToElastic(devtype string, devices *web.QueryResult) {
 	for _, dev := range *devices {
 		// async stat interface

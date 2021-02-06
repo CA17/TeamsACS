@@ -112,6 +112,7 @@ func (h *HttpHandler) FreeradiusAuthorize(c echo.Context) error {
 	resp["reply:Mikrotik-Rate-Limit"] = fmt.Sprintf("%dk/%dk", user.GetUpRateKbps(), user.GetDownRateKbps())
 	sessionTimeout := expireTime.Sub(time.Now()).Seconds()
 	resp["reply:Session-Timeout"] = fmt.Sprintf("%d", int64(sessionTimeout))
+	resp["reply:Acct-Interim-Interval"] = 120
 
 	// Set address pool or static IP
 	var userip = user.GetIpaddr()

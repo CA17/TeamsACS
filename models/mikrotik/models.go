@@ -14,6 +14,8 @@
  *
  */
 
+// GenieACS Mikrotik Data model
+
 package mikrotik
 
 import (

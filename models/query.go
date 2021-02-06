@@ -14,6 +14,8 @@
  *
  */
 
+// Mongodb general query method
+
 package models
 
 import (
@@ -45,6 +47,7 @@ func logQueryParams(q interface{}) {
 	log.Info(string(bs))
 }
 
+// Processing query parameters
 func processQueryParams(params web.RequestParams, findOptions *options.FindOptions) bson.D {
 	var q = bson.D{}
 	for qname, val := range params.GetParamMap("filtermap") {
@@ -92,6 +95,7 @@ func processQueryParams(params web.RequestParams, findOptions *options.FindOptio
 	return q
 }
 
+// General query, no paging, suitable for small data sets
 func (m *ModelManager) QueryItems(params web.RequestParams, collatiion string) (*web.QueryResult, error) {
 	var findOptions = options.Find()
 	limit := params.GetInt64WithDefval("limit", 0)
@@ -157,6 +161,7 @@ func (m *ModelManager) QueryItemOptions(params web.RequestParams, collatiion str
 	return jsonoptions, nil
 }
 
+// Paging query, suitable for large data sets
 func (m *ModelManager) QueryPagerItems(params web.RequestParams, collatiion string) (*web.PageResult, error) {
 	var findOptions = options.Find()
 	var pos = params.GetInt64WithDefval("start", 0)

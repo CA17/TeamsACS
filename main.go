@@ -270,6 +270,10 @@ func main() {
 			log.Info("Start Message publish Server ...")
 			return message.NewPubSubService(manager).StartPubServer()
 		})
+		g.Go(func() error {
+			log.Info("Start Message publish Server ...")
+			return message.NewPubSubService(manager).StartDnslogSubServer()
+		})
 	}
 
 	if err := g.Wait(); err != nil {

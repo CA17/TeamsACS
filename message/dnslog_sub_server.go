@@ -31,16 +31,21 @@ import (
 
 // DNS LOG
 type DnsLog struct {
-	Start   time.Time
-	End     time.Time
-	Time    int64
-	Src     string
-	Dest    []string
-	Matcher []string
-	Ecs     string
-	Tags    []string
-	Result  []DnsResult
-	Error   string
+	Start    time.Time
+	End      time.Time
+	Time     int64
+	Src      string
+	Question []DnsQuestion
+	Ecs      string
+	Tags     []string
+	Result   []DnsResult
+	Error    string
+}
+
+type DnsQuestion struct {
+	Name   string
+	Qtype  string
+	Qclass string
 }
 
 type DnsResult struct {
@@ -52,11 +57,10 @@ type DnsResult struct {
 
 var EmptyDnslog = DnsLog{}
 
-
 // Remove the log from the channel and put it into the batch processing queue
-func (t *PubSubService)  processDnslog(ch chan DnsLog) {
+func (t *PubSubService) processDnslog(ch chan DnsLog) {
 	readWithSelect := func(ch chan DnsLog) (log DnsLog, err error) {
-		timeout := time.NewTimer(time.Millisecond * 100)
+		timeout := time.NewTimer(time.Millisecond * 1000)
 		select {
 		case log = <-ch:
 			return log, nil
@@ -69,36 +73,79 @@ func (t *PubSubService)  processDnslog(ch chan DnsLog) {
 		queue := make([]elastic.TeamsDnsLog, 0)
 		var err error
 		var _log DnsLog
-		if err == nil  && len(queue) < 2000 {
+		for {
+			if len(queue) >= 2000 {
+				break
+			}
 			_log, err = readWithSelect(ch)
+			if err != nil {
+				break
+			}
 			tlog := elastic.TeamsDnsLog{
 				Timestamp: _log.Start.Format(time.RFC3339),
 				Time:      _log.Time,
 				CpeName:   "N/A",
 				CpeSn:     "N/A",
 				Src:       _log.Src,
-				Dest:      _log.Dest,
+				Question:  make([]map[string]interface{}, 0),
 				Ecs:       _log.Ecs,
 				Tags:      _log.Tags,
-				Result: make([]map[string]interface{}, 0),
-				Error:     _log.Error,
+				Result:    make([]map[string]interface{}, 0),
 			}
+
+			// ECS IP Geographical processing
+			if tlog.Ecs != "" && t.Manager.Ipdb != nil {
+				ipinfo, err := t.Manager.Ipdb.FindInfo(tlog.Ecs, "CN")
+				if err == nil {
+					tlog.EcsCity = ipinfo.CityName
+					tlog.EcsCountry = ipinfo.CountryName
+				}
+			}
+
+			// DNS Request data
+			for _, qe := range _log.Question {
+				_qmap := map[string]interface{}{
+					"name":   qe.Name,
+					"qtype":  qe.Qtype,
+					"qclass": qe.Qclass,
+				}
+				tlog.Question = append(tlog.Question, _qmap)
+			}
+
+			// DNS Response data
 			for _, result := range _log.Result {
-				tlog.Result = append(tlog.Result, map[string]interface{}{
-					"type": result.Type,
-					"name": result.Name,
+				_rmap := map[string]interface{}{
+					"type":  result.Type,
+					"name":  result.Name,
 					"value": result.Value,
-					"ttl": result.Ttl,
-				})
+					"ttl":   result.Ttl,
+				}
+
+				// A Recode Geographical processing
+				if (result.Type == "A" || result.Type == "AAAA") && t.Manager.Ipdb != nil {
+					ipinfo, err := t.Manager.Ipdb.FindInfo(result.Value, "CN")
+					if err == nil {
+						_rmap["city"] = ipinfo.CityName
+						_rmap["country"] = ipinfo.CountryName
+					}
+				}
+
+				tlog.Result = append(tlog.Result, _rmap)
 			}
+
 			queue = append(queue, tlog)
+			log.Infof("%+v", tlog)
 		}
-		go func() {
-			_, err = t.Manager.Elastic.BulkTeamsDnslog(queue...)
-			if err != nil {
-				log.Error(err.Error())
-			}
-		}()
+		if len(queue) > 0 {
+			_queue := make([]elastic.TeamsDnsLog, len(queue))
+			copy(_queue, queue)
+			go func() {
+				_, err = t.Manager.Elastic.BulkTeamsDnslog(_queue...)
+				if err != nil {
+					log.Error(err.Error())
+				}
+			}()
+		}
 	}
 }
 
@@ -141,10 +188,8 @@ func (t *PubSubService) StartDnslogSubServer() error {
 	for {
 		msg, err := sock.Recv()
 		if err != nil {
-			if err != nil {
-				log.Errorf("Dnslog Subscriber recv Message error %s", err.Error())
-				continue
-			}
+			log.Errorf("Dnslog Subscriber recv Message error %s", err.Error())
+			continue
 		}
 		var smsg = new(DnsLog)
 		err = msgpack.Unmarshal(msg[len(topicbyte):], smsg)
@@ -157,8 +202,4 @@ func (t *PubSubService) StartDnslogSubServer() error {
 			log.Errorf("Dnslog Subscriber process dnslog Message error %s", err.Error())
 		}
 	}
-
-	return nil
 }
-
-

@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/log"
@@ -45,28 +44,28 @@ type Authlog struct {
 // Radius Accounting Recode
 type Accounting struct {
 	ID                string    `bson:"_id,omitempty" json:"id,omitempty"`
-	Username          string    `bson:"username,omitempty" json:"username,omitempty"`
-	NasId             string    `bson:"nas_id,omitempty" json:"nas_id,omitempty"`
-	NasAddr           string    `bson:"nas_addr,omitempty" json:"nas_addr,omitempty"`
-	NasPaddr          string    `bson:"nas_paddr,omitempty" json:"nas_paddr,omitempty"`
-	SessionTimeout    int       `bson:"session_timeout,omitempty" json:"session_timeout,omitempty"`
-	FramedIpaddr      string    `bson:"framed_ipaddr,omitempty" json:"framed_ipaddr,omitempty"`
-	FramedNetmask     string    `bson:"framed_netmask,omitempty" json:"framed_netmask,omitempty"`
-	MacAddr           string    `bson:"mac_addr,omitempty" json:"mac_addr,omitempty"`
-	NasPort           int64     `bson:"nas_port,omitempty" json:"nas_port,omitempty,string"`
-	NasClass          string    `bson:"nas_class,omitempty" json:"nas_class,omitempty"`
-	NasPortId         string    `bson:"nas_port_id,omitempty" json:"nas_port_id,omitempty"`
-	NasPortType       int       `bson:"nas_port_type,omitempty" json:"nas_port_type,omitempty"`
-	ServiceType       int       `bson:"service_type,omitempty" json:"service_type,omitempty"`
-	AcctSessionId     string    `bson:"acct_session_id,omitempty" json:"acct_session_id,omitempty"`
-	AcctSessionTime   int       `bson:"acct_session_time,omitempty" json:"acct_session_time,omitempty"`
-	AcctInputTotal    int64     `bson:"acct_input_total,omitempty" json:"acct_input_total,omitempty,string"`
-	AcctOutputTotal   int64     `bson:"acct_output_total,omitempty" json:"acct_output_total,omitempty,string"`
-	AcctInputPackets  int       `bson:"acct_input_packets,omitempty" json:"acct_input_packets,omitempty"`
-	AcctOutputPackets int       `bson:"acct_output_packets,omitempty" json:"acct_output_packets,omitempty"`
-	AcctStartTime     time.Time `bson:"acct_start_time,omitempty" json:"acct_start_time,omitempty"`
-	LastUpdate        time.Time `bson:"last_update,omitempty" json:"last_update,omitempty"`
-	AcctStopTime      time.Time `bson:"acct_stop_time,omitempty" json:"acct_stop_time,omitempty"`
+	Username          string    `bson:"username" json:"username"`
+	NasId             string    `bson:"nas_id" json:"nas_id"`
+	NasAddr           string    `bson:"nas_addr" json:"nas_addr"`
+	NasPaddr          string    `bson:"nas_paddr" json:"nas_paddr"`
+	SessionTimeout    int       `bson:"session_timeout" json:"session_timeout"`
+	FramedIpaddr      string    `bson:"framed_ipaddr" json:"framed_ipaddr"`
+	FramedNetmask     string    `bson:"framed_netmask" json:"framed_netmask"`
+	MacAddr           string    `bson:"mac_addr" json:"mac_addr"`
+	NasPort           int64     `bson:"nas_port" json:"nas_port,string"`
+	NasClass          string    `bson:"nas_class" json:"nas_class"`
+	NasPortId         string    `bson:"nas_port_id" json:"nas_port_id"`
+	NasPortType       int       `bson:"nas_port_type" json:"nas_port_type"`
+	ServiceType       int       `bson:"service_type" json:"service_type"`
+	AcctSessionId     string    `bson:"acct_session_id" json:"acct_session_id"`
+	AcctSessionTime   int       `bson:"acct_session_time" json:"acct_session_time"`
+	AcctInputTotal    int64     `bson:"acct_input_total" json:"acct_input_total,string"`
+	AcctOutputTotal   int64     `bson:"acct_output_total" json:"acct_output_total,string"`
+	AcctInputPackets  int       `bson:"acct_input_packets" json:"acct_input_packets"`
+	AcctOutputPackets int       `bson:"acct_output_packets" json:"acct_output_packets"`
+	AcctStartTime     time.Time `bson:"acct_start_time" json:"acct_start_time"`
+	LastUpdate        time.Time `bson:"last_update" json:"last_update"`
+	AcctStopTime      time.Time `bson:"acct_stop_time" json:"acct_stop_time"`
 }
 
 type RadiusManager struct{ *ModelManager }
@@ -161,22 +160,9 @@ func (m *RadiusManager) TruncateRadiusOnline() error {
 }
 
 func (m *RadiusManager) UpdateRadiusOnlineData(acct Accounting) error {
-	data := bson.D{
-		{"$inc", bson.D{
-			{"acct_input_total", acct.AcctInputTotal},
-			{"acct_output_total", acct.AcctOutputTotal},
-			{"acct_input_packets", acct.AcctInputPackets},
-			{"acct_output_packets", acct.AcctOutputPackets},
-			{"acct_input_total", acct.AcctSessionTime},
-		}},
-		{"last_update", primitive.NewDateTimeFromTime(time.Now())},
-	}
-	query := bson.M{"acct_session_id": acct.AcctSessionId}
-	r := m.GetTeamsAcsCollection(TeamsacsOnline).FindOne(context.TODO(), query)
-	if r.Err() == nil {
-		return m.AddRadiusAccounting(acct)
-	}
-	_, err := m.GetTeamsAcsCollection(TeamsacsOnline).UpdateOne(context.TODO(), query, data)
+	query := bson.M{"_id": acct.AcctSessionId}
+	acct.ID = ""
+	_, err := m.GetTeamsAcsCollection(TeamsacsOnline).UpdateOne(context.TODO(), query, acct)
 	return err
 }
 
@@ -206,7 +192,7 @@ func (m *RadiusManager) UpdateRadiusOnline(form *web.WebForm) error {
 	var sessionId = form.GetVal2("acctSessionId", "")
 	var statusType = form.GetVal2("acctStatusType", "")
 	radOnline := Accounting{
-		ID:                common.UUID(),
+		ID: sessionId,
 		Username:          form.GetVal("username"),
 		NasId:             form.GetVal("nasid"),
 		NasAddr:           form.GetVal("nasip"),
@@ -263,7 +249,7 @@ func (m *RadiusManager) UpdateRadiusOnline(form *web.WebForm) error {
 }
 
 func (m *RadiusManager) ClearExpireOnline() (int, error) {
-	filter := bson.M{"last_update": bson.M{"$lte": time.Now().Add(time.Second * 180 * -1)}}
+	filter := bson.M{"last_update": bson.M{"$lte": time.Now().Add(time.Second * 300 * -1)}}
 	drr, err := m.GetTeamsAcsCollection(TeamsacsOnline).DeleteMany(context.TODO(), filter)
 	if err != nil {
 		return 0, err

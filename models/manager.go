@@ -20,10 +20,12 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/go-co-op/gocron"
+	"github.com/ipipdotnet/ipdb-go"
 	"github.com/labstack/echo/v4/middleware"
 	cmap "github.com/orcaman/concurrent-map"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -36,6 +38,7 @@ import (
 	"github.com/ca17/teamsacs/common/elk"
 	"github.com/ca17/teamsacs/common/gmail"
 	"github.com/ca17/teamsacs/common/mongodb"
+	"github.com/ca17/teamsacs/common/resources"
 	"github.com/ca17/teamsacs/common/tpl"
 	"github.com/ca17/teamsacs/config"
 	"github.com/ca17/teamsacs/models/elastic"
@@ -73,6 +76,7 @@ type NameValue struct {
 
 type ModelManager struct {
 	Config       *config.AppConfig
+	Ipdb         *ipdb.City
 	Bus          evbus.Bus
 	Mongo        *mongo.Client
 	Elastic      *elastic.Elastic
@@ -104,6 +108,7 @@ func NewModelManager(appconfig *config.AppConfig, dev bool) *ModelManager {
 	m.TplRender = tpl.NewCommonTemplate([]string{"/resources/templates"}, m.Dev, m.GetTemplateFuncMap())
 	m.SetupSyslogDB()
 	m.SetupElastic()
+	m.SetupIpdb()
 	return m
 }
 
@@ -166,5 +171,31 @@ func (m *ModelManager) SyncElkData(name string) error {
 			return err
 		}
 	}
+	return nil
+}
+
+func (m *ModelManager) SetupIpdb() error {
+	_dbfile := filepath.Join(m.Config.GetResourceDir(), "free.ipdb")
+	if !common.FileExists(_dbfile) {
+		fs, err := os.Create(_dbfile)
+		if err != nil {
+			return err
+		}
+		ipdbbyte, err := resources.ReadResourceBytes("/resources/ipipfree.ipdb")
+		if err != nil {
+			return err
+		}
+		_, err = fs.Write(ipdbbyte)
+		if err != nil {
+			return err
+		}
+	}
+	db, err := ipdb.NewCity(_dbfile)
+	if err != nil {
+		return err
+	}
+
+	m.Ipdb = db
+
 	return nil
 }
