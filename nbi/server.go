@@ -37,9 +37,9 @@ import (
 func ListenNBIServer(manager *models.ModelManager) error {
 	e := echo.New()
 	e.Pre(middleware.RemoveTrailingSlash())
-	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
-		Level: 5,
-	}))
+	// e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+	// 	Level: 1,
+	// }))
 	if os.Getenv("ELASTIC_APM_SERVER_URL") != "" {
 		e.Use(apmechov4.Middleware())
 	} else {

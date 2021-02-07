@@ -1,16 +1,22 @@
-POST http://{{nbi_url}}/nbi/mikrotik/device/interfaces?sn=i8TqFHmQnNG
+POST http://{{nbi_url}}/nbi/mikrotik/device/interfaces?sn=i8TqFHmQnNG&dev=cpe
 Content-Type: application/json
 authorization: Bearer {{nbi_token}}
 
 ###
 
-POST http://{{nbi_url}}/nbi/mikrotik/device/routers?sn=i8TqFHmQnNG
+POST http://{{nbi_url}}/nbi/mikrotik/device/routers?sn=i8TqFHmQnNG&dev=cpe
 Content-Type: application/json
 authorization: Bearer {{nbi_token}}
 
 ###
 
-POST http://{{nbi_url}}/nbi/mikrotik/device/dns?sn=i8TqFHmQnNG
+POST http://{{nbi_url}}/nbi/mikrotik/device/dns?sn=i8TqFHmQnNG&dev=cpe
+Content-Type: application/json
+authorization: Bearer {{nbi_token}}
+
+###
+
+POST http://127.0.0.1:18952/nbi/mikrotik/device/dns?sn=i8TqFHmQnNG&dev=cpe
 Content-Type: application/json
 authorization: Bearer {{nbi_token}}
 
