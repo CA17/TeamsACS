@@ -20,6 +20,7 @@ import (
 	"context"
 	"time"
 
+	"go.elastic.co/apm/module/apmmongo"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
@@ -27,7 +28,7 @@ import (
 )
 
 func GetMongodbClient(cfg config.MongodbConfig) (*mongo.Client, error) {
-	client, err := mongo.NewClient(options.Client().ApplyURI(cfg.Url))
+	client, err := mongo.NewClient(options.Client().ApplyURI(cfg.Url), options.Client().SetMonitor(apmmongo.CommandMonitor()))
 	if err != nil {
 		return nil, err
 	}
