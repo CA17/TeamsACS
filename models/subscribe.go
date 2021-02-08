@@ -167,6 +167,7 @@ func (m *SubscribeManager) UpdateSubscribeByUsername(username string, valmap map
 // If no Elastic configuration is available, the sync will be ignored
 func (m *SubscribeManager) AddSubscribeData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
+	data["data_ver"] = common.GenerateRangeNum(100000,900000)
 	_id := data.GetString("_id")
 	if common.IsEmptyOrNA(_id) {
 		data["_id"] = common.UUID()

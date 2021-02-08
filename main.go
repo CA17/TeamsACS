@@ -37,7 +37,6 @@ import (
 	"github.com/ca17/teamsacs/nbi"
 	"github.com/ca17/teamsacs/radiusd"
 	"github.com/ca17/teamsacs/radiusd/radlog"
-	"github.com/ca17/teamsacs/scheduler"
 	"github.com/ca17/teamsacs/syslogd"
 )
 
@@ -260,7 +259,7 @@ func main() {
 	})
 
 	g.Go(func() error {
-		return scheduler.Start(manager)
+		return manager.StartSched()
 	})
 
 	time.Sleep(time.Millisecond * 50)

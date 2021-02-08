@@ -528,3 +528,10 @@ func GetPointTime(s *time.Time) time.Time {
 	}
 	return time.Time{}
 }
+
+
+func GenerateRangeNum(min, max int) int {
+    mathrand.Seed(time.Now().Unix())
+    randNum := mathrand.Intn(max - min) + min
+    return randNum
+}

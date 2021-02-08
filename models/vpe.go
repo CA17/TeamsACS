@@ -120,6 +120,7 @@ func (m *VpeManager) GetVpeBySn(sn string) (*Cpe, error) {
 // AddVpeData
 func (m *VpeManager) AddVpeData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
+	data["data_ver"] = common.GenerateRangeNum(100000,900000)
 	_id := data.GetString("_id")
 	if common.IsEmptyOrNA(_id) {
 		data["_id"] = common.UUID()
@@ -144,6 +145,7 @@ func (m *VpeManager) AddVpeData(params web.RequestParams) error {
 // UpdateVpeData
 func (m *VpeManager) UpdateVpeData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
+	data["data_ver"] = common.GenerateRangeNum(100000,900000)
 	data["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
 	_id := data.GetMustString("_id")
 	var err error
