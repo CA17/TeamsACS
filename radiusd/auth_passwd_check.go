@@ -125,6 +125,7 @@ func (s *AuthService) CheckMsChapPassword(username, password string, challenge, 
 			microsoft.MSMPPEEncryptionPolicy_Add(radAccept, microsoft.MSMPPEEncryptionPolicy_Value_EncryptionAllowed)
 			microsoft.MSMPPEEncryptionTypes_Add(radAccept, microsoft.MSMPPEEncryptionTypes_Value_RC440or128BitAllowed)
 			radlog.Infof("user:%s mschap access accept", username)
+			return nil
 		}
 	}
 	return fmt.Errorf("user:%s mschap access reject challenge len or response len error", username)
