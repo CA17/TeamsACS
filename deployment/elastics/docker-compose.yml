@@ -1,0 +1,42 @@
+version: '2'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+    container_name: elasticsearch
+    environment:
+      - node.name=master
+      - cluster.name=elasticsearch
+      - path.data=/usr/share/elasticsearch/data
+      - path.logs=/usr/share/elasticsearch/logs
+      - bootstrap.memory_lock=true
+      - discovery.seed_hosts=elasticsearch
+      - cluster.initial_master_nodes=master
+      - TAKE_FILE_OWNERSHIP=true
+      - "ES_JAVA_OPTS=-Xms10g -Xmx10g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /data/elkdata:/usr/share/elasticsearch/data
+      - /data/elklog:/usr/share/elasticsearch/logs
+    ports:
+      - 9200:9200
+    networks:
+      - elk_network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.9.2
+    container_name: kibana
+    networks:
+      - elk_network
+    ports:
+      - 5602:5601
+    environment:
+      NODE_OPTIONS: "--max-old-space-size=4096"
+      I18N_LOCALE: zh-CN
+      SERVER_NAME: kibana
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+
+networks:
+  elk_network:
