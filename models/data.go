@@ -92,11 +92,8 @@ func (m *DataManager) GetDataNameValues(params web.RequestParams) ([]NameValue, 
 // AddData
 func (m *DataManager) AddData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
-	_id := data.GetString("_id")
-	if common.IsEmptyOrNA(_id) {
-		data["_id"] = common.UUID()
-	}
-	data["data_ver"] = common.GenerateRangeNum(100000,900000)
+	data["_id"] = common.UUID()
+	data["data_ver"] = common.GenerateDataVer()
 	data["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
 	collname := params.GetMustString("collname")
 	coll := m.GetTeamsAcsCollection(collname)
@@ -123,7 +120,7 @@ func (m *DataManager) AddBatchData(collname string, datas []interface{}) error {
 // UpdateData
 func (m *DataManager) UpdateData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
-	data["data_ver"] = common.GenerateRangeNum(100000,900000)
+	data["data_ver"] = common.GenerateDataVer()
 	data["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
 	_id := data.GetMustString("_id")
 	query := bson.M{"_id": _id}
@@ -132,7 +129,8 @@ func (m *DataManager) UpdateData(params web.RequestParams) error {
 	go func() {
 		_ = m.Elastic.UpdateData("teamsacs_"+collname, data)
 	}()
-	_, err := m.GetTeamsAcsCollection(collname).UpdateOne(context.TODO(), query, update)
+	r, err := m.GetTeamsAcsCollection(collname).UpdateOne(context.TODO(), query, update)
+	log.Info(r)
 	return err
 }
 

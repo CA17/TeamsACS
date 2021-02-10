@@ -64,12 +64,20 @@ func processQueryParams(params web.RequestParams, findOptions *options.FindOptio
 		}
 		q = append(q, bson.E{Key: qname, Value: bson.M{"$in": varray}})
 	}
+
+	var issort = false
 	for sname, sval := range params.GetParamMap("sortmap") {
 		if sval == "asc" {
 			findOptions.SetSort(bson.D{{sname, 1}})
 		} else if sval == "desc" {
 			findOptions.SetSort(bson.D{{sname, -1}})
 		}
+		issort = true
+	}
+
+
+	if !issort{
+		findOptions.SetSort(bson.D{{"update_time", -1}})
 	}
 
 	timerangemap := params.GetParamMap("timerangemap")

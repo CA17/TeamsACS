@@ -232,7 +232,7 @@ func (h *HttpHandler) RequestParseForm(c echo.Context) web.RequestParams {
 }
 
 func (h *HttpHandler) RequestParse(c echo.Context) web.RequestParams {
-	var params = web.EmptyRequestParams
+	var params = web.EmptyRequestParams()
 	var err error
 	switch c.Request().Method {
 	case http.MethodGet:

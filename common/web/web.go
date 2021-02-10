@@ -164,7 +164,9 @@ type QueryResult []map[string]interface{}
 // 通用查询参数
 type RequestParams map[string]interface{}
 
-var EmptyRequestParams = make(RequestParams)
+var EmptyRequestParams = func() RequestParams {
+	return make(RequestParams)
+}
 
 func (jp RequestParams) Set(key string, value interface{}) {
 	jp[key] = value
@@ -187,13 +189,13 @@ func (jp RequestParams) GetString(key string) string {
 func (jp RequestParams) GetParamMap(key string) RequestParams {
 	v, ok := jp[key]
 	if !ok {
-		return EmptyRequestParams
+		return EmptyRequestParams()
 	}
 	vv, ok := v.(map[string]interface{})
 	if ok {
 		return vv
 	}
-	return EmptyRequestParams
+	return EmptyRequestParams()
 }
 
 func (jp RequestParams) GetStringWithDefval(key string, defval string) string {

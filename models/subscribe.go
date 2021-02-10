@@ -158,6 +158,7 @@ func (m *SubscribeManager) GetSubscribeByCpeid(cpeid string) (*Subscribe, error)
 // UpdateSubscribeByUsername
 func (m *SubscribeManager) UpdateSubscribeByUsername(username string, valmap map[string]interface{}) error {
 	coll := m.GetTeamsAcsCollection(TeamsacsSubscribe)
+	valmap["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
 	_, err := coll.UpdateOne(context.TODO(), bson.M{"username": username}, valmap)
 	return err
 }
@@ -167,7 +168,8 @@ func (m *SubscribeManager) UpdateSubscribeByUsername(username string, valmap map
 // If no Elastic configuration is available, the sync will be ignored
 func (m *SubscribeManager) AddSubscribeData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
-	data["data_ver"] = common.GenerateRangeNum(100000,900000)
+	data["data_ver"] = common.GenerateDataVer()
+	data["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
 	_id := data.GetString("_id")
 	if common.IsEmptyOrNA(_id) {
 		data["_id"] = common.UUID()

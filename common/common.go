@@ -372,11 +372,13 @@ func SetEmptyStrToNA(t interface{}) {
 }
 
 func IsEmptyOrNA(val string) bool {
+	val = strings.TrimSpace(val)
 	return val == "" || val == NA
 }
 
 func IsNotEmptyAndNA(val string) bool {
-	return val != "" && val != NA
+	val = strings.TrimSpace(val)
+	return strings.TrimSpace(val) != "" && val != NA
 }
 
 func Md5HashFile(filePath string) (string, error) {
@@ -534,4 +536,11 @@ func GenerateRangeNum(min, max int) int {
     mathrand.Seed(time.Now().Unix())
     randNum := mathrand.Intn(max - min) + min
     return randNum
+}
+
+func GenerateDataVer() string {
+    mathrand.Seed(time.Now().Unix())
+    r1 := mathrand.Intn(600 - 100) + 100
+    r2 := mathrand.Intn(900 - 500) + 500
+    return fmt.Sprintf("%d-%d", r1, r2)
 }

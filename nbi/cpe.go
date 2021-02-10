@@ -30,7 +30,6 @@ import (
 
 func (h *HttpHandler) QueryCpes(c echo.Context) error {
 	params := h.RequestParse(c)
-	params.GetParamMap("sortmap")["update_time"] = "desc"
 	ispager := params.GetQueryMap().GetString("ispager") == "true"
 	if ispager {
 		data, err := h.GetManager().GetCpeManager().QueryCpes(params)

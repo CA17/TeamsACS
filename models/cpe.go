@@ -102,11 +102,9 @@ func (m *CpeManager) ExistCpe(sn string) bool {
 
 func (m *CpeManager) AddCpeData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
-	data["data_ver"] = common.GenerateRangeNum(100000,900000)
-	_id := data.GetString("_id")
-	if common.IsEmptyOrNA(_id) {
-		data["_id"] = common.UUID()
-	}
+	data["data_ver"] = common.GenerateDataVer()
+	data["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
+	data["_id"] = common.UUID()
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
 	var err error
 	// If an api password is set, use aes encryption.
@@ -139,6 +137,7 @@ func (m *CpeManager) AddCpeDataMap(cpe Cpe) error {
 			return err
 		}
 	}
+	cpe["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
 	_, err = coll.InsertOne(context.TODO(), cpe)
 	go func() {
 		_ = m.Elastic.AddData("teamsacs_cpe", cpe)
@@ -148,7 +147,7 @@ func (m *CpeManager) AddCpeDataMap(cpe Cpe) error {
 
 func (m *CpeManager) UpdateCpeData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
-	data["data_ver"] = common.GenerateRangeNum(100000,900000)
+	data["data_ver"] = common.GenerateDataVer()
 	data["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
 	_id := data.GetMustString("_id")
 	var err error
@@ -174,6 +173,7 @@ func (m *CpeManager) UpdateCpeData(params web.RequestParams) error {
 // UpdateVpeBySn
 func (m *CpeManager) UpdateCpeBySn(sn string, valmap map[string]interface{}) error {
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
+	valmap["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
 	update := bson.M{"$set": valmap}
 	_, err := coll.UpdateOne(context.TODO(), bson.M{"sn": sn}, update)
 	return err
@@ -182,6 +182,7 @@ func (m *CpeManager) UpdateCpeBySn(sn string, valmap map[string]interface{}) err
 // UpdateCpeById
 func (m *CpeManager) UpdateCpeById(id string, valmap map[string]interface{}) error {
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
+	valmap["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
 	update := bson.M{"$set": valmap}
 	_, err := coll.UpdateOne(context.TODO(), bson.M{"_id": id}, update)
 	return err
@@ -195,6 +196,7 @@ func (m *CpeManager) UpdateCpeSubscribeInfo(id string) error {
 	}
 	valmap := map[string]interface{}{
 		"subscribe_username": subs.GetUsername(),
+		"update_time" : time.Now().Format("2006-01-02 15:04:05 Z0700 MST"),
 	}
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
 	update := bson.M{"$set": valmap}

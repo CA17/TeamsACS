@@ -27,7 +27,6 @@ import (
 
 func (h *HttpHandler) QueryVpes(c echo.Context) error {
 	params := h.RequestParse(c)
-	params.GetParamMap("sortmap")["update_time"] = "desc"
 	data, err := h.GetManager().GetVpeManager().QueryVpes(params)
 	if err != nil {
 		return h.GetInternalError(err)

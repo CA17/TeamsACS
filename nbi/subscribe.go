@@ -28,7 +28,6 @@ import (
 
 func (h *HttpHandler) QuerySubscribes(c echo.Context) error {
 	params := h.RequestParse(c)
-	params.GetSortMap()["update_time"] = "desc"
 	// Check for expiring accounts
 	expireDays := params.GetQueryMap().GetInt64("expire_days")
 	if expireDays > 0 {

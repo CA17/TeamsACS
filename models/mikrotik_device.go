@@ -133,9 +133,9 @@ func (m *MikrotikDeviceManager) SyncMikrotikDeviceStatToElastic(devtypes ...stri
 		var err error
 		switch devtype {
 		case "cpe":
-			devices, err = m.QueryItems(web.EmptyRequestParams, TeamsacsCpe)
+			devices, err = m.QueryItems(web.EmptyRequestParams(), TeamsacsCpe)
 		case "vpe":
-			devices, err = m.QueryItems(web.EmptyRequestParams, TeamsacsVpe)
+			devices, err = m.QueryItems(web.EmptyRequestParams(), TeamsacsVpe)
 		default:
 			err = errors.New("unsupported device types")
 		}
