@@ -93,8 +93,11 @@ func (h *HttpHandler) RunMikrotikCpeScriptPolicy(c echo.Context) error {
 	}
 	addfilereq, err := http.NewRequest(http.MethodPut, fileurl, bytes.NewReader([]byte(scriptValue)))
 	common.Must(err)
-	addfilereq.Header.Set("Content-Type", "application/json")
+	// addfilereq.Header.Set("Content-Type", "application/json")
 	addfilereq.Header.Set("fileType", "3 Vendor Configuration File")
+	addfilereq.Header.Set("oui", "")
+	addfilereq.Header.Set("productClass", "")
+	addfilereq.Header.Set("version", "")
 	addfileresp, err := client.Do(addfilereq)
 	if err != nil {
 		return c.JSON(200, h.RestError(fmt.Sprintf("Put new script error %s", err.Error())))

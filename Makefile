@@ -1,3 +1,4 @@
+BUILD_ORG   := ca17
 BUILD_VERSION   := latest
 BUILD_TIME      := $(shell date "+%F %T")
 BUILD_NAME      := teamsacs
@@ -89,6 +90,12 @@ github:
 	&& rm -f /tmp/.teamsacsbuild "
 	rm -f .build
 
+docker:
+	make build-linux
+	make upx
+	docker build -t ${BUILD_ORG}/teamsacs:latest .
+	docker push ${BUILD_ORG}/teamsacs:latest
+
 upx:
 	upx ${RELEASE_DIR}/${BUILD_NAME}
 
@@ -105,7 +112,25 @@ build-abfs:
 	CGO_ENABLED=0 go build -a -ldflags '-s -w -extldflags "-static"' -o abfs commands/abfs/abfs.go
 
 build-labfs:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-s -w -extldflags "-static"' -o labfs commands/abfs/abfs.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-s -w -extldflags "-static"' -o release/labfs commands/abfs/abfs.go
+
+build-frmate:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-s -w -extldflags "-static"' -o deployment/freeradius/lfreemate commands/freemate/freemate.go
+	upx deployment/freeradius/lfreemate
+
+build-freeradius:
+	make build-frmate
+	cd deployment/freeradius && docker build -t ${BUILD_ORG}/freeradius:latest .
+	docker push ${BUILD_ORG}/freeradius:latest
+
+build-geineacs:
+	cd deployment/genieacs && docker build -t ${BUILD_ORG}/genieacs .
+	docker push ${BUILD_ORG}/genieacs
+
+acscert:
+	echo "make acs cert"
+	openssl req -new -nodes -x509 -out deployment/teamsacs.tls.crt -keyout deployment/teamsacs.tls.key -days 36500 -subj \
+	"/C=CN/ST=NRW/L=Earth/O=Random Company/OU=IT/CN=*.teamsacs.cc/emailAddress=master@teamsacs.cc"
 
 .PHONY: clean build rpccert webcert
 

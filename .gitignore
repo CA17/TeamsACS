@@ -9,3 +9,4 @@ release
 /Dockerfile.local
 /abfs
 /labfs
+/deployment/freeradius/lfreemate

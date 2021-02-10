@@ -1,0 +1,35 @@
+#
+#  Registers xlat to convert between time formats.
+#
+#  xlat input string is an attribute name. If this attribute is of date
+#  or integer type, the date xlat will convert it to a time string in
+#  the format of the format config item.
+#
+#  If the attribute is a string type, date will attempt to parse it in
+#  the format specified by the format config item, and will expand
+#  to a Unix timestamp.
+#
+date {
+	format = "%b %e %Y %H:%M:%S %Z"
+
+	# Use UTC instead of local time.
+	#
+	#  default = no
+#	utc = yes
+}
+
+#
+#  The WISPr-Session-Terminate-Time attribute is of type "string",
+#  and not "date".  Use this expansion to create an attribute
+#  that holds an actual date:
+#
+#	Tmp-Date-0 := "%{wispr2date:&reply:WISPr-Session-Terminate-Time}"
+#
+date wispr2date {
+	format = "%Y-%m-%dT%H:%M:%S"
+
+	# Use UTC instead of local time.
+	#
+	#  default = no
+#	utc = yes
+}

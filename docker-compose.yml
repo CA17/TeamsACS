@@ -1,0 +1,126 @@
+version: "2"
+services:
+  mongo:
+    image: mongo:4.0
+    container_name: "mongo"
+    restart: always
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/var/log/mongodb
+    volumes:
+      - /data/mongodb_data:/data/db
+    ports:
+      - 127.0.0.1:27017:27017
+    expose:
+      - 27017
+    networks:
+      acs_network:
+
+  genieacs:
+    depends_on:
+      - 'mongo'
+    image: ca17/genieacs
+    container_name: "genieacs"
+    restart: always
+    environment:
+      - GENIEACS_UI_JWT_SECRET=mysecret
+      - GENIEACS_CWMP_ACCESS_LOG_FILE=/var/log/genieacs/genieacs-cwmp-access.log
+      - GENIEACS_NBI_ACCESS_LOG_FILE=/var/log/genieacs/genieacs-nbi-access.log
+      - GENIEACS_FS_ACCESS_LOG_FILE=/var/log/genieacs/genieacs-fs-access.log
+      - GENIEACS_UI_ACCESS_LOG_FILE=/var/log/genieacs/genieacs-ui-access.log
+      - GENIEACS_DEBUG_FILE=/var/log/genieacs/genieacs-debug.yaml
+      - GENIEACS_EXT_DIR=/opt/genieacs/ext
+      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://mongo/genieacs
+      - GENIEACS_FS_PORT=7567
+      - GENIEACS_CWMP_SSL=true
+      - GENIEACS_CWMP_SSL_CERT=/etc/ssl/genieacs/genieacs_ssl.cer
+      - GENIEACS_CWMP_SSL_KEY=/etc/ssl/genieacs/genieacs_ssl.key
+      - GENIEACS_UI_SSL_CERT=/etc/ssl/genieacs/genieacs_ssl.cer
+      - GENIEACS_UI_SSL_KEY=/etc/ssl/genieacs/genieacs_ssl.key
+    ports:
+      - "3000:3000"
+      - "7547:7547"
+      - "7557:7557"
+      - "7567:7567"
+    expose:
+      - 3000
+      - 7547
+      - 7557
+      - 7567
+    volumes:
+      - /data/acs_data/genieacs/logs:/var/log/genieacs
+    networks:
+      acs_network:
+
+  teamsacs:
+    depends_on:
+      - 'mongo'
+    image: ca17/teamsacs:latest
+    container_name: "teamsacs"
+    restart: always
+    ports:
+      - "1979:1979"
+      - "1980:1980"
+      - "1981:1981"
+      - "1812:1812/udp"
+      - "1813:1813/udp"
+      - "1914:1914/udp"
+      - "1924:1924/udp"
+      - "1934:1934/udp"
+      - "1935:1935"
+      - "1936:1936"
+    expose:
+      - 1979
+      - 1980
+      - 1981
+      - 1812/udp
+      - 1813/udp
+      - 1914
+      - 1924
+      - 1934
+      - 1935
+      - 1936
+    volumes:
+      - /data/teamsacs_data:/var/teamsacs
+    environment:
+      - GODEBUG=x509ignoreCN=0
+      - TEAMSACS_NBI_DEBUG=1
+      - TEAMSACS_MESSAGE_PUB_ADDRESS=tcp://0.0.0.0:1935
+      - TEAMSACS_MESSAGE_SUB_ADDRESS=tcp://0.0.0.0:1936
+      - TEAMSACS_MIKROTIK_APIUSER=apimaster
+      - TEAMSACS_MIKROTIK_APIPWD=myapipwd
+      - TEAMSACS_NBI_SECRET=9b6de5cc-0731-xxxx-xxxx-0f568ac9da37
+      - TEAMSACS_MONGODB_URL=mongodb://mongo:27017
+      - TEAMSACS_RADIUS_DEBUG=0
+      #- ELASTIC_APM_SERVER_URL=http://x.x.x.x:8200
+      - TEAMSACS_GENIEACS_NBIURL=http://genieacs:7557
+      - TEAMSACS_RFC3164=true
+      - TEAMSACS_RFC5424=true
+      #- TEAMSACS_ELASTIC_URLS=http://x.x.x.x:9200
+    networks:
+      acs_network:
+
+  freeradius:
+    depends_on:
+      - 'teamsacs'
+    image: ca17/freeradius
+    container_name: "freeradius"
+    restart: always
+    command: lfreemate
+    ports:
+      - "1812:1812/udp"
+      - "1813:1813/udp"
+      - "1815:1815"
+    expose:
+      - 1812/udp
+      - 1813/udp
+      - 1815
+    volumes:
+      - /data/radius_data/freeradius/logs:/var/log/freeradius
+    environment:
+      - FREERADIUS_API_URL=http://teamsacs:1980
+    networks:
+      acs_network:
+
+networks:
+  acs_network:

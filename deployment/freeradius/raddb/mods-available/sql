@@ -1,0 +1,341 @@
+# -*- text -*-
+##
+## mods-available/sql -- SQL modules
+##
+##	$Id: 7e9eee03c58bab67206ec10249db79ebbc0baa3c $
+
+######################################################################
+#
+#  Configuration for the SQL module
+#
+#  The database schemas and queries are located in subdirectories:
+#
+#	sql/<DB>/main/schema.sql	Schema
+#	sql/<DB>/main/queries.conf	Authorisation and Accounting queries
+#
+#  Where "DB" is mysql, mssql, oracle, or postgresql.
+#
+#  The name used to query SQL is sql_user_name, which is set in the file
+#
+#     raddb/mods-config/sql/main/${dialect}/queries.conf
+#
+#  If you are using realms, that configuration should be changed to use
+#  the Stripped-User-Name attribute.  See the comments around sql_user_name
+#  for more information.
+#
+
+sql {
+	#
+	#  The dialect of SQL being used.
+	#
+	#  Allowed dialects are:
+	#
+	#	mssql
+	#	mysql
+	#	oracle
+	#	postgresql
+	#	sqlite
+	#	mongo
+	#
+	dialect = "sqlite"
+
+	#
+	#  The driver module used to execute the queries.  Since we
+	#  don't know which SQL drivers are being used, the default is
+	#  "rlm_sql_null", which just logs the queries to disk via the
+	#  "logfile" directive, below.
+	#
+	#  In order to talk to a real database, delete the next line,
+	#  and uncomment the one after it.
+	#
+	#  If the dialect is "mssql", then the driver should be set to
+	#  one of the following values, depending on your system:
+	#
+	#	rlm_sql_db2
+	#	rlm_sql_firebird
+	#	rlm_sql_freetds
+	#	rlm_sql_iodbc
+	#	rlm_sql_unixodbc
+	#
+	driver = "rlm_sql_null"
+#	driver = "rlm_sql_${dialect}"
+
+	#
+	#  Driver-specific subsections.  They will only be loaded and
+	#  used if "driver" is something other than "rlm_sql_null".
+	#  When a real driver is used, the relevant driver
+	#  configuration section is loaded, and all other driver
+	#  configuration sections are ignored.
+	#
+	sqlite {
+		# Path to the sqlite database
+		filename = "/tmp/freeradius.db"
+
+		# How long to wait for write locks on the database to be
+		# released (in ms) before giving up.
+		busy_timeout = 200
+
+		# If the file above does not exist and bootstrap is set
+		# a new database file will be created, and the SQL statements
+		# contained within the bootstrap file will be executed.
+		bootstrap = "${modconfdir}/${..:name}/main/sqlite/schema.sql"
+	}
+
+	mysql {
+		# If any of the files below are set, TLS encryption is enabled
+		tls {
+			ca_file = "/etc/ssl/certs/my_ca.crt"
+			ca_path = "/etc/ssl/certs/"
+			certificate_file = "/etc/ssl/certs/private/client.crt"
+			private_key_file = "/etc/ssl/certs/private/client.key"
+			cipher = "DHE-RSA-AES256-SHA:AES128-SHA"
+
+			tls_required = yes
+			tls_check_cert = no
+			tls_check_cert_cn = no
+		}
+
+		# If yes, (or auto and libmysqlclient reports warnings are
+		# available), will retrieve and log additional warnings from
+		# the server if an error has occured. Defaults to 'auto'
+		warnings = auto
+	}
+
+	postgresql {
+
+		# unlike MySQL, which has a tls{} connection configuration, postgresql
+		# uses its connection parameters - see the radius_db option below in
+		# this file
+
+		# Send application_name to the postgres server
+		# Only supported in PG 9.0 and greater. Defaults to no.
+		send_application_name = yes
+	}
+
+	#
+	#	Configuration for Mongo.
+	#
+	#	Note that the Mongo driver is experimental.  The FreeRADIUS developers
+	#	are unable to help with the syntax of the Mongo queries.  Please see
+	#	the Mongo documentation for that syntax.
+	#
+	#	The Mongo driver supports only the following methods:
+	#
+	#		aggregate
+	#		findAndModify
+	#		findOne
+	#		insert
+	#
+	#	For examples, see the query files:
+	#
+	#		raddb/mods-config/sql/main/mongo/queries.conf
+	#		raddb/mods-config/sql/main/ippool/queries.conf
+	#
+	mongo {
+		#
+		#  The application name to use.
+		#
+		appname = "freeradius"
+
+		#
+		#  The TLS parameters here map directly to the Mongo TLS configuration
+		#
+		tls {
+			certificate_file = /path/to/file
+			certificate_password = "password"
+			ca_file = /path/to/file
+			ca_dir = /path/to/directory
+			crl_file = /path/to/file
+			weak_cert_validation = false
+			allow_invalid_hostname = false
+		}
+	}
+
+	# Connection info:
+	#
+#	server = "localhost"
+#	port = 3306
+#	login = "radius"
+#	password = "radpass"
+
+	# Connection info for Mongo
+	# Authentication Without SSL
+	#	server = "mongodb://USER:PASSWORD@192.16.0.2:PORT/DATABASE?authSource=admin&ssl=false"
+
+	# Authentication With SSL
+	#	server = "mongodb://USER:PASSWORD@192.16.0.2:PORT/DATABASE?authSource=admin&ssl=true"
+
+	# Authentication with Certificate
+	# Use this command for retrieve Derived username:
+	# openssl x509 -in mycert.pem -inform PEM -subject -nameopt RFC2253
+	# server = mongodb://<DERIVED USERNAME>@192.168.0.2:PORT/DATABASE?authSource=$external&ssl=true&authMechanism=MONGODB-X509
+
+	# Database table configuration for everything except Oracle
+	radius_db = "radius"
+
+	# If you are using Oracle then use this instead
+#	radius_db = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SID=your_sid)))"
+
+	# If you're using postgresql this can also be used instead of the connection info parameters
+#	radius_db = "dbname=radius host=localhost user=radius password=raddpass"
+
+        # Postgreql doesn't take tls{} options in its module config like mysql does - if you want to
+        # use SSL connections then use this form of connection info parameter
+#	radius_db = "host=localhost port=5432 dbname=radius user=radius password=raddpass sslmode=verify-full sslcert=/etc/ssl/client.crt sslkey=/etc/ssl/client.key sslrootcert=/etc/ssl/ca.crt" 
+
+	# If you want both stop and start records logged to the
+	# same SQL table, leave this as is.  If you want them in
+	# different tables, put the start table in acct_table1
+	# and stop table in acct_table2
+	acct_table1 = "radacct"
+	acct_table2 = "radacct"
+
+	# Allow for storing data after authentication
+	postauth_table = "radpostauth"
+
+	# Tables containing 'check' items
+	authcheck_table = "radcheck"
+	groupcheck_table = "radgroupcheck"
+
+	# Tables containing 'reply' items
+	authreply_table = "radreply"
+	groupreply_table = "radgroupreply"
+
+	# Table to keep group info
+	usergroup_table = "radusergroup"
+
+	# If set to 'yes' (default) we read the group tables unless Fall-Through = no in the reply table.
+	# If set to 'no' we do not read the group tables unless Fall-Through = yes in the reply table.
+#	read_groups = yes
+
+	# If set to 'yes' (default) we read profiles unless Fall-Through = no in the groupreply table.
+	# If set to 'no' we do not read profiles unless Fall-Through = yes in the groupreply table.
+#	read_profiles = yes
+
+	# Remove stale session if checkrad does not see a double login
+	delete_stale_sessions = yes
+
+	# Write SQL queries to a logfile. This is potentially useful for tracing
+	# issues with authorization queries.  See also "logfile" directives in
+	# mods-config/sql/main/*/queries.conf.  You can enable per-section logging
+	# by enabling "logfile" there, or global logging by enabling "logfile" here.
+	#
+	# Per-section logging can be disabled by setting "logfile = ''"
+#	logfile = ${logdir}/sqllog.sql
+
+	#  Set the maximum query duration and connection timeout
+	#  for rlm_sql_mysql.
+#	query_timeout = 5
+
+	#  As of version 3.0, the "pool" section has replaced the
+	#  following configuration items:
+	#
+	#  num_sql_socks
+	#  connect_failure_retry_delay
+	#  lifetime
+	#  max_queries
+
+	#
+	#  The connection pool is new for 3.0, and will be used in many
+	#  modules, for all kinds of connection-related activity.
+	#
+	# When the server is not threaded, the connection pool
+	# limits are ignored, and only one connection is used.
+	#
+	# If you want to have multiple SQL modules re-use the same
+	# connection pool, use "pool = name" instead of a "pool"
+	# section.  e.g.
+	#
+	#	sql sql1 {
+	#	    ...
+	#	    pool {
+	#	    	 ...
+	#	    }
+	#	}
+	#
+	#	# sql2 will use the connection pool from sql1
+	#	sql sql2 {
+	#	     ...
+	#	     pool = sql1
+	#	}
+	#
+	pool {
+		#  Connections to create during module instantiation.
+		#  If the server cannot create specified number of
+		#  connections during instantiation it will exit.
+		#  Set to 0 to allow the server to start without the
+		#  database being available.
+		start = ${thread[pool].start_servers}
+
+		#  Minimum number of connections to keep open
+		min = ${thread[pool].min_spare_servers}
+
+		#  Maximum number of connections
+		#
+		#  If these connections are all in use and a new one
+		#  is requested, the request will NOT get a connection.
+		#
+		#  Setting 'max' to LESS than the number of threads means
+		#  that some threads may starve, and you will see errors
+		#  like 'No connections available and at max connection limit'
+		#
+		#  Setting 'max' to MORE than the number of threads means
+		#  that there are more connections than necessary.
+		max = ${thread[pool].max_servers}
+
+		#  Spare connections to be left idle
+		#
+		#  NOTE: Idle connections WILL be closed if "idle_timeout"
+		#  is set.  This should be less than or equal to "max" above.
+		spare = ${thread[pool].max_spare_servers}
+
+		#  Number of uses before the connection is closed
+		#
+		#  0 means "infinite"
+		uses = 0
+
+		#  The number of seconds to wait after the server tries
+		#  to open a connection, and fails.  During this time,
+		#  no new connections will be opened.
+		retry_delay = 30
+
+		# The lifetime (in seconds) of the connection
+		lifetime = 0
+
+		#  idle timeout (in seconds).  A connection which is
+		#  unused for this length of time will be closed.
+		idle_timeout = 60
+
+		#  NOTE: All configuration settings are enforced.  If a
+		#  connection is closed because of "idle_timeout",
+		#  "uses", or "lifetime", then the total number of
+		#  connections MAY fall below "min".  When that
+		#  happens, it will open a new connection.  It will
+		#  also log a WARNING message.
+		#
+		#  The solution is to either lower the "min" connections,
+		#  or increase lifetime/idle_timeout.
+	}
+
+	# Set to 'yes' to read radius clients from the database ('nas' table)
+	# Clients will ONLY be read on server startup.
+#	read_clients = yes
+
+	# Table to keep radius client info
+	client_table = "nas"
+
+	#
+	# The group attribute specific to this instance of rlm_sql
+	#
+
+	# This entry should be used for additional instances (sql foo {})
+	# of the SQL module.
+#	group_attribute = "${.:instance}-SQL-Group"
+
+	# This entry should be used for the default instance (sql {})
+	# of the SQL module.
+	group_attribute = "SQL-Group"
+
+	# Read database-specific queries
+	$INCLUDE ${modconfdir}/${.:name}/main/${dialect}/queries.conf
+}
