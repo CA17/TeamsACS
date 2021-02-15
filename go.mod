@@ -12,7 +12,8 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-co-op/gocron v0.1.1
 	github.com/go-ole/go-ole v1.2.5 // indirect
-	github.com/golang/protobuf v1.4.2
+	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang/protobuf v1.4.3
 	github.com/gosnmp/gosnmp v1.29.0
 	github.com/hallidave/mibtool v0.2.0
 	github.com/influxdata/go-syslog/v3 v3.0.0
@@ -20,6 +21,7 @@ require (
 	github.com/labstack/echo/v4 v4.1.15
 	github.com/labstack/gommon v0.3.0
 	github.com/mitchellh/mapstructure v1.2.2
+	github.com/mjibson/esc v0.2.0 // indirect
 	github.com/olivere/elastic/v7 v7.0.22
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
@@ -30,10 +32,13 @@ require (
 	go.elastic.co/apm/module/apmmongo v1.11.0
 	go.mongodb.org/mongo-driver v1.4.2
 	go.nanomsg.org/mangos/v3 v3.1.3
-	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
+	golang.org/x/mod v0.4.1 // indirect
+	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
+	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
 	golang.org/x/text v0.3.3
+	golang.org/x/tools v0.1.0 // indirect
 	google.golang.org/grpc v1.33.0
-	google.golang.org/protobuf v1.23.0
+	google.golang.org/protobuf v1.25.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/routeros.v2 v2.0.0-20190905230420-1bbf141cdd91
