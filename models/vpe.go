@@ -61,6 +61,20 @@ func (v Vpe) GetApiAddr() (string, error) {
 	return maputils.GetStringValueWithErr(v, "api_addr")
 }
 
+// CopyIMap copy to interface map
+func (jp Vpe) CopyIMap() (map[string]interface{}, error) {
+	newMap := make(map[string]interface{})
+	bs, err := common.JsonMarshal(jp)
+	if err != nil {
+		return nil, err
+	}
+	err = common.JsonUnmarshal(bs, &newMap)
+	if err != nil {
+		return nil, err
+	}
+	return newMap, nil
+}
+
 // VpeManager
 type VpeManager struct{ *ModelManager }
 
@@ -73,7 +87,7 @@ func (m *VpeManager) QueryVpes(params web.RequestParams) (*web.PageResult, error
 	return m.QueryPagerItems(params, TeamsacsVpe)
 }
 
-// GetVpeByIpaddr
+// GetVpeByIpaddr ..
 func (m *VpeManager) GetVpeByIpaddr(ip string) (*Vpe, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsVpe)
 	doc := coll.FindOne(context.TODO(), bson.M{"ipaddr": ip})
@@ -86,7 +100,7 @@ func (m *VpeManager) GetVpeByIpaddr(ip string) (*Vpe, error) {
 	return result, err
 }
 
-// GetVpeByIdentifier
+// GetVpeByIdentifier ..
 func (m *VpeManager) GetVpeByIdentifier(identifier string) (*Vpe, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsVpe)
 	doc := coll.FindOne(context.TODO(), bson.M{"identifier": identifier})
@@ -99,12 +113,14 @@ func (m *VpeManager) GetVpeByIdentifier(identifier string) (*Vpe, error) {
 	return result, err
 }
 
+// ExistVpe ..
 func (m *VpeManager) ExistVpe(sn string) bool {
 	coll := m.GetTeamsAcsCollection(TeamsacsVpe)
 	count, _ := coll.CountDocuments(context.TODO(), bson.M{"sn": sn})
 	return count > 0
 }
 
+// GetVpeBySn ..
 func (m *VpeManager) GetVpeBySn(sn string) (*Cpe, error) {
 	coll := m.GetTeamsAcsCollection(TeamsacsVpe)
 	doc := coll.FindOne(context.TODO(), bson.M{"sn": sn})
@@ -117,7 +133,7 @@ func (m *VpeManager) GetVpeBySn(sn string) (*Cpe, error) {
 	return result, err
 }
 
-// AddVpeData
+// AddVpeData ..
 func (m *VpeManager) AddVpeData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
 	data["data_ver"] = common.GenerateDataVer()
@@ -134,13 +150,15 @@ func (m *VpeManager) AddVpeData(params web.RequestParams) error {
 		}
 	}
 	go func() {
-		_ = m.Elastic.AddData("teamsacs_vpe", data)
+		if _data, err := data.CopyIMap(); err != nil {
+			_ = m.Elastic.AddData("teamsacs_vpe", _data)
+		}
 	}()
 	_, err = coll.InsertOne(context.TODO(), data)
 	return err
 }
 
-// UpdateVpeData
+// UpdateVpeData ..
 func (m *VpeManager) UpdateVpeData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
 	data["data_ver"] = common.GenerateDataVer()
@@ -160,13 +178,15 @@ func (m *VpeManager) UpdateVpeData(params web.RequestParams) error {
 	query := bson.M{"_id": _id}
 	update := bson.M{"$set": data}
 	go func() {
-		_ = m.Elastic.UpdateData("teamsacs_vpe", data)
+		if _data, err := data.CopyIMap(); err != nil {
+			_ = m.Elastic.UpdateData("teamsacs_vpe", _data)
+		}
 	}()
 	_, err = m.GetTeamsAcsCollection(TeamsacsVpe).UpdateOne(context.TODO(), query, update)
 	return err
 }
 
-// UpdateVpeBySn
+// UpdateVpeBySn ..
 func (m *VpeManager) UpdateVpeBySn(sn string, valmap map[string]interface{}) error {
 	coll := m.GetTeamsAcsCollection(TeamsacsVpe)
 	valmap["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")

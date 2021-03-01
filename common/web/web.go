@@ -193,11 +193,26 @@ func (jp RequestParams) GetParamMap(key string) RequestParams {
 	}
 	vv, ok := v.(map[string]interface{})
 	if ok {
-		return vv
+		return common.DeepCopy(vv).(map[string]interface{})
 	}
 	return EmptyRequestParams()
 }
 
+// CopyIMap copy to interface map
+func (jp RequestParams) CopyIMap() (map[string]interface{}, error) {
+	newMap := make(map[string]interface{})
+	bs, err := common.JsonMarshal(jp)
+	if err != nil {
+		return nil, err
+	}
+	err = common.JsonUnmarshal(bs, &newMap)
+	if err != nil {
+		return nil, err
+	}
+	return newMap, nil
+}
+
+// GetStringWithDefval ..
 func (jp RequestParams) GetStringWithDefval(key string, defval string) string {
 	v, ok := jp[key]
 	if !ok {

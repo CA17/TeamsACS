@@ -17,6 +17,7 @@ require (
 	github.com/hallidave/mibtool v0.2.0
 	github.com/influxdata/go-syslog/v3 v3.0.0
 	github.com/ipipdotnet/ipdb-go v1.3.1
+	github.com/json-iterator/go v1.1.10
 	github.com/labstack/echo/v4 v4.1.15
 	github.com/labstack/gommon v0.3.0
 	github.com/mitchellh/mapstructure v1.2.2

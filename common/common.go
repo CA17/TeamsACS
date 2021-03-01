@@ -45,7 +45,10 @@ import (
 	"github.com/bwmarrin/snowflake"
 
 	"github.com/ca17/teamsacs/common/log"
+	jsoniter "github.com/json-iterator/go"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 var (
 	EmptyList = []interface{}{}
@@ -531,16 +534,42 @@ func GetPointTime(s *time.Time) time.Time {
 	return time.Time{}
 }
 
-
 func GenerateRangeNum(min, max int) int {
-    mathrand.Seed(time.Now().Unix())
-    randNum := mathrand.Intn(max - min) + min
-    return randNum
+	mathrand.Seed(time.Now().Unix())
+	randNum := mathrand.Intn(max-min) + min
+	return randNum
 }
 
 func GenerateDataVer() string {
-    mathrand.Seed(time.Now().Unix())
-    r1 := mathrand.Intn(600 - 100) + 100
-    r2 := mathrand.Intn(900 - 500) + 500
-    return fmt.Sprintf("%d-%d", r1, r2)
+	mathrand.Seed(time.Now().Unix())
+	r1 := mathrand.Intn(600-100) + 100
+	r2 := mathrand.Intn(900-500) + 500
+	return fmt.Sprintf("%d-%d", r1, r2)
+}
+
+// DeepCopy deep copy value
+func DeepCopy(value interface{}) interface{} {
+	if valueMap, ok := value.(map[string]interface{}); ok {
+		newMap := make(map[string]interface{})
+		for k, v := range valueMap {
+			newMap[k] = DeepCopy(v)
+		}
+		return newMap
+	} else if valueSlice, ok := value.([]interface{}); ok {
+		newSlice := make([]interface{}, len(valueSlice))
+		for k, v := range valueSlice {
+			newSlice[k] = DeepCopy(v)
+		}
+
+		return newSlice
+	}
+	return value
+}
+
+func JsonMarshal(v interface{}) ([]byte, error) {
+	return json.Marshal(v)
+}
+
+func JsonUnmarshal(data []byte, v interface{}) error {
+	return json.Unmarshal(data, v)
 }

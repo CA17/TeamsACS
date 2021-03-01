@@ -55,6 +55,20 @@ func (v Cpe) GetID() string {
 	return maputils.GetStringValue(v, "_id", "")
 }
 
+// CopyIMap copy to interface map
+func (jp Cpe) CopyIMap() (map[string]interface{}, error) {
+	newMap := make(map[string]interface{})
+	bs, err := common.JsonMarshal(jp)
+	if err != nil {
+		return nil, err
+	}
+	err = common.JsonUnmarshal(bs, &newMap)
+	if err != nil {
+		return nil, err
+	}
+	return newMap, nil
+}
+
 type CpeManager struct{ *ModelManager }
 
 func (m *ModelManager) GetCpeManager() *CpeManager {
@@ -100,6 +114,7 @@ func (m *CpeManager) ExistCpe(sn string) bool {
 	return count > 0
 }
 
+// AddCpeData add cpe data from web request
 func (m *CpeManager) AddCpeData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
 	data["data_ver"] = common.GenerateDataVer()
@@ -117,11 +132,14 @@ func (m *CpeManager) AddCpeData(params web.RequestParams) error {
 	}
 	_, err = coll.InsertOne(context.TODO(), data)
 	go func() {
-		_ = m.Elastic.AddData("teamsacs_cpe", data)
+		if _data, err := data.CopyIMap(); err != nil {
+			_ = m.Elastic.AddData("teamsacs_cpe", _data)
+		}
 	}()
 	return err
 }
 
+// AddCpeDataMap add cpe datamap
 func (m *CpeManager) AddCpeDataMap(cpe Cpe) error {
 	_id := cpe.GetID()
 	if common.IsEmptyOrNA(_id) {
@@ -140,11 +158,14 @@ func (m *CpeManager) AddCpeDataMap(cpe Cpe) error {
 	cpe["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
 	_, err = coll.InsertOne(context.TODO(), cpe)
 	go func() {
-		_ = m.Elastic.AddData("teamsacs_cpe", cpe)
+		if _data, err := cpe.CopyIMap(); err != nil {
+			_ = m.Elastic.AddData("teamsacs_cpe", _data)
+		}
 	}()
 	return err
 }
 
+// UpdateCpeData update cpe data attrs
 func (m *CpeManager) UpdateCpeData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
 	data["data_ver"] = common.GenerateDataVer()
@@ -164,13 +185,15 @@ func (m *CpeManager) UpdateCpeData(params web.RequestParams) error {
 	query := bson.M{"_id": _id}
 	update := bson.M{"$set": data}
 	go func() {
-		_ = m.Elastic.UpdateData("teamsacs_cpe", data)
+		if _data, err := data.CopyIMap(); err != nil {
+			_ = m.Elastic.UpdateData("teamsacs_cpe", _data)
+		}
 	}()
 	_, err = m.GetTeamsAcsCollection(TeamsacsCpe).UpdateOne(context.TODO(), query, update)
 	return err
 }
 
-// UpdateVpeBySn
+// UpdateCpeBySn update cpe data attr by sn
 func (m *CpeManager) UpdateCpeBySn(sn string, valmap map[string]interface{}) error {
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
 	valmap["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
@@ -179,7 +202,7 @@ func (m *CpeManager) UpdateCpeBySn(sn string, valmap map[string]interface{}) err
 	return err
 }
 
-// UpdateCpeById
+// UpdateCpeById update cpe data by id
 func (m *CpeManager) UpdateCpeById(id string, valmap map[string]interface{}) error {
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
 	valmap["update_time"] = time.Now().Format("2006-01-02 15:04:05 Z0700 MST")
@@ -188,7 +211,7 @@ func (m *CpeManager) UpdateCpeById(id string, valmap map[string]interface{}) err
 	return err
 }
 
-// UpdateVpeBySn
+// UpdateCpeSubscribeInfo ...
 func (m *CpeManager) UpdateCpeSubscribeInfo(id string) error {
 	subs, err := m.GetSubscribeManager().GetSubscribeByCpeid(id)
 	if err != nil {
@@ -196,7 +219,7 @@ func (m *CpeManager) UpdateCpeSubscribeInfo(id string) error {
 	}
 	valmap := map[string]interface{}{
 		"subscribe_username": subs.GetUsername(),
-		"update_time" : time.Now().Format("2006-01-02 15:04:05 Z0700 MST"),
+		"update_time":        time.Now().Format("2006-01-02 15:04:05 Z0700 MST"),
 	}
 	coll := m.GetTeamsAcsCollection(TeamsacsCpe)
 	update := bson.M{"$set": valmap}

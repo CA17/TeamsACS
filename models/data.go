@@ -54,7 +54,7 @@ func (m *DataManager) GetData(params web.RequestParams) (*Attributes, error) {
 	return result, err
 }
 
-// GetDataById
+// GetDataByAttr ..
 func (m *DataManager) GetDataByAttr(collname, attrname string, attrvalue interface{}) (*Attributes, error) {
 	coll := m.GetTeamsAcsCollection(collname)
 	doc := coll.FindOne(context.TODO(), bson.M{attrname: attrvalue})
@@ -67,7 +67,7 @@ func (m *DataManager) GetDataByAttr(collname, attrname string, attrvalue interfa
 	return result, err
 }
 
-// GetDataById
+// GetDataNameValues ..
 func (m *DataManager) GetDataNameValues(params web.RequestParams) ([]NameValue, error) {
 	_id := params.GetParamMap("querymap").GetMustString("_id")
 	collname := params.GetMustString("collname")
@@ -89,7 +89,7 @@ func (m *DataManager) GetDataNameValues(params web.RequestParams) ([]NameValue, 
 	return nvs, err
 }
 
-// AddData
+// AddData ..
 func (m *DataManager) AddData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
 	data["_id"] = common.UUID()
@@ -98,13 +98,15 @@ func (m *DataManager) AddData(params web.RequestParams) error {
 	collname := params.GetMustString("collname")
 	coll := m.GetTeamsAcsCollection(collname)
 	go func() {
-		_ = m.Elastic.AddData("teamsacs_"+collname, data)
+		if _data, err := data.CopyIMap(); err != nil {
+			_ = m.Elastic.AddData("teamsacs_"+collname, _data)
+		}
 	}()
 	_, err := coll.InsertOne(context.TODO(), data)
 	return err
 }
 
-// AddData
+// AddBatchData ..
 func (m *DataManager) AddBatchData(collname string, datas []interface{}) error {
 	coll := m.GetTeamsAcsCollection(collname)
 	_, err := coll.InsertMany(context.TODO(), datas)
@@ -117,7 +119,7 @@ func (m *DataManager) AddBatchData(collname string, datas []interface{}) error {
 	return err
 }
 
-// UpdateData
+// UpdateData ..
 func (m *DataManager) UpdateData(params web.RequestParams) error {
 	data := params.GetParamMap("data")
 	data["data_ver"] = common.GenerateDataVer()
@@ -127,14 +129,16 @@ func (m *DataManager) UpdateData(params web.RequestParams) error {
 	update := bson.M{"$set": data}
 	collname := params.GetMustString("collname")
 	go func() {
-		_ = m.Elastic.UpdateData("teamsacs_"+collname, data)
+		if _data, err := data.CopyIMap(); err != nil {
+			_ = m.Elastic.UpdateData("teamsacs_"+collname, _data)
+		}
 	}()
 	r, err := m.GetTeamsAcsCollection(collname).UpdateOne(context.TODO(), query, update)
 	log.Info(r)
 	return err
 }
 
-// DeleteData
+// DeleteData ..
 func (m *DataManager) DeleteData(params web.RequestParams) error {
 	collname := params.GetMustString("collname")
 	ids := params.GetParamMap("querymap").GetString("ids")
@@ -159,7 +163,7 @@ func (m *DataManager) DeleteData(params web.RequestParams) error {
 	}
 }
 
-// SaveData
+// SaveData ..
 func (m *DataManager) SaveData(params web.RequestParams) (interface{}, error) {
 	op := params.GetString("webix_operation")
 	switch op {
