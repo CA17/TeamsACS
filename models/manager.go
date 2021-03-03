@@ -92,6 +92,7 @@ type ModelManager struct {
 	Dev            bool
 }
 
+// NewModelManager
 func NewModelManager(appconfig *config.AppConfig, dev bool) *ModelManager {
 	m := &ModelManager{Config: appconfig, Dev: dev}
 	m.Bus = evbus.New()
@@ -112,6 +113,8 @@ func NewModelManager(appconfig *config.AppConfig, dev bool) *ModelManager {
 	return m
 }
 
+// SetupSyslogDB
+// Set up syslogdb configuration
 func (m *ModelManager) SetupSyslogDB() {
 	var Capped = true
 	var max = int64(m.Config.Syslogd.MaxRecodes)
@@ -121,6 +124,8 @@ func (m *ModelManager) SetupSyslogDB() {
 	})
 }
 
+// SetupElastic
+// Initialize the Elasticsearch client
 func (m *ModelManager) SetupElastic() {
 	urls := strings.Split(m.Config.Elastic.Urls, ",")
 	_elastic, err := elk.NewSimpleElasticClient(m.Config.Elastic.User, m.Config.Elastic.Pwd, urls...)
@@ -130,6 +135,7 @@ func (m *ModelManager) SetupElastic() {
 	m.Elastic = elastic.NewElastic(_elastic)
 }
 
+// registerManagers
 func (m *ModelManager) registerManagers() {
 	m.ManagerMap.Set("SubscribeManager", &SubscribeManager{m})
 	m.ManagerMap.Set("RadiusManager", &RadiusManager{m})
@@ -143,14 +149,18 @@ func (m *ModelManager) registerManagers() {
 	m.ManagerMap.Set("MikrotikDeviceManager", &MikrotikDeviceManager{m})
 }
 
+// GetTeamsAcsCollection
 func (m *ModelManager) GetTeamsAcsCollection(coll string) *mongo.Collection {
 	return m.Mongo.Database(MDBTeamsacs).Collection(coll)
 }
 
+// GetGenieAcsCollection
 func (m *ModelManager) GetGenieAcsCollection(coll string) *mongo.Collection {
 	return m.Mongo.Database(MDBGenieacs).Collection(coll)
 }
 
+// GetTemplateFuncMap
+// Set up golang template functions
 func (m *ModelManager) GetTemplateFuncMap() map[string]interface{} {
 	return map[string]interface{}{
 		"Pagever": func() int64 {
@@ -159,7 +169,8 @@ func (m *ModelManager) GetTemplateFuncMap() map[string]interface{} {
 	}
 }
 
-// UpdateVpeBySn
+// SyncElkData
+// Sync data to Elasticsearch
 func (m *ModelManager) SyncElkData(name string) error {
 	items, err := m.QueryItems(map[string]interface{}{}, name)
 	if err == nil {
@@ -174,6 +185,8 @@ func (m *ModelManager) SyncElkData(name string) error {
 	return nil
 }
 
+
+// Initialize the IP database
 func (m *ModelManager) SetupIpdb() error {
 	_dbfile := filepath.Join(m.Config.GetResourceDir(), "free.ipdb")
 	if !common.FileExists(_dbfile) {

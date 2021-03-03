@@ -1,0 +1,44 @@
+POST http://{{nbi_url}}/nbi/data/subscribe/add
+Content-Type: application/json
+authorization: Bearer {{nbi_token}}
+
+{
+  "username": "account01",
+  "email": "myacsaccount@gmail.com",
+  "password": "123456",
+  "active_num": 3,
+  "addr_pool": "J8009",
+  "up_rate": 20000,
+  "down_rate": 20000,
+  "ip_addr": "",
+  "expire_time": "2022-12-31 00:00:00",
+  "status": "enabled",
+  "remark": "demo user"
+}
+
+###
+
+POST http://{{nbi_url}}/nbi/data/subscribe/update
+Content-Type: application/json
+authorization: Bearer {{nbi_token}}
+
+{
+  "_id": "603f59c5-3ebb-5f34-a30b-1e8a-1003950a",
+  "username": "account01",
+  "email": "myacsaccount@gmail.com",
+  "password": "123456",
+  "active_num": 3,
+  "addr_pool": "J8009",
+  "up_rate": 20000,
+  "down_rate": 20000,
+  "ip_addr": "",
+  "expire_time": "2022-12-31 00:00:00",
+  "status": "enabled",
+  "remark": "demo user"
+}
+
+###
+
+GET http://{{nbi_url}}/nbi/data/subscribe/query
+Content-Type: application/json
+authorization: Bearer {{nbi_token}}
