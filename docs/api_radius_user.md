@@ -93,9 +93,9 @@ authorization: Bearer {{nbi_token}}
 
 Query parameter
 
-> Reference [API Param Rules](ApiParamRules)
+> Reference [API Param Rules](ApiParamRules)<!-- @IGNORE PREVIOUS: link -->
 >
-> Such as user matching  ?equal[username]=account01
+> Such as user matching  `?equal[username]=account01`
 
 
 Response
