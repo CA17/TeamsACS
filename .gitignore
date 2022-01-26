@@ -1,0 +1,17 @@
+.idea
+__pycache__
+.vscode
+assets/build.txt
+assets/buildver.txt
+/resources/*.xlsx
+/release/
+release
+/common/static/static.go
+/common/resources/resources.go
+/Dockerfile.local
+/abfs
+/labfs
+/deployment/freeradius/lfreemate
+__debug_bin
+metaslink.yml
+.DS_Store

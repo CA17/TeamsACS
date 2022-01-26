@@ -1,0 +1,29 @@
+system:
+  appid: TeamsACS
+  location: Asia/Shanghai
+  workdir: /var/teamsacs
+  syslog_addr: ""
+  version: latest
+  job_enabled: true
+  debug: true
+web:
+  host: 0.0.0.0
+  port: 8000
+  tls: false
+  secret: 9b6de5cc-0731-4bf1-xxxx-0f568ac9da37
+database:
+  host: 172.21.66.168
+  port: 5437
+  name: teamsacs
+  user: teamsacs
+  passwd: teamsacs
+  debug: false
+cwmp:
+  host: 0.0.0.0
+  port: 8106
+  tls: false
+  debug: true
+syslogd:
+  host: 0.0.0.0
+  port: 8514
+  debug: true
