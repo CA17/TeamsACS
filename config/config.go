@@ -139,7 +139,7 @@ var DefaultAppConfig = &AppConfig{
 	System: SysConfig{
 		Appid:      "MetasLink",
 		Location:   "Asia/Shanghai",
-		Workdir:    "/var/metaslink",
+		Workdir:    "/var/teamsacs",
 		SyslogAddr: "",
 		Version:    "latest",
 		JobEnabled: true,
@@ -154,7 +154,7 @@ var DefaultAppConfig = &AppConfig{
 	Database: DBConfig{
 		Host:   "127.0.0.1",
 		Port:   5432,
-		Name:   "metaslink",
+		Name:   "teamsacs",
 		User:   "postgres",
 		Passwd: "root",
 		Debug:  false,
@@ -180,10 +180,10 @@ var DefaultAppConfig = &AppConfig{
 func LoadConfig(cfile string) *AppConfig {
 	// 开发环境首先查找当前目录是否存在自定义配置文件
 	if cfile == "" {
-		cfile = "metaslink.yml"
+		cfile = "teamsacs.yml"
 	}
 	if !common.FileExists(cfile) {
-		cfile = "/etc/metaslink.yml"
+		cfile = "/etc/teamsacs.yml"
 	}
 	cfg := new(AppConfig)
 	if common.FileExists(cfile) {

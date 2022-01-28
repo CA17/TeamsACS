@@ -27,11 +27,11 @@ fastpub:
 	docker tag metaslink metaslink/metaslink:latest
 	docker push metaslink/metaslink:latest
 
-build:
+build-ctl:
 	make buildpre
 	test -d ./release || mkdir -p ./release
 	CGO_ENABLED=0 GOARCH=amd64 go build -a -ldflags  '-s -w -extldflags "-static"'  -o ./release/teamsctl teamsctl/teamsctl.go
-	upx ./release/teamscli
+	upx ./release/teamsctl
 
 
 ci:

@@ -26,8 +26,9 @@ import (
 
 func FindSettings(ctype string) ([]models.SysConfig, error) {
 	var resp []models.SysConfig
+	var url = common.UrlJoin2(api.Apiurl, "/settings/list")
 	err := gout.
-		GET(common.UrlJoin(api.Apiurl, "/settings/list")).
+		GET(url).
 		SetHeader(api.CreateAuthorization()).
 		Debug(api.Debug).
 		SetTimeout(time.Second * 5).
@@ -39,19 +40,31 @@ func FindSettings(ctype string) ([]models.SysConfig, error) {
 	return resp, nil
 }
 
-func UpdateSettings(ctype, name, value, remark string) (*web.WebRestResult, error) {
+func RemoveSettings(ctype, name string) (*web.WebRestResult, error) {
 	var resp web.WebRestResult
+	var url = common.UrlJoin2(api.Apiurl, "/settings/remove")
 	err := gout.
-		POST(common.UrlJoin(api.Apiurl, "/settings/update")).
+		GET(url).
 		SetHeader(api.CreateAuthorization()).
 		Debug(api.Debug).
 		SetTimeout(time.Second * 5).
-		SetBody(&models.SysConfig{
-			Type:   ctype,
-			Name:   name,
-			Value:  value,
-			Remark: remark,
-		}).
+		SetQuery(gout.H{"type": ctype, "name": name}).
+		BindJSON(&resp).
+		Do()
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func UpdateSettings(cfgs ...models.SysConfig) (*web.WebRestResult, error) {
+	var resp web.WebRestResult
+	err := gout.
+		POST(common.UrlJoin(api.Apiurl, "/settings/update")).
+		Debug(api.Debug).
+		SetHeader(api.CreateAuthorization()).
+		SetTimeout(time.Second * 5).
+		SetJSON(&cfgs).
 		BindJSON(&resp).
 		Do()
 	if err != nil {

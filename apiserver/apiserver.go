@@ -38,15 +38,15 @@ type ApiServer struct {
 }
 
 func Init() {
-	server = NewAdminServer()
+	server = NewApiServer()
 }
 
 func Listen() error {
 	return server.Start()
 }
 
-// NewAdminServer 创建管理系统服务器
-func NewAdminServer() *ApiServer {
+// NewApiServer 创建管理系统服务器
+func NewApiServer() *ApiServer {
 	s := &ApiServer{}
 	s.root = echo.New()
 	s.root.Pre(middleware.RemoveTrailingSlash())
@@ -92,6 +92,11 @@ func NewAdminServer() *ApiServer {
 		ErrorHandler: func(err error) error {
 			return echo.NewHTTPError(http.StatusBadRequest, "资源访问受限", err.Error())
 		},
+	}
+	s.root.Use(middleware.JWTWithConfig(s.jwtConfig))
+	s.initRouter()
+	for _, r := range s.root.Routes() {
+		log.Infof(fmt.Sprintf("%s %s", r.Method, r.Path))
 	}
 	return s
 }

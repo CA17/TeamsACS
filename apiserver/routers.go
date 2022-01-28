@@ -18,4 +18,6 @@ package apiserver
 func (s *ApiServer) initRouter() {
 	s.root.GET("/status", s.ApiStatus)
 	s.root.GET("/settings/list", s.FindSettings)
+	s.root.POST("/settings/update", s.UpdateSettings)
+	s.root.GET("/settings/remove", s.RemoveSettings)
 }

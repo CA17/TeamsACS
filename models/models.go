@@ -7,14 +7,10 @@ import (
 //  系统数据模型
 
 type SysConfig struct {
-	ID        int64     `json:"id,string" `
-	Sort      int       `json:"sort" `
-	Type      string    `json:"type"`
-	Name      string    `json:"name"`
-	Value     string    `json:"value"`
-	Remark    string    `json:"remark"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Type   string `gorm:"primaryKey" json:"type"`
+	Name   string `gorm:"primaryKey" json:"name"`
+	Value  string `json:"value"`
+	Remark string `json:"remark"`
 }
 
 type Syslog struct {

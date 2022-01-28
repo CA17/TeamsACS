@@ -25,7 +25,7 @@ import (
 
 var (
 	api    *TeamsacsApi
-	apiurl = "http://127.0.0.1:8160"
+	apiurl = "http://127.0.0.1:8000"
 	secret = "9b6de5cc-0731-4bf1-xxxx-0f568ac9da37"
 	debug  bool
 )
@@ -41,8 +41,12 @@ func NewTeamsacsApi(apiurl string, secret string, debug bool) *TeamsacsApi {
 }
 
 func init() {
-	apiurl = os.Getenv("TEAMSACS_API_URL")
-	secret = os.Getenv("TEAMSACS_API_SECRET")
+	if os.Getenv("TEAMSACS_API_URL") != "" {
+		apiurl = os.Getenv("TEAMSACS_API_URL")
+	}
+	if os.Getenv("TEAMSACS_API_SECRET") != "" {
+		secret = os.Getenv("TEAMSACS_API_SECRET")
+	}
 	debug = os.Getenv("TEAMSACS_API_DEBUG") == "true"
 	api = NewTeamsacsApi(apiurl, secret, debug)
 }
@@ -58,4 +62,8 @@ func (a *TeamsacsApi) CreateAuthorization() gout.H {
 	claims["exp"] = time.Now().Add(time.Second * 300).Unix()
 	t, _ := token.SignedString([]byte(a.Secret))
 	return gout.H{"authorization": "Bearer " + t}
+}
+
+func SetDebug(debug bool) {
+	api.Debug = debug
 }

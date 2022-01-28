@@ -12,11 +12,11 @@ web:
   tls: false
   secret: 9b6de5cc-0731-4bf1-xxxx-0f568ac9da37
 database:
-  host: 172.21.66.168
-  port: 5437
+  host: 127.0.0.1
+  port: 5432
   name: teamsacs
-  user: teamsacs
-  passwd: teamsacs
+  user: postgres
+  passwd: root
   debug: false
 cwmp:
   host: 0.0.0.0
