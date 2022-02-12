@@ -13,7 +13,6 @@ import (
 	"github.com/ca17/teamsacs/config"
 	"github.com/ca17/teamsacs/cwmpserver"
 	"github.com/ca17/teamsacs/installer"
-	"github.com/ca17/teamsacs/syslogd"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -104,13 +103,6 @@ func main() {
 	}
 
 	app.Init(_config)
-
-	syslogserv := syslogd.NewSyslogServer()
-
-	g.Go(func() error {
-		log.Info("Start Syslog Server ...")
-		return syslogserv.StartSyslogServer()
-	})
 
 	// API服务启动
 	g.Go(func() error {

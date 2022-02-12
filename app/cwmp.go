@@ -12,15 +12,22 @@ import (
 	"github.com/ca17/teamsacs/models"
 )
 
+// CwmpEventTable CPE 缓存表
 type CwmpEventTable struct {
 	cpeTable map[string]*CwmpCpe
 	cpeLock  sync.Mutex
 }
 
+type CwmpEventData struct {
+	Session string       `json:"session"`
+	Sn      string       `json:"sn"`
+	Message cwmp.Message `json:"message"`
+}
+
 type CwmpCpe struct {
 	Sn             string `json:"sn"`
-	cwmpQueueMap   chan models.CwmpEventData
-	cwmpHPQueueMap chan models.CwmpEventData
+	cwmpQueueMap   chan CwmpEventData
+	cwmpHPQueueMap chan CwmpEventData
 	LastInform     *cwmp.Inform `json:"latest_message"`
 	LastUpdate     time.Time    `json:"last_update"`
 	LastDataNotify time.Time    `json:"last_data_notify"`
@@ -34,6 +41,7 @@ func NewCwmpEventTable() *CwmpEventTable {
 	return et
 }
 
+// GetCwmpCpe 查询或者创建一个缓存 CPE 数据
 func (c *CwmpEventTable) GetCwmpCpe(key string) *CwmpCpe {
 	if common.IsEmptyOrNA(key) {
 		panic(errors.New("key is empty"))
@@ -48,8 +56,8 @@ func (c *CwmpEventTable) GetCwmpCpe(key string) *CwmpCpe {
 			Sn:             key,
 			LastUpdate:     timeutil.EmptyTime,
 			LastDataNotify: timeutil.EmptyTime,
-			cwmpQueueMap:   make(chan models.CwmpEventData, 32),
-			cwmpHPQueueMap: make(chan models.CwmpEventData, 8),
+			cwmpQueueMap:   make(chan CwmpEventData, 32),
+			cwmpHPQueueMap: make(chan CwmpEventData, 8),
 			LastInform:     nil,
 			IsRegister:     count > 0,
 		}
@@ -68,12 +76,12 @@ func (c *CwmpCpe) UpdateStatus(msg *cwmp.Inform) {
 	c.LastUpdate = time.Now()
 }
 
+// CheckRegister 检测并自动注册CPE信息
 func (c *CwmpCpe) CheckRegister(ip string, msg *cwmp.Inform) {
 	if !c.IsRegister {
 		var ctime = time.Now()
 		err := GormDB.Create(&models.NetDevice{
 			ID:              common.UUIDint64(),
-			RegionId:        0,
 			DevType:         "general",
 			Sn:              msg.Sn,
 			Name:            "Device-" + msg.Sn,
@@ -90,9 +98,6 @@ func (c *CwmpCpe) CheckRegister(ip string, msg *cwmp.Inform) {
 			ProductClass:    msg.ProductClass,
 			CwmpUrl:         msg.GetParam("Device.ManagementServer.ConnectionRequestURL"),
 			CwmpLastInform:  ctime,
-			SnmpPort:        161,
-			SnmpCommunity:   "N/A",
-			SnmpStatus:      "unknow",
 			Tags:            "",
 			Uptime:          0,
 			MemoryTotal:     0,
@@ -108,6 +113,7 @@ func (c *CwmpCpe) CheckRegister(ip string, msg *cwmp.Inform) {
 	}
 }
 
+// NotifyDataUpdate 通知 CPE 更新数据（发布通知 event ）
 func (c *CwmpCpe) NotifyDataUpdate(force bool) {
 	var ctime = time.Now()
 	updateFlag := ctime.Sub(c.LastDataNotify).Seconds() > 60
@@ -124,7 +130,7 @@ func (c *CwmpCpe) UpdateParamValues(values map[string]string) {
 	Bus.Publish(EventCwmpParamsUpdate, c.Sn, values)
 }
 
-func (c *CwmpCpe) getQueue(hp bool) chan models.CwmpEventData {
+func (c *CwmpCpe) getQueue(hp bool) chan CwmpEventData {
 	var que = c.cwmpQueueMap
 	if hp {
 		que = c.cwmpHPQueueMap
@@ -138,7 +144,7 @@ func setMapValue(vmap map[string]interface{}, name string, value interface{}) {
 	}
 }
 
-func (c *CwmpCpe) RecvCwmpEventData(timeoutMsec int, hp bool) (data *models.CwmpEventData, err error) {
+func (c *CwmpCpe) RecvCwmpEventData(timeoutMsec int, hp bool) (data *CwmpEventData, err error) {
 	select {
 	case _data := <-c.getQueue(hp):
 		return &_data, nil
@@ -147,7 +153,7 @@ func (c *CwmpCpe) RecvCwmpEventData(timeoutMsec int, hp bool) (data *models.Cwmp
 	}
 }
 
-func (c *CwmpCpe) SendCwmpEventData(data models.CwmpEventData, timeoutMsec int, hp bool) error {
+func (c *CwmpCpe) SendCwmpEventData(data CwmpEventData, timeoutMsec int, hp bool) error {
 	select {
 	case c.getQueue(hp) <- data:
 		return nil
@@ -157,7 +163,7 @@ func (c *CwmpCpe) SendCwmpEventData(data models.CwmpEventData, timeoutMsec int, 
 }
 
 func (c *CwmpCpe) UpdateManagementAuthInfo(session string, timeout int, hp bool) error {
-	return c.SendCwmpEventData(models.CwmpEventData{
+	return c.SendCwmpEventData(CwmpEventData{
 		Session: session,
 		Sn:      c.Sn,
 		Message: &cwmp.SetParameterValues{
@@ -179,7 +185,7 @@ func (c *CwmpCpe) UpdateManagementAuthInfo(session string, timeout int, hp bool)
 }
 
 func (c *CwmpCpe) UpdateParameterNames(session string, timeout int, hp bool) error {
-	return c.SendCwmpEventData(models.CwmpEventData{
+	return c.SendCwmpEventData(CwmpEventData{
 		Session: session,
 		Sn:      c.Sn,
 		Message: &cwmp.GetParameterNames{

@@ -5,7 +5,6 @@ import (
 
 	evbus "github.com/asaskevich/EventBus"
 	"github.com/ca17/teamsacs/common/cwmp"
-	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/models"
 )
 
@@ -14,15 +13,10 @@ var (
 )
 
 const (
-	EventSyslog           = "EventSyslog"
 	EventDeviceEventLog   = "EventDeviceEventLog"
 	EventCwmpInformUpdate = "EventCwmpInformUpdate"
 	EventCwmpParamsUpdate = "EventCwmpParamsUpdate"
 )
-
-func PubSyslog(logdata interface{}) {
-	Bus.Publish(EventSyslog, logdata)
-}
 
 func PubDeviceEventLog(sn, logtype, session, action, level, message string) {
 	Bus.Publish(EventDeviceEventLog, sn, logtype, session, action, level, message)
@@ -30,11 +24,6 @@ func PubDeviceEventLog(sn, logtype, session, action, level, message string) {
 
 // setupEventSubscribe 事件订阅
 func setupEventSubscribe() {
-
-	// Syslog 订阅
-	_ = Bus.SubscribeAsync(EventSyslog, func(data interface{}) {
-		log.ErrorIf(GormDB.Create(data).Error)
-	}, false)
 
 	Bus.SubscribeAsync(EventCwmpInformUpdate, func(sn string, msg *cwmp.Inform) {
 		valmap := map[string]interface{}{}

@@ -1,12 +1,12 @@
 [
   {
-    "type": "tr069",
+    "type": "cwmp",
     "name": "CpeConnectionRequestPassword",
     "value": "crpsecret2021",
     "remark": "CPE 管理连接密码"
   },
   {
-    "type": "tr069",
+    "type": "cwmp",
     "name": "CwmpDownloadUrlPrefix",
     "value": "http://127.0.0.1:8106",
     "remark": "CWMP 文件下载 URL"

@@ -39,13 +39,6 @@ type WebConfig struct {
 	Secret string `yaml:"secret"`
 }
 
-// FreeradiusConfig Freeradius API 配置
-type FreeradiusConfig struct {
-	Host  string `yaml:"host" json:"host"`
-	Port  int    `yaml:"port" json:"port"`
-	Debug bool   `yaml:"debug" json:"debug"`
-}
-
 // CwmpConfig Cwmp API 配置
 type CwmpConfig struct {
 	Host  string `yaml:"host" json:"host"`
@@ -54,20 +47,11 @@ type CwmpConfig struct {
 	Debug bool   `yaml:"debug" json:"debug"`
 }
 
-// SyslogdConfig Syslog 服务器配置
-type SyslogdConfig struct {
-	Host  string `yaml:"host" json:"host"`
-	Port  int    `yaml:"port" json:"port"`
-	Debug bool   `yaml:"debug" json:"debug"`
-}
-
 type AppConfig struct {
-	System     SysConfig        `yaml:"system"`
-	Web        WebConfig        `yaml:"web"`
-	Database   DBConfig         `yaml:"database"`
-	Cwmp       CwmpConfig       `yaml:"cwmp" json:"cwmp"`
-	Freeradius FreeradiusConfig `yaml:"freeradius" json:"freeradius"`
-	Syslogd    SyslogdConfig    `yaml:"syslogd" json:"syslogd"`
+	System   SysConfig  `yaml:"system"`
+	Web      WebConfig  `yaml:"web"`
+	Database DBConfig   `yaml:"database"`
+	Cwmp     CwmpConfig `yaml:"cwmp" json:"cwmp"`
 }
 
 func (c *AppConfig) GetLogDir() string {
@@ -93,6 +77,7 @@ func (c *AppConfig) GetBackupDir() string {
 func (c *AppConfig) InitDirs() {
 	os.MkdirAll(path.Join(c.System.Workdir, "logs"), 0755)
 	os.MkdirAll(path.Join(c.System.Workdir, "data"), 0755)
+	os.MkdirAll(path.Join(c.System.Workdir, "cwmpfile"), 0755)
 	os.MkdirAll(path.Join(c.System.Workdir, "public"), 0755)
 	os.MkdirAll(path.Join(c.System.Workdir, "private"), 0755)
 	os.MkdirAll(path.Join(c.System.Workdir, "backup"), 0644)
@@ -159,20 +144,10 @@ var DefaultAppConfig = &AppConfig{
 		Passwd: "root",
 		Debug:  false,
 	},
-	Syslogd: SyslogdConfig{
-		Host:  "0.0.0.0",
-		Port:  1914,
-		Debug: true,
-	},
 	Cwmp: CwmpConfig{
 		Host:  "0.0.0.0",
 		Tls:   false,
 		Port:  8106,
-		Debug: true,
-	},
-	Freeradius: FreeradiusConfig{
-		Host:  "0.0.0.0",
-		Port:  1980,
 		Debug: true,
 	},
 }
@@ -212,15 +187,6 @@ func LoadConfig(cfile string) *AppConfig {
 	setEnvValue("TEAMSACS_DB_PWD", &cfg.Database.Passwd)
 	setEnvIntValue("TEAMSACS_DB_PORT", &cfg.Database.Port)
 	setEnvBoolValue("TEAMSACS_DB_DEBUG", &cfg.Database.Debug)
-
-	// syslog config
-	setEnvIntValue("TEAMSACS_SYSLOG_PORT", &cfg.Syslogd.Port)
-	setEnvBoolValue("TEAMSACS_SYSLOG_DEBUG", &cfg.Syslogd.Debug)
-
-	// FreeRADIUS Config
-	setEnvValue("TEAMSACS_FREERADIUS_WEB_HOST", &cfg.Freeradius.Host)
-	setEnvBoolValue("TEAMSACS_FREERADIUS_WEB_DEBUG", &cfg.Freeradius.Debug)
-	setEnvIntValue("TEAMSACS_FREERADIUS_WEB_PORT", &cfg.Freeradius.Port)
 
 	// Cwmp Config
 	setEnvValue("TEAMSACS_CWMP_WEB_HOST", &cfg.Cwmp.Host)

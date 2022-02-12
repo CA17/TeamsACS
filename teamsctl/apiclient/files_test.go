@@ -18,37 +18,42 @@ package apiclient
 import (
 	"testing"
 
-	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/models"
 )
 
-func TestFindSettings(t *testing.T) {
+func TestFindCwmpFile(t *testing.T) {
 	api.Debug = true
-	got, err := FindSettings("test")
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(common.ToJson(got))
-}
-
-func TestUpdateSettings(t *testing.T) {
-	api.Debug = true
-	r, err := UpdateSettings([]models.SysConfig{
-		{
-			Type:   "test",
-			Name:   "test",
-			Value:  "test",
-			Remark: "test",
-		},
-	}...)
+	r, err := FindCwmpFile("")
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(r)
 }
 
-func TestRemoveSettings(t *testing.T) {
-	r, err := RemoveSettings("test", "test")
+func TestFindCwmpFileTask(t *testing.T) {
+	api.Debug = true
+	r, err := FindCwmpFileTask("", "error")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(r)
+}
+
+func TestRemoveCwmpFile(t *testing.T) {
+	api.Debug = true
+	r, err := RemoveCwmpFile("1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(r)
+}
+
+func TestUploadCwmpFile(t *testing.T) {
+	api.Debug = true
+	r, err := UploadCwmpFile(models.CwmpFile{
+		FileType: "3 Vendor Configuration File",
+		FilePath: "/Users/wangjuntao/github/TeamsACS/teamsctl/apiclient/files_test.go",
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
