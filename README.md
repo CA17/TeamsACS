@@ -13,6 +13,7 @@ TeamsACS is committed to providing superior ease of network management for work 
 
 The core of the system is based on Golang technology, providing superior performance and an easy deployment experience.
 
+![TeamsACS Struct](https://user-images.githubusercontent.com/377938/166147509-c5df9824-52f1-43c3-ae46-842a1cbe9400.png)
 
 ## Install and config
 
