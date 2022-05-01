@@ -14,7 +14,7 @@ web:
 database:
   host: 127.0.0.1
   port: 5432
-  name: teamsacs
+  name: teamsacs_osc
   user: postgres
   passwd: root
   debug: false
@@ -22,8 +22,4 @@ cwmp:
   host: 0.0.0.0
   port: 8106
   tls: false
-  debug: true
-syslogd:
-  host: 0.0.0.0
-  port: 8514
   debug: true

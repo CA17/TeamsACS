@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/ca17/teamsacs/assets"
+	"github.com/ca17/teamsacs/teamsctl/files"
 	"github.com/ca17/teamsacs/teamsctl/settings"
 	"github.com/urfave/cli/v2"
 	_ "github.com/urfave/cli/v2"
@@ -28,6 +29,7 @@ func main() {
 	}
 
 	app.Commands = append(app.Commands, settings.Commands...)
+	app.Commands = append(app.Commands, files.Commands...)
 
 	err := app.Run(os.Args)
 	if err != nil {

@@ -24,15 +24,15 @@ import (
 	"github.com/guonaihong/gout"
 )
 
-func FindSettings(ctype string) ([]models.SysConfig, error) {
-	var resp []models.SysConfig
-	var url = common.UrlJoin2(api.Apiurl, "/settings/list")
+func FindCwmpFile(query string) ([]models.CwmpFile, error) {
+	var resp []models.CwmpFile
+	var url = common.UrlJoin2(api.Apiurl, "/cwmpfile/list")
 	err := gout.
 		GET(url).
 		SetHeader(api.CreateAuthorization()).
 		Debug(api.Debug).
 		SetTimeout(time.Second * 5).
-		SetQuery(gout.H{"type": ctype}).
+		SetQuery(gout.H{"query": query}).
 		BindJSON(&resp).
 		Do()
 	if err != nil {
@@ -41,15 +41,37 @@ func FindSettings(ctype string) ([]models.SysConfig, error) {
 	return resp, nil
 }
 
-func RemoveSettings(ctype, name string) (*web.WebRestResult, error) {
-	var resp web.WebRestResult
-	var url = common.UrlJoin2(api.Apiurl, "/settings/remove")
+func FindCwmpFileTask(id, status string) ([]models.CwmpFile, error) {
+	var resp []models.CwmpFile
+	var url = common.UrlJoin2(api.Apiurl, "/cwmpfile/task/list")
 	err := gout.
-		DELETE(url).
+		GET(url).
 		SetHeader(api.CreateAuthorization()).
 		Debug(api.Debug).
 		SetTimeout(time.Second * 5).
-		SetQuery(gout.H{"type": ctype, "name": name}).
+		SetQuery(gout.H{"id": id, "status": status}).
+		BindJSON(&resp).
+		Do()
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func UploadCwmpFile(file models.CwmpFile) (*web.WebRestResult, error) {
+	var hd = api.CreateAuthorization()
+	hd["product_class"] = file.ProductClass
+	hd["oui"] = file.Oui
+	hd["manufacturer"] = file.Manufacturer
+	hd["version"] = file.Version
+	hd["file_type"] = file.FileType
+	var resp web.WebRestResult
+	err := gout.
+		POST(common.UrlJoin(api.Apiurl, "/cwmpfile/upload")).
+		Debug(api.Debug).
+		SetHeader(hd).
+		SetTimeout(time.Second * 5).
+		SetForm(gout.H{"upload": gout.FormFile(file.FilePath)}).
 		BindJSON(&resp).
 		Do()
 	if err != nil {
@@ -58,14 +80,15 @@ func RemoveSettings(ctype, name string) (*web.WebRestResult, error) {
 	return &resp, nil
 }
 
-func UpdateSettings(cfgs ...models.SysConfig) (*web.WebRestResult, error) {
+func RemoveCwmpFile(id string) (*web.WebRestResult, error) {
 	var resp web.WebRestResult
+	var url = common.UrlJoin2(api.Apiurl, "/cwmpfile/remove")
 	err := gout.
-		POST(common.UrlJoin(api.Apiurl, "/settings/update")).
-		Debug(api.Debug).
+		DELETE(url).
 		SetHeader(api.CreateAuthorization()).
+		Debug(api.Debug).
 		SetTimeout(time.Second * 5).
-		SetJSON(&cfgs).
+		SetQuery(gout.H{"id": id}).
 		BindJSON(&resp).
 		Do()
 	if err != nil {

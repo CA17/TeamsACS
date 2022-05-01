@@ -14,5 +14,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	os.WriteFile("metaslink.yml", bs, 777)
+	os.WriteFile("teamsacs.yml", bs, 777)
 }

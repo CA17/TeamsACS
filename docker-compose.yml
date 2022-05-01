@@ -1,7 +1,7 @@
 version: "2"
 services:
   pgdb:
-    image: timescale/timescaledb:latest-pg13
+    image: timescale/timescaledb:latest-pg14
     container_name: "pgdb"
     ports:
       - "127.0.0.1:5432:5432"
@@ -23,16 +23,14 @@ services:
     ports:
       - 8000
       - 8106
-      - 8514/udp
     expose:
       - 8000
       - 8106
-      - 8514/udp
     volumes:
       - /data/teamsacs:/var/teamsacs
     environment:
       - GODEBUG=x509ignoreCN=0
-      - METASLINK_WEB_DEBUG=1
+      - TEAMSACS_WEB_DEBUG=1
       - TEAMSACS_SECRET=9b6de5cc-xxxx-xxxx-xxx-0f568ac9da37
     networks:
       teamsacs_network:

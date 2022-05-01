@@ -19,5 +19,8 @@ func (s *ApiServer) initRouter() {
 	s.root.GET("/status", s.ApiStatus)
 	s.root.GET("/settings/list", s.FindSettings)
 	s.root.POST("/settings/update", s.UpdateSettings)
-	s.root.GET("/settings/remove", s.RemoveSettings)
+	s.root.DELETE("/settings/remove", s.RemoveSettings)
+	s.root.GET("/cwmpfile/list", s.FindCwmpFile)
+	s.root.POST("/cwmpfile/upload", s.UploadCwmpFile)
+	s.root.DELETE("/cwmpfile/remove", s.RemoveCwmpFile)
 }

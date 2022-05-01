@@ -31,7 +31,6 @@ var server *ApiServer
 
 type ApiServer struct {
 	root      *echo.Echo
-	api       *echo.Group
 	dbapi     *echo.Group
 	pgapi     *echo.Group
 	jwtConfig middleware.JWTConfig

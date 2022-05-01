@@ -4,6 +4,17 @@ import (
 	"github.com/ca17/teamsacs/models"
 )
 
+/**
+
+CREATE USER teamsacs WITH PASSWORD 'teamsacs'
+
+CREATE DATABASE teamsacs_osc OWNER postgres;
+CREATE DATABASE teamsacs OWNER teamsacs;
+
+GRANT ALL PRIVILEGES ON DATABASE teamsacs TO teamsacs;
+
+*/
+
 func initSettings() {
 	GormDB.Where("1 = 1").Delete(&models.SysConfig{})
 }

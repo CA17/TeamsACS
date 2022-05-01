@@ -38,7 +38,7 @@ func (s *CwmpServer) Tr069Download(c echo.Context) error {
 	c.Response().Header().Set("Connection", "keep-alive")
 	c.Response().Header().Set("Keep-Alive", "timeout=5")
 	c.Response().Header().Set("Content-Disposition", fmt.Sprintf("attachment;filename=%s", filename))
-	return c.Blob(200, echo.MIMEOctetStream, []byte(downloadTask.Content))
+	return c.File(downloadTask.FilePath)
 }
 
 func (s *CwmpServer) Tr069Index(c echo.Context) error {
