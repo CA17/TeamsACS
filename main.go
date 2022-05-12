@@ -12,6 +12,7 @@ import (
 	"github.com/ca17/teamsacs/common/log"
 	"github.com/ca17/teamsacs/config"
 	"github.com/ca17/teamsacs/cwmpserver"
+	"github.com/ca17/teamsacs/freeradius"
 	"github.com/ca17/teamsacs/installer"
 	"golang.org/x/sync/errgroup"
 )
@@ -29,7 +30,7 @@ var (
 	CommitSubject  string
 )
 
-// 命令行定义
+// Command line definition
 var (
 	h         = flag.Bool("h", false, "help usage")
 	showVer   = flag.Bool("v", false, "show version")
@@ -81,7 +82,7 @@ func main() {
 		return
 	}
 
-	// 安装为系统服务
+	// Installation as a system service
 	if *install {
 		err := installer.Install(_config)
 		if err != nil {
@@ -90,7 +91,6 @@ func main() {
 		return
 	}
 
-	// 卸载
 	if *uninstall {
 		installer.Uninstall()
 		return
@@ -114,6 +114,12 @@ func main() {
 	g.Go(func() error {
 		log.Info("Start Cwmp Server ...")
 		return cwmpserver.Listen()
+	})
+
+	// Freeradius API 服务启动
+	g.Go(func() error {
+		log.Info("Start Freeradius API Server ...")
+		return freeradius.Listen()
 	})
 
 	if err := g.Wait(); err != nil {

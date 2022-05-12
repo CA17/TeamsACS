@@ -13,9 +13,38 @@ TeamsACS is committed to providing superior ease of network management for work 
 
 The core of the system is based on Golang technology, providing superior performance and an easy deployment experience.
 
+TeamsACS uses Timescaledb as the primary data store, supporting time-series data and providing support for system observability
+
+- TR069-based device management
+
+TeamsACS implements the TR069 protocol server, supports Mikrotik as a TR069 protocol client for secure access, 
+and supports Mikrotik TR069 private features, supports configuration reading and modification, 
+and supports uploading Mikrotik script files for execution.
+
+- Supports integrated freeRADIUS for RADIUS authentication
+
+TeamsACS implements a REST API server for freeRADIUS, provides a practical database structure on the backend to store user data, 
+supports Mikrotik access as a RADIUS client, supports normal authentication and EAP authentication
+
+- Syslog Server Implementation
+
+TeamsACS implements a Syslog Server that accepts syslog output from Mikrotik devices and provides queries.
+
+- Device Backup Management
+
+The TR069 protocol enables Mikrotik devices to be backed up regularly and then downloaded to the TeamsACS file system for unified management, 
+and supports backup restoration via TR069.
+
+
+# Development Roadmap
+
+- Implement TeamsEdge edge nodes and support RouterOS V7-based containerized deployments.
+- Interacts with CoreDNS-based TeamsDNS to implement dynamic CDN-based application triage policies based on DNS resolution
+
+
 ![TeamsACS Struct](https://user-images.githubusercontent.com/377938/166147509-c5df9824-52f1-43c3-ae46-842a1cbe9400.png)
 
-## Install and config
+# Install and config
 
 TeamsACS uses PostgreSQL as its primary database and uses the Timescaledb extension
 
@@ -27,7 +56,7 @@ TeamsACS uses PostgreSQL as its primary database and uses the Timescaledb extens
     
     GRANT ALL PRIVILEGES ON DATABASE teamsacs TO teamsacs;
 
-## Docker Deploy
+# Docker Deploy
 
 ```yml
 version: "2"
@@ -55,9 +84,13 @@ services:
     ports:
       - 8000
       - 8106
+      - 8107
+      - 8108/udp
     expose:
       - 8000
       - 8106
+      - 8107
+      - 8108/udp
     volumes:
       - /data/teamsacs:/var/teamsacs
     environment:

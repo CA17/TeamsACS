@@ -8,4 +8,9 @@ var Tables = []interface{}{
 	&CwmpDownloadTask{},
 	&CwmpParamNameList{},
 	&TsDeviceLoad{},
+	&RadiusAccounting{},
+	&RadiusAuthlog{},
+	&RadiusOnline{},
+	&RadiusProfile{},
+	&RadiusUser{},
 }

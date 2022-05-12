@@ -1,8 +1,8 @@
-BUILD_ORG   := metaslink
+BUILD_ORG   := teamsacs
 BUILD_VERSION   := latest
 BUILD_TIME      := $(shell date "+%F %T")
-BUILD_NAME      := metaslink
-RELEASE_VERSION := v2.0.1
+BUILD_NAME      := teamsacs
+RELEASE_VERSION := v1.0.1
 SOURCE          := main.go
 RELEASE_DIR     := ./release
 COMMIT_SHA1     := $(shell git show -s --format=%H )
@@ -23,9 +23,9 @@ buildpre:
 
 fastpub:
 	make buildpre
-	docker build --build-arg BTIME="$(shell date "+%F %T")" -t metaslink . -f Dockerfile
-	docker tag metaslink metaslink/metaslink:latest
-	docker push metaslink/metaslink:latest
+	docker build --build-arg BTIME="$(shell date "+%F %T")" -t teamsacs . -f Dockerfile
+	docker tag teamsacs teamsacs/teamsacs:latest
+	docker push teamsacs/teamsacs:latest
 
 build-ctl:
 	make buildpre
@@ -52,6 +52,7 @@ syncdev:
 	git push origin main
 	# 切换回自己的开发分支继续工作
 	git checkout develop
+	git push origin develop
 
 
 gitlog:

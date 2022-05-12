@@ -1,0 +1,8 @@
+BuildVersion=latest
+ReleaseVersion=v1.0.1
+BuildTime=2022-05-12 17:07:45
+BuildName=teamsacs
+CommitID=f17e7dadf9cba47905a7c72e659c13488ed91d13
+CommitDate=Sun, 1 May 2022 21:31:16 +0800
+CommitUser=jamiesun.net@gmail.com
+CommitSubject=2022-05-01 21:31:10 : git merge
