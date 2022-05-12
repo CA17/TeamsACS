@@ -1,5 +1,5 @@
 system:
-  appid: TeamsACS
+  appid: MetasLink
   location: Asia/Shanghai
   workdir: /var/teamsacs
   syslog_addr: ""
@@ -14,7 +14,7 @@ web:
 database:
   host: 127.0.0.1
   port: 5432
-  name: teamsacs_osc
+  name: teamsacs
   user: postgres
   passwd: root
   debug: false
@@ -22,4 +22,12 @@ cwmp:
   host: 0.0.0.0
   port: 8106
   tls: false
+  debug: true
+freeradius:
+  host: 0.0.0.0
+  port: 8107
+  debug: true
+syslogd:
+  host: 0.0.0.0
+  port: 8108
   debug: true

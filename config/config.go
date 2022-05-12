@@ -39,6 +39,13 @@ type WebConfig struct {
 	Secret string `yaml:"secret"`
 }
 
+// FreeradiusConfig Freeradius API 配置
+type FreeradiusConfig struct {
+	Host  string `yaml:"host" json:"host"`
+	Port  int    `yaml:"port" json:"port"`
+	Debug bool   `yaml:"debug" json:"debug"`
+}
+
 // CwmpConfig Cwmp API 配置
 type CwmpConfig struct {
 	Host  string `yaml:"host" json:"host"`
@@ -47,11 +54,20 @@ type CwmpConfig struct {
 	Debug bool   `yaml:"debug" json:"debug"`
 }
 
+// SyslogdConfig Syslog 服务器配置
+type SyslogdConfig struct {
+	Host  string `yaml:"host" json:"host"`
+	Port  int    `yaml:"port" json:"port"`
+	Debug bool   `yaml:"debug" json:"debug"`
+}
+
 type AppConfig struct {
-	System   SysConfig  `yaml:"system"`
-	Web      WebConfig  `yaml:"web"`
-	Database DBConfig   `yaml:"database"`
-	Cwmp     CwmpConfig `yaml:"cwmp" json:"cwmp"`
+	System     SysConfig        `yaml:"system"`
+	Web        WebConfig        `yaml:"web"`
+	Database   DBConfig         `yaml:"database"`
+	Cwmp       CwmpConfig       `yaml:"cwmp" json:"cwmp"`
+	Freeradius FreeradiusConfig `yaml:"freeradius" json:"freeradius"`
+	Syslogd    SyslogdConfig    `yaml:"syslogd" json:"syslogd"`
 }
 
 func (c *AppConfig) GetLogDir() string {
@@ -150,6 +166,16 @@ var DefaultAppConfig = &AppConfig{
 		Port:  8106,
 		Debug: true,
 	},
+	Freeradius: FreeradiusConfig{
+		Host:  "0.0.0.0",
+		Port:  8107,
+		Debug: true,
+	},
+	Syslogd: SyslogdConfig{
+		Host:  "0.0.0.0",
+		Port:  8108,
+		Debug: true,
+	},
 }
 
 func LoadConfig(cfile string) *AppConfig {
@@ -192,6 +218,15 @@ func LoadConfig(cfile string) *AppConfig {
 	setEnvValue("TEAMSACS_CWMP_WEB_HOST", &cfg.Cwmp.Host)
 	setEnvBoolValue("TEAMSACS_CWMP_WEB_DEBUG", &cfg.Cwmp.Debug)
 	setEnvIntValue("TEAMSACS_CWMP_WEB_PORT", &cfg.Cwmp.Port)
+
+	// FreeRADIUS Config
+	setEnvValue("TEAMSACS_FREERADIUS_WEB_HOST", &cfg.Freeradius.Host)
+	setEnvBoolValue("TEAMSACS_FREERADIUS_WEB_DEBUG", &cfg.Freeradius.Debug)
+	setEnvIntValue("TEAMSACS_FREERADIUS_WEB_PORT", &cfg.Freeradius.Port)
+
+	// syslog config
+	setEnvIntValue("TEAMSACS_SYSLOG_PORT", &cfg.Syslogd.Port)
+	setEnvBoolValue("TEAMSACS_SYSLOG_DEBUG", &cfg.Syslogd.Debug)
 
 	return cfg
 }
