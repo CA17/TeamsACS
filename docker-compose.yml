@@ -1,0 +1,45 @@
+version: "3"
+services:
+  pgdb:
+    image: timescale/timescaledb:latest-pg14
+    container_name: "pgdb"
+    ports:
+      - "127.0.0.1:15432:5432"
+    environment:
+      POSTGRES_DB: teamsacs
+      POSTGRES_USER: teamsacs
+      POSTGRES_PASSWORD: teamsacs
+    volumes:
+      - pgdb-volume:/var/lib/postgresql/data
+    networks:
+      teamsacs_network:
+
+  teamsacs:
+    depends_on:
+      - 'pgdb'
+    image: ca17/teamsacs:latest
+    container_name: "teamsacs"
+    restart: always
+    ports:
+      - "2979:2979"
+      - "2989:2989"
+      - "2999:2999"
+    volumes:
+      - teamsacs-volume:/var/teamsacs
+    environment:
+      - GODEBUG=x509ignoreCN=0
+      - TEAMSACS_DB_HOST=pgdb
+      - TEAMSACS_DB_PORT=5432
+      - TEAMSACS_DB_NAME=teamsacs
+      - TEAMSACS_DB_USER=teamsacs
+      - TEAMSACS_DB_PWD=teamsacs
+      - TEAMSACS_WEB_DEBUG=1
+    networks:
+      teamsacs_network:
+
+networks:
+  teamsacs_network:
+
+volumes:
+  pgdb-volume:
+  teamsacs-volume:

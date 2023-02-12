@@ -30,12 +30,28 @@ fastpubm1:
 	make buildpre
 	make build
 	docker buildx build --platform=linux/amd64 --build-arg BTIME="$(shell date "+%F %T")" -t teamsacs . -f Dockerfile.local
-	docker tag teamsacs ${BUILD_ORG}/teamsacs:latest
-	docker push ${BUILD_ORG}/teamsacs:latest
+	docker tag teamsacs ${BUILD_ORG}/teamsacs:latest-amd64
+	docker push ${BUILD_ORG}/teamsacs:latest-amd64
+	make buildarm64
+	docker buildx build --platform=linux/arm64 --build-arg BTIME="$(shell date "+%F %T")" -t teamsacs . -f Dockerfile.local
+	docker tag teamsacs ${BUILD_ORG}/teamsacs:latest-arm64
+	docker push ${BUILD_ORG}/teamsacs:latest-arm64
+	docker manifest create ${BUILD_ORG}/teamsacs:latest ${BUILD_ORG}/teamsacs:latest-arm64 ${BUILD_ORG}/teamsacs:latest-amd64
+	# 标注不同架构镜像
+	docker manifest annotate ${BUILD_ORG}/teamsacs:latest ${BUILD_ORG}/teamsacs:latest-amd64 --os linux --arch amd64
+	docker manifest annotate ${BUILD_ORG}/teamsacs:latest ${BUILD_ORG}/teamsacs:latest-arm64 --os linux --arch arm64
+	# 推送镜像
+	docker manifest push ${BUILD_ORG}/teamsacs:latest
+
 
 build:
 	test -d ./release || mkdir -p ./release
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags  '-s -w -extldflags "-static"'  -o ./release/teamsacs main.go
+	upx ./release/teamsacs
+
+buildarm64:
+	test -d ./release || mkdir -p ./release
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -a -ldflags  '-s -w -extldflags "-static"'  -o ./release/teamsacs main.go
 	upx ./release/teamsacs
 
 syncdev:

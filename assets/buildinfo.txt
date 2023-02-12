@@ -1,8 +1,8 @@
-BuildVersion=latest v1.0.1 2023-02-13 01:16:53
+BuildVersion=latest v1.0.1 2023-02-13 02:30:39
 ReleaseVersion=v1.0.1
-BuildTime=2023-02-13 01:16:53
+BuildTime=2023-02-13 02:30:39
 BuildName=teamsacs
-CommitID=bfe97f08e2b1906a53ab144abde554b4bdfb6c5f
-CommitDate=Mon, 13 Feb 2023 00:32:44 +0800
+CommitID=85825bd37d3b937a287c508cbc74d17234f7246c
+CommitDate=Mon, 13 Feb 2023 01:17:04 +0800
 CommitUser=jamiesun.net@gmail.com
-CommitSubject= : log err fix
+CommitSubject= : ci config
