@@ -1,8 +1,8 @@
-BuildVersion=latest v1.0.1 2023-02-13 00:00:35
+BuildVersion=latest v1.0.1 2023-02-13 00:19:05
 ReleaseVersion=v1.0.1
-BuildTime=2023-02-13 00:00:35
+BuildTime=2023-02-13 00:19:05
 BuildName=teamsacs
-CommitID=873aac863193c3e576c40e0c13594a0c200bf70e
-CommitDate=Sun, 12 Feb 2023 23:59:45 +0800
+CommitID=ebe49b8888a7d0296c0a5f2bb0de8a7d53d11e9d
+CommitDate=Mon, 13 Feb 2023 00:12:39 +0800
 CommitUser=jamiesun.net@gmail.com
-CommitSubject=dockerfile config
+CommitSubject=log test fix
