@@ -1,8 +1,8 @@
-BuildVersion=latest v1.0.1 2023-02-13 00:30:11
+BuildVersion=latest v1.0.1 2023-02-13 00:32:39
 ReleaseVersion=v1.0.1
-BuildTime=2023-02-13 00:30:11
+BuildTime=2023-02-13 00:32:39
 BuildName=teamsacs
-CommitID=a1c47721a18b274f62af1cae145bea55b52c7320
-CommitDate=Mon, 13 Feb 2023 00:19:27 +0800
+CommitID=987f164f18a8d8c730ea6fbb76d3d9dbe0182b59
+CommitDate=Mon, 13 Feb 2023 00:30:24 +0800
 CommitUser=jamiesun.net@gmail.com
-CommitSubject=log test fix
+CommitSubject= : clear code
