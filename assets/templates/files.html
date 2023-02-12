@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {{template "header"}}
+</head>
+<body>
+<script>
+    webix.ready(function () {
+        let tableid = webix.uid().toString();
+        let uploadid = webix.uid().toString();
+        let uploadurl = '/admin/files/upload'
+        let reloadData = wxui.reloadDataFunc(tableid, "/admin/files/query", null)
+        wxui.initUploadApi(uploadid, uploadurl, reloadData);
+        webix.ui({
+            css: "main-panel",
+            padding: 7,
+            rows: [
+                wxui.getPageToolbar({
+                    title: gtr("Files"),
+                    icon: "mdi mdi-folder-multiple-image",
+                    elements: [
+                        wxui.getPrimaryButton(gtr("Upload"), 90, false, function () {
+                            $$(uploadid).fileDialog({});
+                        }),
+                    ]
+                }),
+                wxui.getDatatable({
+                    tableid: tableid,
+                    url: '/admin/files/query',
+                    columns: [
+                        {
+                            id: "filename", header: [""], width:45, sort: "string",
+                            template: "<a href='javascript:void(0)'><i class='mdi mdi-content-copy'></i></a>"
+                        },
+                        {
+                            id: "filename", header: [gtr("Filename")], fillspace: true, sort: "string",
+                            template: "<a href='/admin/files/download/#filename#'>#filename#</a>"
+                        },
+                        {
+                            id: "size", header: [gtr("Size")], adjust: true, sort: "string", template: function (obj) {
+                                return bytesToSize(obj.size);
+                            }
+                        },
+                        {id: "mode", header: [gtr("Perm")], adjust: true, sort: "string"},
+                        {id: "update_time", header: [gtr("Updated")], width: 160, sort: "string"},
+                        {id: "delete", header: "", css: "pointer", template: "{common.trashIcon()}", width: 50},
+                        // {header: {content: "headerMenu"}, headermenu: false, width: 35}
+                    ],
+                    rightSplit: 1,
+                    leftSplit: 0,
+                    pager: true,
+                    onClick: {
+                        "mdi-content-copy": function (e, id) {
+                            let item = this.getItem(id);
+                            let fpath = "/cwmpfiles/download/" + item.filename
+                            navigator.clipboard.writeText(fpath).then(function() {
+                                webix.message(tr("files", "Copying to clipboard was successful!"));
+                            }, function(err) {
+                                webix.message(tr("files", "Could not copy text: ") + err);
+                            });
+                        },
+                        "wxi-trash": function (e, id) {
+                            if (id.column === "delete") {
+                                let item = this.getItem(id);
+                                webix.confirm({
+                                    title: tr("cpe", "Operation confirmation"),
+                                    ok: "Yes", cancel: "No",
+                                    text: "Confirm to delete? This operation is irreversible.",
+                                    callback: function (ev) {
+                                        if (ev) {
+                                            webix.ajax().get('/admin/files/delete/' + item.filename).then(function (result) {
+                                                let resp = result.json();
+                                                webix.message({type: resp.msgtype, text: resp.msg, expire: 2000});
+                                                reloadData()
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }),
+                wxui.getTableFooterBar({
+                    tableid: tableid,
+                    actions: [],
+                    callback: reloadData
+                }),
+            ]
+        })
+    })
+</script>
+</body>
+</html>

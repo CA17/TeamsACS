@@ -1,0 +1,13 @@
+.idea
+.vscode
+/release/
+release
+__debug_bin
+.DS_Store
+/.fleet/
+/testdatas/
+/teamsacs.yml
+/tmp/
+/log_info.log
+/assets/tr069_teamsacs_dev.rsc
+/Makefile.local

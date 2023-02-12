@@ -1,0 +1,22 @@
+[
+  {"id": "100", "value": "Overview", "icon": "mdi mdi-monitor-dashboard", "url": "/admin/overview"},
+  {"id": "102", "value": "System Status", "icon": "mdi mdi-gauge", "url": "/admin/sysstatus"},
+  {
+    "id": "120", "value": "Network", "icon": "mdi mdi-switch", "data": [
+      {"id": "1200", "value": "Node", "icon": "mdi mdi-chevron-right", "url": "/admin/node"},
+      {"id": "1201", "value": "CPE Device", "icon": "mdi mdi-chevron-right", "url": "/admin/cpe"},
+      {"id": "1202", "value": "TR069 Config", "icon": "mdi mdi-chevron-right", "url": "/admin/cwmp/config"},
+      {"id": "1203", "value": "TR069 Preset", "icon": "mdi mdi-chevron-right", "url": "/admin/cwmp/preset"},
+      {"id": "1204", "value": "Factoryreset Config", "icon": "mdi mdi-chevron-right", "url": "/admin/cwmp/factoryreset"},
+      {"id": "1205", "value": "Firmware Config", "icon": "mdi mdi-chevron-right", "url": "/admin/cwmp/firmwareconfig"},
+      {"id": "1206", "value": "Tr069 Session", "icon": "mdi mdi-chevron-right", "url": "/admin/cwmp/config/session"},
+      {"id": "1207", "value": "TR069 Tasks", "icon": "mdi mdi-chevron-right", "url": "/admin/cwmp/preset/task"}
+    ]
+  },
+  {
+    "id": "180", "value": "System", "icon": "mdi mdi-cogs", "data": [
+      {"id": "1801", "value": "Settings", "icon": "mdi mdi-chevron-right", "url": "/admin/settings"},
+      {"id": "1807", "value": "Logging", "icon": "mdi mdi-chevron-right", "url": "/admin/logging"}
+    ]
+  }
+]

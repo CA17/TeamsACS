@@ -1,0 +1,3 @@
+CREATE USER teamsacs WITH PASSWORD 'teamsacs';
+CREATE DATABASE teamsacs WITH OWNER teamsacs;
+GRANT ALL PRIVILEGES ON DATABASE teamsacs TO teamsacs;

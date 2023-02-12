@@ -1,0 +1,11 @@
+<upgrade version="1" type="links">
+   <config/>
+   <links>
+       <link>
+          <url>{{.TR069AccessAddress}}/cwmpfiles/download/lora-7.7.npk</url>
+       </link>
+       <link>
+          <url>{{.TR069AccessAddress}}/cwmpfiles/download/user-manager-7.7.npk</url>
+       </link>
+   </links>
+</upgrade>

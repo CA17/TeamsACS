@@ -1,0 +1,20 @@
+{
+  "paths": [
+    "/ready",
+    "/realip",
+    "/login",
+    "/logout",
+    "/admin/login"
+  ],
+  "prefixs": [
+    "/ready",
+    "/realip",
+    "/login",
+    "/logout",
+    "/admin/login",
+    "/static"
+  ],
+  "suffixs": [
+    ".css"
+  ]
+}

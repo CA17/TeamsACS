@@ -1,0 +1,8 @@
+BuildVersion=latest
+ReleaseVersion=v1.0.1
+BuildTime=2023-02-12 18:44:17
+BuildName=teamsacs
+CommitID=eb9357f00ea5b24838092f7e5a2099c925748737
+CommitDate=Sun, 12 Feb 2023 18:44:08 +0800
+CommitUser=jamiesun.net@gmail.com
+CommitSubject=..
