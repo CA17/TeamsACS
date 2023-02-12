@@ -81,7 +81,7 @@ func (c *AppConfig) GetBackupDir() string {
 	return path.Join(c.System.Workdir, "backup")
 }
 
-func (c *AppConfig) initDirs() {
+func (c *AppConfig) InitDirs() {
 	os.MkdirAll(path.Join(c.System.Workdir, "logs"), 0755)
 	os.MkdirAll(path.Join(c.System.Workdir, "public"), 0755)
 	os.MkdirAll(path.Join(c.System.Workdir, "data"), 0755)
@@ -183,7 +183,7 @@ func LoadConfig(cfile string) *AppConfig {
 		cfg = DefaultAppConfig
 	}
 
-	cfg.initDirs()
+	cfg.InitDirs()
 
 	setEnvValue("TEAMSACS_SYSTEM_WORKER_DIR", &cfg.System.Workdir)
 	setEnvBoolValue("TEAMSACS_SYSTEM_DEBUG", &cfg.System.Debug)
