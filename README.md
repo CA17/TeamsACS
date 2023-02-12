@@ -33,7 +33,7 @@ and supports backup restoration via TR069.
 - Provide basic equipment information and status data query API, and data maintenance API.
 - Provide various policy management APIs, such as firewall rules, routing tables, etc.
 
-# Install and config
+# Quick Start
 
 TeamsACS uses PostgreSQL as its primary database and uses the Timescaledb extension
 
@@ -45,22 +45,40 @@ TeamsACS uses PostgreSQL as its primary database and uses the Timescaledb extens
     
     GRANT ALL PRIVILEGES ON DATABASE teamsacs TO teamsacs;
 
+
+- Install TeamsACS 
+
+The following installation method will download and build the latest teamsacs version
+
+```
+go install github.com/ca17/teamsacs@latest
+
+teamsacs -install
+
+```
+
+> If you want to download the compiled binaries directly, you can visit [Github Release](https://github.com/CA17/TeamsACS/releases)
+
+- Config TeamsACS
+
+Modifying configuration file [/etc/teamsacs.yml](Configuration)
+
 # Docker Deploy
 
 ```yml
-version: "2"
+version: "3"
 services:
   pgdb:
     image: timescale/timescaledb:latest-pg14
     container_name: "pgdb"
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:15432:5432"
     environment:
       POSTGRES_DB: teamsacs
       POSTGRES_USER: teamsacs
       POSTGRES_PASSWORD: teamsacs
     volumes:
-      - /data/pgdata:/var/lib/postgresql/data
+      - pgdb-volume:/var/lib/postgresql/data
     networks:
       teamsacs_network:
 
@@ -75,11 +93,12 @@ services:
       - "2989:2989"
       - "2999:2999"
     volumes:
-      - /data/teamsacs:/var/teamsacs
+      - teamsacs-volume:/var/teamsacs
     environment:
       - GODEBUG=x509ignoreCN=0
       - TEAMSACS_DB_HOST=pgdb
       - TEAMSACS_DB_PORT=5432
+      - TEAMSACS_DB_NAME=teamsacs
       - TEAMSACS_DB_USER=teamsacs
       - TEAMSACS_DB_PWD=teamsacs
       - TEAMSACS_WEB_DEBUG=1
@@ -88,6 +107,10 @@ services:
 
 networks:
   teamsacs_network:
+
+volumes:
+  pgdb-volume:
+  teamsacs-volume:
 
 ```
 
