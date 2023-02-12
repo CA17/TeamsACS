@@ -40,11 +40,9 @@ build:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags  '-s -w -extldflags "-static"'  -o ./release/teamsacs main.go
 	upx ./release/teamsacs
 
-
 syncdev:
-	@read -p "提示:同步操作尽量在完成一个完整功能特性后进行，请输入提交描述 (develop):  " cimsg; \
 	make buildpre
-	echo "CommitMsg: $${cimsg}"
+	@read -p "提示:同步操作尽量在完成一个完整功能特性后进行，请输入提交描述 (develop):  " cimsg; \
 	git commit -am "$(date "+%F %T") : $${cimsg}"
 	# 切换主分支并更新
 	git checkout main
