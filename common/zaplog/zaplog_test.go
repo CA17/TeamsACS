@@ -16,7 +16,7 @@ func TestInfo(t *testing.T) {
 func TestLoki(t *testing.T) {
 	InitGlobalLogger(LogConfig{
 		Mode:       Dev,
-		LokiEnable: true,
+		LokiEnable: false,
 		FileEnable: true,
 		Filename:   "/tmp/test.log",
 		LokiApi:    "http://127.0.0.1:3100",
