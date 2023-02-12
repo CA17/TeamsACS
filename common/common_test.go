@@ -42,7 +42,7 @@ func TestToCamelCase1(t *testing.T) {
 	}{
 		{"user_name", args{"user_name"}, "UserName"},
 		{"username", args{"username"}, "Username"},
-		{"id", args{"id"}, "ID"},
+		{"id", args{"id"}, "Id"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
