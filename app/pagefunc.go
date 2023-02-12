@@ -13,7 +13,7 @@ func (a *Application) GetTemplateFuncMap() map[string]interface{} {
 			return time.Now().Unix()
 		},
 		"buildver": func() string {
-			bv := strings.TrimSpace(assets.BuildVer)
+			bv := strings.TrimSpace(assets.BuildVersion())
 			if bv != "" {
 				return bv
 			}

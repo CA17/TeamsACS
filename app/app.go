@@ -205,8 +205,9 @@ func (a *Application) BackupDatabase() error {
 // checkAppVersion Check version
 func (a *Application) checkAppVersion() {
 	cver := a.GetSettingsStringValue("system", "TeamsacsVersion")
-	if assets.BuildVer != cver {
-		_ = a.gormDB.Exec("UPDATE sys_config SET value = ? WHERE type = ? and name = ?", assets.BuildVer, "system", "TeamsacsVersion")
+	buildVersion := assets.BuildVersion()
+	if buildVersion != cver {
+		_ = a.gormDB.Exec("UPDATE sys_config SET value = ? WHERE type = ? and name = ?", buildVersion, "system", "TeamsacsVersion")
 	}
 }
 

@@ -1,0 +1,8 @@
+BuildVersion=latest v1.0.1 2023-02-13 00:00:35
+ReleaseVersion=v1.0.1
+BuildTime=2023-02-13 00:00:35
+BuildName=teamsacs
+CommitID=873aac863193c3e576c40e0c13594a0c200bf70e
+CommitDate=Sun, 12 Feb 2023 23:59:45 +0800
+CommitUser=jamiesun.net@gmail.com
+CommitSubject=dockerfile config

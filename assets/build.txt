@@ -1,8 +1,0 @@
-BuildVersion=latest
-ReleaseVersion=v1.0.1
-BuildTime=2023-02-12 22:33:37
-BuildName=teamsacs
-CommitID=f159a0b06684e6e5a16209661b870dcd2ce5ce0b
-CommitDate=Sun, 12 Feb 2023 22:28:34 +0800
-CommitUser=jamiesun.net@gmail.com
-CommitSubject= : fix Makefile
