@@ -23,28 +23,35 @@ func (a *Application) initJob() {
 	loc, _ := time.LoadLocation(a.appConfig.System.Location)
 	a.sched = cron.New(cron.WithLocation(loc), cron.WithParser(cronParser))
 
-	_, _ = a.sched.AddFunc("@every 30s", func() {
+	var err error
+	_, err = a.sched.AddFunc("@every 30s", func() {
 		go a.SchedSystemMonitorTask()
 		go a.SchedProcessMonitorTask()
 	})
 
-	_, _ = a.sched.AddFunc("@every 60s", func() {
+	_, err = a.sched.AddFunc("@every 60s", func() {
 		a.SchedUpdateBatchCwmpStatus()
 	})
 
 	// database backup
-	_, _ = a.sched.AddFunc("@daily", func() {
+	_, err = a.sched.AddFunc("@daily", func() {
 		err := app.BackupDatabase()
 		if err != nil {
 			log.Errorf("database backup err %s", err.Error())
 		}
 	})
 
-	_, _ = a.sched.AddFunc("@daily", func() {
+	_, err = a.sched.AddFunc("@daily", func() {
 		a.gormDB.
 			Where("opt_time < ? ", time.Now().
 				Add(-time.Hour*24*365)).Delete(models.SysOprLog{})
 	})
+
+	if err != nil {
+		log.Errorf("init job error %s", err.Error())
+	}
+
+	a.setupCwmpTask()
 
 	a.sched.Start()
 }
@@ -156,27 +163,27 @@ func (a *Application) SchedUpdateBatchCwmpStatus() {
 		Update("cwmp_status", "offline")
 }
 
-func (a *Application) SchedSetupCwmpTask() {
+func (a *Application) setupCwmpTask() {
 	var err error
-	_, _ = a.sched.AddFunc("@every 5m", func() {
+	_, err = a.sched.AddFunc("@every 5m", func() {
 		_ = CreateCwmpScheduledTask("5m")
 	})
-	_, _ = a.sched.AddFunc("@every 10m", func() {
+	_, err = a.sched.AddFunc("@every 10m", func() {
 		_ = CreateCwmpScheduledTask("10m")
 	})
-	_, _ = a.sched.AddFunc("@every 30m", func() {
+	_, err = a.sched.AddFunc("@every 30m", func() {
 		_ = CreateCwmpScheduledTask("30m")
 	})
-	_, _ = a.sched.AddFunc("@every 1h", func() {
+	_, err = a.sched.AddFunc("@every 1h", func() {
 		_ = CreateCwmpScheduledTask("1h")
 	})
-	_, _ = a.sched.AddFunc("@every 4h", func() {
+	_, err = a.sched.AddFunc("@every 4h", func() {
 		_ = CreateCwmpScheduledTask("4h")
 	})
-	_, _ = a.sched.AddFunc("@every 8h", func() {
+	_, err = a.sched.AddFunc("@every 8h", func() {
 		_ = CreateCwmpScheduledTask("8h")
 	})
-	_, _ = a.sched.AddFunc("@every 12", func() {
+	_, err = a.sched.AddFunc("@every 12", func() {
 		_ = CreateCwmpScheduledTask("12")
 	})
 
