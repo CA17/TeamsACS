@@ -11,27 +11,25 @@ COMMIT_USER     := $(shell git show -s --format=%ce )
 COMMIT_SUBJECT     := $(shell git show -s --format=%s )
 
 buildpre:
-	echo "${BUILD_VERSION} ${RELEASE_VERSION} ${BUILD_TIME}" > assets/buildver.txt
-	echo "BuildVersion=${BUILD_VERSION}" > assets/build.txt
-	echo "ReleaseVersion=${RELEASE_VERSION}" >> assets/build.txt
-	echo "BuildTime=${BUILD_TIME}" >> assets/build.txt
-	echo "BuildName=${BUILD_NAME}" >> assets/build.txt
-	echo "CommitID=${COMMIT_SHA1}" >> assets/build.txt
-	echo "CommitDate=${COMMIT_DATE}" >> assets/build.txt
-	echo "CommitUser=${COMMIT_USER}" >> assets/build.txt
-	echo "CommitSubject=${COMMIT_SUBJECT}" >> assets/build.txt
+	echo "BuildVersion=${BUILD_VERSION} ${RELEASE_VERSION} ${BUILD_TIME}" > assets/buildinfo.txt
+	echo "ReleaseVersion=${RELEASE_VERSION}" >> assets/buildinfo.txt
+	echo "BuildTime=${BUILD_TIME}" >> assets/buildinfo.txt
+	echo "BuildName=${BUILD_NAME}" >> assets/buildinfo.txt
+	echo "CommitID=${COMMIT_SHA1}" >> assets/buildinfo.txt
+	echo "CommitDate=${COMMIT_DATE}" >> assets/buildinfo.txt
+	echo "CommitUser=${COMMIT_USER}" >> assets/buildinfo.txt
+	echo "CommitSubject=${COMMIT_SUBJECT}" >> assets/buildinfo.txt
 
 fastpub:
 	make buildpre
-	make build
-	docker build --build-arg BTIME="$(shell date "+%F %T")" -t teamsacs . -f docker/teamsacs/Dockerfile
+	docker buildx build --platform=linux/amd64 --build-arg BTIME="$(date "+%F %T")" -t teamsacs .
 	docker tag teamsacs ${BUILD_ORG}/teamsacs:latest
 	docker push ${BUILD_ORG}/teamsacs:latest
 
 fastpubm1:
 	make buildpre
 	make build
-	docker buildx build --platform=linux/amd64 --build-arg BTIME="$(shell date "+%F %T")" -t teamsacs . -f docker/teamsacs/Dockerfile
+	docker buildx build --platform=linux/amd64 --build-arg BTIME="$(shell date "+%F %T")" -t teamsacs . -f Dockerfile.local
 	docker tag teamsacs ${BUILD_ORG}/teamsacs:latest
 	docker push ${BUILD_ORG}/teamsacs:latest
 

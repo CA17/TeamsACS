@@ -23,7 +23,6 @@ func TestLoki(t *testing.T) {
 		LokiUser:   "test",
 		LokiPwd:    "test",
 		LokiJob:    "test",
-		LokiBuff:   8192,
 	})
 	for i := 0; i < 32; i++ {
 		log.Info(fmt.Sprintf("hello world %s", common.UUID()))

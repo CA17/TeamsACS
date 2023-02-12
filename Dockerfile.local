@@ -1,0 +1,11 @@
+FROM alpine:3.17
+
+RUN apk add --no-cache curl
+RUN apk add --no-cache postgresql14-client
+
+COPY ./release/teamsacs /usr/local/bin/teamsacs
+RUN chmod +x /usr/local/bin/teamsacs
+
+EXPOSE 2979 2989 2999
+
+CMD ["/usr/local/bin/teamsacs"]
