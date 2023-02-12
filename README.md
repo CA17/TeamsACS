@@ -61,7 +61,13 @@ teamsacs -install
 
 - Config TeamsACS
 
-Modifying configuration file [/etc/teamsacs.yml](Configuration)
+Modifying configuration file [/etc/teamsacs.yml](https://github.com/CA17/TeamsACS/wiki/Configuration)
+
+Start the service with the following commands
+
+    systemctl enable teamsacs
+    systemctl start teamsacs
+
 
 # Docker Deploy
 
@@ -113,6 +119,12 @@ volumes:
   teamsacs-volume:
 
 ```
+
+## Access web console
+
+Open the browser and enter the URL: `http://your-ip:2979` or `https://your-ip:2989` 
+
+The default username and password are `admin/teamsacs`
 
 ## Links
 
