@@ -44,7 +44,8 @@ build:
 syncdev:
 	@read -p "提示:同步操作尽量在完成一个完整功能特性后进行，请输入提交描述 (develop):  " cimsg; \
 	make buildpre
-	git commit -am "$(shell date "+%F %T") : $${cimsg}" || echo "no commit"
+	echo "CommitMsg: $${cimsg}"
+	git commit -am "$(date "+%F %T") : $${cimsg}"
 	# 切换主分支并更新
 	git checkout main
 	git pull origin main
