@@ -1,8 +1,8 @@
-BuildVersion=latest v1.0.1 2023-02-13 02:49:12
+BuildVersion=latest v1.0.1 2023-02-13 12:56:42
 ReleaseVersion=v1.0.1
-BuildTime=2023-02-13 02:49:12
+BuildTime=2023-02-13 12:56:42
 BuildName=teamsacs
-CommitID=eaf674de52f47d12af732c2804d7f650c411d685
-CommitDate=Mon, 13 Feb 2023 02:48:49 +0800
+CommitID=95c1ce1d71278567610ca646a3b5d8d2ab267fda
+CommitDate=Mon, 13 Feb 2023 02:49:32 +0800
 CommitUser=jamiesun.net@gmail.com
-CommitSubject=rm go.xml
+CommitSubject=readme
