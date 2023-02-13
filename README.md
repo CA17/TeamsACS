@@ -7,9 +7,14 @@ Welcome to TeamsACS project!
     _|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""| 
     "`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-' 
 
+
+<img width="1236" alt="image" src="https://user-images.githubusercontent.com/377938/218494949-def6c4e8-8425-495d-bcdf-533917cd71ef.png">
+
 # TeamsACS
 
 TeamsACS is committed to providing superior ease of network management for work teams. We use Mikrotik's networking products as the base core.
+
+TeamsACS is a TR069 Auto-configuration server (ACS) specially designed for Mikrotik devices, which is designed to help administrators manage and configure Mikrotik devices remotely through the TR069 protocol
 
 The core of the system is based on Golang technology, providing superior performance and an easy deployment experience.
 
