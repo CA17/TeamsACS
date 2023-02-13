@@ -5152,13 +5152,13 @@ body.webix_print {
 }
 @font-face {
   font-family: 'Open Sans';
-  src: url('../fonts/open-sans-regular.woff2') format('woff2'), url('../fonts/open-sans-regular.woff') format('woff');
+  src: url('/static/webix/fonts/open-sans-regular.woff2') format('woff2'), url('/static/webix/fonts/open-sans-regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: 'Open Sans';
-  src: url('../fonts/open-sans-600.woff2') format('woff2'), url('../fonts/open-sans-600.woff') format('woff');
+  src: url('/static/webix/fonts/open-sans-600.woff2') format('woff2'), url('/static/webix/fonts/open-sans-600.woff') format('woff');
   font-style: normal;
   font-weight: 600;
 }
@@ -6670,7 +6670,7 @@ textarea.webix_invalid {
 /* based on MaterialDesignIcons.com */
 @font-face {
   font-family: "Webix Material Icons";
-  src: url('../fonts/webixmdi-webfont.woff2') format('woff2'), url('../fonts/webixmdi-webfont.woff') format('woff');
+  src: url('/static/webix/fonts/webixmdi-webfont.woff2') format('woff2'), url('/static/webix/fonts/webixmdi-webfont.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
