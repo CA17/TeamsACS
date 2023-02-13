@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"github.com/ca17/teamsacs/controllers/charts"
 	"github.com/ca17/teamsacs/controllers/cpe"
 	"github.com/ca17/teamsacs/controllers/cwmpconfig"
 	"github.com/ca17/teamsacs/controllers/cwmppreset"
@@ -25,7 +24,6 @@ func Init() {
 	opr.InitRouter()
 	settings.InitRouter()
 	dashboard.InitRouter()
-	charts.InitRouter()
 	cpe.InitRouter()
 	logging.InitRouter()
 	node.InitRouter()

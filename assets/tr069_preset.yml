@@ -6,9 +6,8 @@
 #	- onfail  If it is defined as cancel, when the task fails, all unexecuted tasks defined by the description file will be canceled; when defined as ignore, unexecuted tasks will continue to be executed
 
 # The order of execution is  FactoryresetConfig -> FirmwareConfig -> Downloads ->Uploads -> SetParameterValues -> GetParameterNames,
-# In a set of preset tasks, only some operations can be set, if the preset is executed by the system scheduled task,
-# factoryreset, firmwareconfig will be ignored
 
+# If the preset is performed by a scheduled system task (the time policy is set to `sys_scheduled`), then factoryreset, firmwareconfig are ignored in the set of preset tasks.
 
 # Factory settings script description, single definition
 FactoryResetConfig:

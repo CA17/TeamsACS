@@ -25,9 +25,7 @@ func InitRouter() {
 		stype := c.Param("type")
 		var cpes []models.NetCpe
 		common.Must(app.GDB().Find(&cpes).Error)
-		var statdata = map[string]*echarts.NameValuePair{
-			"unknow": {Value: 0, Name: "unknow"},
-		}
+		var statdata = map[string]*echarts.NameValuePair{}
 		for _, dev := range cpes {
 			var name string
 			switch stype {
@@ -39,11 +37,10 @@ func InitRouter() {
 				continue
 			}
 			if name == "" {
-				statdata["unknow"].Incr()
 				continue
 			}
 			if _, ok := statdata[name]; !ok {
-				statdata[name] = &echarts.NameValuePair{Name: name, Value: 0}
+				statdata[name] = &echarts.NameValuePair{Name: name, Value: 1}
 			} else {
 				statdata[name].Incr()
 			}
