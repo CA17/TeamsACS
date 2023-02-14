@@ -7,27 +7,22 @@ import (
 	"github.com/ca17/teamsacs/models"
 )
 
-func (a *Application) initOpr() {
-	a.gormDB.Where("1 = 1").Delete(&models.SysOpr{})
-	a.gormDB.Create(&models.SysOpr{
-		ID:        common.UUIDint64(),
-		Realname:  "administrator",
-		Mobile:    "0000",
-		Email:     "N/A",
-		Username:  "admin",
-		Password:  common.Sha256HashWithSalt("teamsacs", common.SecretSalt),
-		Level:     "super",
-		Status:    "enabled",
-		Remark:    "super",
-		LastLogin: time.Now(),
-	})
-}
-
 func (a *Application) checkSuper() {
 	var count int64
-	a.gormDB.Model(&models.SysOpr{}).Where("username='admin', level = ?", "super").Count(&count)
+	a.gormDB.Model(&models.SysOpr{}).Where("username='admin' and  level = ?", "super").Count(&count)
 	if count == 0 {
-		a.initOpr()
+		a.gormDB.Create(&models.SysOpr{
+			ID:        common.UUIDint64(),
+			Realname:  "administrator",
+			Mobile:    "0000",
+			Email:     "N/A",
+			Username:  "admin",
+			Password:  common.Sha256HashWithSalt("teamsacs", common.SecretSalt),
+			Level:     "super",
+			Status:    "enabled",
+			Remark:    "super",
+			LastLogin: time.Now(),
+		})
 	}
 }
 
