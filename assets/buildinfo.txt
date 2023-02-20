@@ -1,8 +1,8 @@
-BuildVersion=latest v1.0.1 2023-02-20 14:08:31
+BuildVersion=latest v1.0.1 2023-02-20 21:36:34
 ReleaseVersion=v1.0.1
-BuildTime=2023-02-20 14:08:31
+BuildTime=2023-02-20 21:36:34
 BuildName=teamsacs
-CommitID=eea939bbc487c153eb676cdd6ebe25854144144e
-CommitDate=Tue, 14 Feb 2023 23:57:48 +0800
+CommitID=fdabedbaf20add392e63d9aa8b7f0ffc6d55d181
+CommitDate=Mon, 20 Feb 2023 14:08:40 +0800
 CommitUser=jamiesun.net@gmail.com
-CommitSubject=update makefile
+CommitSubject= : set lang
