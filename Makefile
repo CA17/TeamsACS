@@ -21,13 +21,11 @@ buildpre:
 	echo "CommitSubject=${COMMIT_SUBJECT}" >> assets/buildinfo.txt
 
 fastpub:
-	make buildpre
 	docker buildx build --platform=linux/amd64 --build-arg BTIME="$(date "+%F %T")" -t teamsacs .
 	docker tag teamsacs ${BUILD_ORG}/teamsacs:latest
 	docker push ${BUILD_ORG}/teamsacs:latest
 
 fastpubm1:
-	make buildpre
 	make build
 	docker buildx build --platform=linux/amd64 --build-arg BTIME="$(shell date "+%F %T")" -t teamsacs . -f Dockerfile.local
 	docker tag teamsacs ${BUILD_ORG}/teamsacs:latest-amd64
