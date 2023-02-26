@@ -38,7 +38,7 @@ func execCwmpConfig(c echo.Context, id string, deviceId int64, session string) e
 	}
 
 	cpe := app.GApp().CwmpTable().GetCwmpCpe(dev.Sn)
-	if !app.GApp().MatchDevice(dev, script.OUI, script.ProductClass, script.SoftwareVersion) {
+	if !app.GApp().MatchDevice(dev, script.Oui, script.ProductClass, script.SoftwareVersion) {
 		return c.JSON(http.StatusOK, web.RestError(fmt.Sprintf("Device %s Does not match CwmpConfig", dev.Sn)))
 	}
 
@@ -60,7 +60,7 @@ func execCwmpConfig(c echo.Context, id string, deviceId int64, session string) e
 			Level:           script.Level,
 			SoftwareVersion: script.SoftwareVersion,
 			ProductClass:    script.ProductClass,
-			OUI:             script.OUI,
+			Oui:             script.Oui,
 			TaskTags:        script.TaskTags,
 			Content:         scontent,
 			ExecStatus:      "initialize",

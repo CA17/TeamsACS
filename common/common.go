@@ -486,8 +486,7 @@ func UrlJoin2(hurl string, elm ...string) string {
 	sb := strings.Builder{}
 	sb.WriteString(u.Scheme)
 	sb.WriteString("://")
-	sb.WriteString(u.Host)
-	sb.WriteString(u.Path)
+	sb.WriteString(path.Join(u.Host, u.Path))
 	return sb.String()
 }
 
