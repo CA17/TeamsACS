@@ -49,7 +49,7 @@ func InitRouter() {
 				log.Error(err)
 			}
 			for _, sdata := range data {
-				if !app.GApp().MatchDevice(dev, sdata.OUI, sdata.ProductClass, sdata.SoftwareVersion) {
+				if !app.GApp().MatchDevice(dev, sdata.Oui, sdata.ProductClass, sdata.SoftwareVersion) {
 					continue
 				}
 				actions = append(actions, SuperviseAction{

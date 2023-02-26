@@ -1,8 +1,8 @@
-BuildVersion=latest v1.0.1 2023-02-20 21:36:34
+BuildVersion=latest v1.0.1 2023-02-26 22:53:45
 ReleaseVersion=v1.0.1
-BuildTime=2023-02-20 21:36:34
+BuildTime=2023-02-26 22:53:45
 BuildName=teamsacs
-CommitID=fdabedbaf20add392e63d9aa8b7f0ffc6d55d181
-CommitDate=Mon, 20 Feb 2023 14:08:40 +0800
+CommitID=de4bd3b08827cd0809324613ceddcc216d7b36e2
+CommitDate=Sun, 26 Feb 2023 22:53:40 +0800
 CommitUser=jamiesun.net@gmail.com
-CommitSubject= : set lang
+CommitSubject=add query form for datatable

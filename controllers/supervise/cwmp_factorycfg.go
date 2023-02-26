@@ -34,7 +34,7 @@ func execCwmpFactoryConfiguration(c echo.Context, id string, deviceId int64, ses
 	}
 
 	cpe := app.GApp().CwmpTable().GetCwmpCpe(dev.Sn)
-	if !app.GApp().MatchDevice(dev, factscript.OUI, factscript.ProductClass, factscript.SoftwareVersion) {
+	if !app.GApp().MatchDevice(dev, factscript.Oui, factscript.ProductClass, factscript.SoftwareVersion) {
 		return c.JSON(http.StatusOK, web.RestError(fmt.Sprintf("Device %s Does not match CwmpFactoryReset", dev.Sn)))
 	}
 
@@ -54,7 +54,7 @@ func execCwmpFactoryConfiguration(c echo.Context, id string, deviceId int64, ses
 			Level:           "major",
 			SoftwareVersion: factscript.SoftwareVersion,
 			ProductClass:    factscript.ProductClass,
-			OUI:             factscript.OUI,
+			Oui:             factscript.Oui,
 			Content:         scontent,
 			ExecStatus:      "initialize",
 			LastError:       "",

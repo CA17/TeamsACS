@@ -8,6 +8,7 @@ import (
 	_ "time/tzdata"
 
 	"github.com/ca17/teamsacs/app"
+	"github.com/ca17/teamsacs/assets"
 	"github.com/ca17/teamsacs/common/zaplog/log"
 	"github.com/ca17/teamsacs/config"
 	"github.com/ca17/teamsacs/controllers"
@@ -19,15 +20,6 @@ import (
 
 var (
 	g errgroup.Group
-
-	BuildVersion   string
-	ReleaseVersion string
-	BuildTime      string
-	BuildName      string
-	CommitID       string
-	CommitDate     string
-	CommitUser     string
-	CommitSubject  string
 )
 
 // 命令行定义
@@ -41,19 +33,12 @@ var (
 
 // PrintVersion Print version information
 func PrintVersion() {
-	_, _ = fmt.Fprintf(os.Stdout, "build name:\t%s\n", BuildName)
-	_, _ = fmt.Fprintf(os.Stdout, "build version:\t%s\n", BuildVersion)
-	_, _ = fmt.Fprintf(os.Stdout, "build time:\t%s\n", BuildTime)
-	_, _ = fmt.Fprintf(os.Stdout, "release version:\t%s\n", ReleaseVersion)
-	_, _ = fmt.Fprintf(os.Stdout, "Commit ID:\t%s\n", CommitID)
-	_, _ = fmt.Fprintf(os.Stdout, "Commit Date:\t%s\n", CommitDate)
-	_, _ = fmt.Fprintf(os.Stdout, "Commit Username:\t%s\n", CommitUser)
-	_, _ = fmt.Fprintf(os.Stdout, "Commit Subject:\t%s\n", CommitSubject)
+	println(assets.BuildInfo)
 }
 
 func printHelp() {
 	if *h {
-		ustr := fmt.Sprintf("%s version: %s, Usage:%s -h\nOptions:", BuildName, BuildVersion, BuildName)
+		ustr := fmt.Sprintf("teamsacs version: %s, Usage: teamsacs -h\nOptions:", assets.BuildVersion())
 		_, _ = fmt.Fprintf(os.Stderr, ustr)
 		flag.PrintDefaults()
 		os.Exit(0)

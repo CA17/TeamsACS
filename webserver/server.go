@@ -2,7 +2,6 @@ package webserver
 
 import (
 	_ "embed"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -36,22 +35,27 @@ import (
 	"github.com/pkg/errors"
 )
 
-const UserSession = "user_session"
-const UserSessionName = "user_session_name"
-const UserSessionLevel = "user_session_level"
+const UserSession = "teamsacs_user_session"
+const UserSessionName = "teamsacs_user_session_name"
+const UserSessionLevel = "teamsacs_user_session_level"
 const ConstCookieName = "teamsacs_cookie"
 
-type Skips struct {
-	Paths   []string `json:"paths"`
-	Prefixs []string `json:"prefixs"`
-	Suffixs []string `json:"suffixs"`
+var sessionSkips = []string{
+	"/ready",
+	"/realip",
+	"/login",
+	"/logout",
+	"/admin/login",
+	"/static",
 }
 
-//go:embed jwt_skips.json
-var jwtSkipsData []byte
-
-//go:embed session_skip.json
-var SessionSkipsData []byte
+var jwtSkips = []string{
+	"/ready",
+	"/static",
+	"/metrics",
+	"/login",
+	"/admin/login",
+}
 
 var server *AdminServer
 
@@ -119,7 +123,14 @@ func NewAdminServer() *AdminServer {
 	s.jwtConfig = echojwt.Config{
 		SigningKey:    []byte(appconfig.Web.Secret),
 		SigningMethod: middleware.AlgorithmHS256,
-		Skipper:       skipFUnc(jwtSkipsData),
+		Skipper: func(c echo.Context) bool {
+			for _, prefix := range jwtSkips {
+				if strings.HasPrefix(c.Request().RequestURI, prefix) {
+					return true
+				}
+			}
+			return false
+		},
 		ErrorHandler: func(c echo.Context, err error) error {
 			return c.JSON(http.StatusBadRequest, web.RestError("Resource access is limited "+err.Error()))
 		},
@@ -215,35 +226,17 @@ func ServerRecover(debug bool) echo.MiddlewareFunc {
 	}
 }
 
-// skipFUnc Web 请求过滤中间件
-func skipFUnc(skipdata []byte) func(c echo.Context) bool {
-	return func(c echo.Context) bool {
-		if os.Getenv("TEAMSACS_DEVMODE") == "true" {
-			return true
-		}
-		var skip Skips
-		err := json.Unmarshal(skipdata, &skip)
-		if err != nil {
-			common.Must(err)
-		}
-
-		if common.InSlice(c.Request().RequestURI, skip.Paths) {
-			return true
-		}
-
-		for _, prefix := range skip.Prefixs {
-			if strings.HasPrefix(c.Path(), prefix) {
-				return true
-			}
-		}
-		for _, suffix := range skip.Suffixs {
-			if strings.HasSuffix(c.Path(), suffix) {
-				return true
-			}
-		}
-		return false
-	}
-}
+// // skipFUnc Web 请求过滤中间件
+// func skipFUnc(skipdata []byte) func(c echo.Context) bool {
+// 	return func(c echo.Context) bool {
+// 		for _, prefix := range jwtSkips {
+// 			if strings.HasPrefix(c.Request().RequestURI, prefix) {
+// 				return true
+// 			}
+// 		}
+// 		return false
+// 	}
+// }
 
 // 检查 Session
 func sessionCheck() echo.MiddlewareFunc {
@@ -253,23 +246,8 @@ func sessionCheck() echo.MiddlewareFunc {
 				return next(c)
 			}
 
-			var skip Skips
-			err := json.Unmarshal(SessionSkipsData, &skip)
-			if err != nil {
-				common.Must(err)
-			}
-
-			if common.InSlice(c.Request().RequestURI, skip.Paths) {
-				return next(c)
-			}
-
-			for _, prefix := range skip.Prefixs {
-				if strings.HasPrefix(c.Path(), prefix) {
-					return next(c)
-				}
-			}
-			for _, suffix := range skip.Suffixs {
-				if strings.HasSuffix(c.Path(), suffix) {
+			for _, prefix := range sessionSkips {
+				if strings.HasPrefix(c.Request().RequestURI, prefix) {
 					return next(c)
 				}
 			}

@@ -21,6 +21,8 @@ import (
 	mathrand "math/rand"
 	"net/url"
 	"testing"
+
+	"github.com/go-playground/assert/v2"
 )
 
 func TestToCamelCase(t *testing.T) {
@@ -106,4 +108,16 @@ func TestGetFieldType(t *testing.T) {
 	}
 
 	t.Log(GetFieldType(tt{}, "aaa"))
+}
+
+// 为 UrlJoin2 生成测试
+func TestUrlJoin2(t *testing.T) {
+	url := UrlJoin2("http://www.baidu.com", "a", "b")
+	assert.Equal(t, "http://www.baidu.com/a/b", url)
+}
+
+// UrlJoin 生成测试
+func TestUrlJoin(t *testing.T) {
+	url := UrlJoin("http://www.baidu.com", "a", "b")
+	assert.Equal(t, "http://www.baidu.com/a/b", url)
 }

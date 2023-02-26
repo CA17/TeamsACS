@@ -41,7 +41,7 @@ func execCwmpUpdateFirmware(c echo.Context, devids []string, firmwareId, session
 		}
 
 		cpe := app.GApp().CwmpTable().GetCwmpCpe(dev.Sn)
-		if !app.GApp().MatchDevice(dev, firmwareCfg.OUI, firmwareCfg.ProductClass, firmwareCfg.SoftwareVersion) {
+		if !app.GApp().MatchDevice(dev, firmwareCfg.Oui, firmwareCfg.ProductClass, firmwareCfg.SoftwareVersion) {
 			events.PubSuperviseLog(dev.ID, session, "error",
 				fmt.Sprintf("cpe %s not match CwmpFirmwareConfig", dev.Sn))
 			continue
@@ -60,7 +60,7 @@ func execCwmpUpdateFirmware(c echo.Context, devids []string, firmwareId, session
 				Level:           "manage",
 				SoftwareVersion: firmwareCfg.SoftwareVersion,
 				ProductClass:    firmwareCfg.ProductClass,
-				OUI:             firmwareCfg.OUI,
+				Oui:             firmwareCfg.Oui,
 				Content:         scontent,
 				ExecStatus:      "initialize",
 				LastError:       "",
