@@ -3,6 +3,7 @@ package index
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/ca17/teamsacs/app"
@@ -106,6 +107,9 @@ func InitRouter() {
 		var user models.SysOpr
 		err := app.GDB().Where("username=?", username).First(&user).Error
 		if err != nil {
+			if strings.Contains(err.Error(), "dial error") {
+				return c.Redirect(http.StatusMovedPermanently, "/login?errmsg=Database connection failed")
+			}
 			return c.Redirect(http.StatusMovedPermanently, "/login?errmsg=User does not exist")
 		}
 
