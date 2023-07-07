@@ -45,7 +45,7 @@ TeamsACS uses PostgreSQL as its primary database and uses the Timescaledb extens
 - Create Database
 
 ```sql
-    CREATE USER teamsacs WITH PASSWORD 'teamsacs'
+    CREATE USER teamsacs WITH PASSWORD 'teamsacs';
     
     CREATE DATABASE teamsacs OWNER teamsacs;
     
