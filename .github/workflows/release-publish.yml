@@ -1,0 +1,107 @@
+name: teamsacs release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.21'
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # Build for ARM64
+      - name: Build for ARM64
+        run: |
+          mkdir -p ./release
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -a -ldflags  '-s -w -extldflags "-static"' -o ./release/teamsacs_arm64 main.go
+
+      # Build for AMD64
+      - name: Build for AMD64
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags  '-s -w -extldflags "-static"' -o ./release/teamsacs_amd64 main.go
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      # Upload ARM64 Asset
+      - name: Upload Release Asset for ARM64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release/teamsacs_arm64
+          asset_name: teamsacs_arm64
+          asset_content_type: application/octet-stream
+
+      # Upload AMD64 Asset
+      - name: Upload Release Asset for AMD64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release/teamsacs_amd64
+          asset_name: teamsacs_amd64
+          asset_content_type: application/octet-stream
+
+            # define job to build and publish docker image
+  build-and-push-docker-image:
+    name: Build Docker image and push to repositories
+    # run only when code is compiling and tests are passing
+    runs-on: ubuntu-latest
+
+    # steps to perform in job
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # setup Docker buld action
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to Github Packages
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.MY_GITHUB_TOKEN }}
+
+      - name: Build image and push to Docker Hub and GitHub Container Registry
+        uses: docker/build-push-action@v2
+        with:
+          # 指向带有 Dockerfile 的源代码所在位置的相对路径
+          context: ./
+          # Note: tags has to be all lower-case
+          tags: |
+            ca17/teamsacs:${{ github.ref_name }} 
+            ghcr.io/ca17/teamsacs:${{ github.ref_name }}
+          # build on feature branches, push only on main branch
+          push: ${{ startsWith(github.ref, 'refs/tags/') }}
+
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
