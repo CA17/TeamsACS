@@ -1,8 +1,8 @@
-BuildVersion=latest v1.0.1 2024-03-08 22:18:44
+BuildVersion=latest v1.0.1 2024-05-17 13:55:23
 ReleaseVersion=v1.0.1
-BuildTime=2024-03-08 22:18:44
+BuildTime=2024-05-17 13:55:23
 BuildName=teamsacs
-CommitID=91e6fe7f72395b71c27ca63fc139cd279036c65e
-CommitDate=Sat, 24 Jun 2023 10:52:35 +0800
+CommitID=b88275d9e89e5495f6df8a71dc55156812804588
+CommitDate=Fri, 8 Mar 2024 22:19:02 +0800
 CommitUser=jamiesun.net@gmail.com
-CommitSubject= :
+CommitSubject= : release publish
