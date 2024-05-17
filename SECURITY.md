@@ -1,21 +1,19 @@
-# Security Policy
+## Security Update: XSS Vulnerability Fix
 
-## Supported Versions
+We have released a new version (1.0.3) that addresses a critical security vulnerability related to cross-site scripting (XSS). The issue was found in the `errmsg` parameter handling in the login endpoint.
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+### Affected Versions
+- Versions 1.0.2 and below
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+### Fixed Versions
+- Version 1.0.3
 
-## Reporting a Vulnerability
+### Recommended Actions
+We strongly recommend all users to update to the latest version (1.0.3) immediately. You can update your project by following the instructions in our documentation.
 
-Use this section to tell people how to report a vulnerability.
+### Reporting Security Issues
+If you find any security issues, please report them to [jamiesun.net@gmail.com](mailto:jamiesun.net@gmail.com). We appreciate your help in keeping our project secure.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Thank you for your attention to this important update.
+
+- The Security Team
