@@ -1,14 +1,14 @@
-BUILD_ORG   := ca17
-BUILD_VERSION   := latest
-BUILD_TIME      := $(shell date "+%F %T")
-BUILD_NAME      := teamsacs
-RELEASE_VERSION := v1.0.1
-SOURCE          := main.go
-RELEASE_DIR     := ./release
-COMMIT_SHA1     := $(shell git show -s --format=%H )
-COMMIT_DATE     := $(shell git show -s --format=%cD )
-COMMIT_USER     := $(shell git show -s --format=%ce )
-COMMIT_SUBJECT     := $(shell git show -s --format=%s )
+BUILD_ORG       ?= ca17
+BUILD_VERSION   ?= latest
+BUILD_TIME      ?= $(shell date "+%F %T")
+BUILD_NAME      ?= teamsacs
+RELEASE_VERSION ?= $(shell git describe --tags --exact-match 2>/dev/null || git describe --tags --always --dirty 2>/dev/null || echo dev)
+SOURCE          ?= main.go
+RELEASE_DIR     ?= ./release
+COMMIT_SHA1     ?= $(shell git show -s --format=%H )
+COMMIT_DATE     ?= $(shell git show -s --format=%cD )
+COMMIT_USER     ?= $(shell git show -s --format=%ce )
+COMMIT_SUBJECT  ?= $(shell git show -s --format=%s )
 
 buildpre:
 	echo "BuildVersion=${BUILD_VERSION} ${RELEASE_VERSION} ${BUILD_TIME}" > assets/buildinfo.txt
@@ -43,14 +43,26 @@ fastpubm1:
 
 
 build:
+	$(MAKE) buildpre
 	test -d ./release || mkdir -p ./release
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags  '-s -w -extldflags "-static"'  -o ./release/teamsacs main.go
 	upx ./release/teamsacs
 
 buildarm64:
+	$(MAKE) buildpre
 	test -d ./release || mkdir -p ./release
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -a -ldflags  '-s -w -extldflags "-static"'  -o ./release/teamsacs main.go
 	upx ./release/teamsacs
+
+release-amd64:
+	$(MAKE) buildpre
+	test -d ./release || mkdir -p ./release
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags  '-s -w -extldflags "-static"'  -o ./release/teamsacs_amd64 main.go
+
+release-arm64:
+	$(MAKE) buildpre
+	test -d ./release || mkdir -p ./release
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -a -ldflags  '-s -w -extldflags "-static"'  -o ./release/teamsacs_arm64 main.go
 
 syncdev:
 	make buildpre
@@ -101,6 +113,5 @@ updev:
 	scp ${RELEASE_DIR}/${BUILD_NAME} trdev-server:/tmp/teamsacs
 	ssh trdev-server "systemctl stop teamsacs && /tmp/teamsacs -install && systemctl start teamsacs"
 
-.PHONY: clean build tr069crt radseccrt
-
+.PHONY: clean build buildpre buildarm64 release-amd64 release-arm64 tr069crt radseccrt
 
