@@ -10,13 +10,21 @@ services:
       POSTGRES_USER: teamsacs
       POSTGRES_PASSWORD: teamsacs
     volumes:
+      # Persist PostgreSQL data across container restarts (operators live here).
       - pgdb-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U teamsacs -d teamsacs"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
     networks:
       teamsacs_network:
 
   teamsacs:
     depends_on:
-      - 'pgdb'
+      pgdb:
+        condition: service_healthy
     image: ca17/teamsacs:latest
     container_name: "teamsacs"
     restart: always
@@ -25,6 +33,7 @@ services:
       - "2989:2989"
       - "2999:2999"
     volumes:
+      # Persist files / TLS material; database state is in pgdb-volume.
       - teamsacs-volume:/var/teamsacs
     environment:
       - GODEBUG=x509ignoreCN=0
@@ -33,7 +42,9 @@ services:
       - TEAMSACS_DB_NAME=teamsacs
       - TEAMSACS_DB_USER=teamsacs
       - TEAMSACS_DB_PWD=teamsacs
-      - TEAMSACS_WEB_DEBUG=1
+      # Optional first-boot only. Existing operators are never overwritten.
+      # - TEAMSACS_BOOTSTRAP_ADMIN_USERNAME=admin
+      # - TEAMSACS_BOOTSTRAP_ADMIN_PASSWORD=please-change-me
     networks:
       teamsacs_network:
 

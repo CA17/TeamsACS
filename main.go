@@ -75,7 +75,12 @@ func main() {
 
 	app.InitGlobalApplication(_config)
 
-	app.GApp().MigrateDB(false)
+	if err := app.GApp().MigrateDB(false); err != nil {
+		log.Fatal(err)
+	}
+	if err := app.GApp().Bootstrap(); err != nil {
+		log.Fatal(err)
+	}
 
 	defer app.Release()
 
