@@ -187,6 +187,8 @@ func LoadConfig(cfile string) *AppConfig {
 
 	setEnvValue("TEAMSACS_SYSTEM_WORKER_DIR", &cfg.System.Workdir)
 	setEnvBoolValue("TEAMSACS_SYSTEM_DEBUG", &cfg.System.Debug)
+	// Legacy alias used in older compose samples; does not affect auth/bootstrap.
+	setEnvBoolValue("TEAMSACS_WEB_DEBUG", &cfg.System.Debug)
 
 	// WEB
 	setEnvValue("TEAMSACS_WEB_HOST", &cfg.Web.Host)

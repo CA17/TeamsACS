@@ -11,7 +11,6 @@ import (
 	_ "time/tzdata"
 
 	"github.com/ca17/teamsacs/assets"
-	"github.com/ca17/teamsacs/common"
 	"github.com/ca17/teamsacs/common/zaplog"
 	"github.com/ca17/teamsacs/common/zaplog/log"
 	"github.com/ca17/teamsacs/config"
@@ -97,11 +96,8 @@ func (a *Application) Init(cfg *config.AppConfig) {
 	default:
 		panic("not support database type")
 	}
-	common.Must(err)
-	go a.checkSuper()
-	go a.checkSettings()
-	// init default node
-	a.checkDefaultPNode()
+	// Schema migration + bootstrap seeding happen in main after Init,
+	// so existing production DBs are migrated first and seed stays idempotent.
 	a.cwmpTable = NewCwmpEventTable()
 	a.initJob()
 	a.RenderTranslateFiles()
@@ -120,29 +116,20 @@ func (a *Application) MigrateDB(track bool) (err error) {
 			}
 		}
 	}()
+	var migrateErr error
 	if track {
-		_ = a.gormDB.Debug().Migrator().AutoMigrate(models.Tables...)
+		migrateErr = a.gormDB.Debug().Migrator().AutoMigrate(models.Tables...)
 	} else {
-		_ = a.gormDB.Migrator().AutoMigrate(models.Tables...)
+		migrateErr = a.gormDB.Migrator().AutoMigrate(models.Tables...)
 	}
-	return nil
+	if migrateErr != nil {
+		return migrateErr
+	}
+	return err
 }
 
 func (a *Application) DropAll() {
 	_ = a.gormDB.Migrator().DropTable(models.Tables...)
-}
-
-// checkDefaultPNode check default node
-func (a *Application) checkDefaultPNode() {
-	var pnode models.NetNode
-	err := a.gormDB.Where("id=?", AutoRegisterPopNodeId).First(&pnode).Error
-	if err != nil {
-		a.gormDB.Create(&models.NetNode{
-			ID:     AutoRegisterPopNodeId,
-			Name:   "default",
-			Remark: "Device auto-registration node",
-		})
-	}
 }
 
 // GetSettingsStringValue Get settings string value

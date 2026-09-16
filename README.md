@@ -78,60 +78,31 @@ Start the service with the following commands
 
 # Docker Deploy
 
-```yml
-version: "3"
-services:
-  pgdb:
-    image: timescale/timescaledb:latest-pg14
-    container_name: "pgdb"
-    ports:
-      - "127.0.0.1:15432:5432"
-    environment:
-      POSTGRES_DB: teamsacs
-      POSTGRES_USER: teamsacs
-      POSTGRES_PASSWORD: teamsacs
-    volumes:
-      - pgdb-volume:/var/lib/postgresql/data
-    networks:
-      teamsacs_network:
+Use the repository [`docker-compose.yml`](./docker-compose.yml). Key points for a smooth production rollout:
 
-  teamsacs:
-    depends_on:
-      - 'pgdb'
-    image: ca17/teamsacs:latest
-    container_name: "teamsacs"
-    restart: always
-    ports:
-      - "2979:2979"
-      - "2989:2989"
-      - "2999:2999"
-    volumes:
-      - teamsacs-volume:/var/teamsacs
-    environment:
-      - GODEBUG=x509ignoreCN=0
-      - TEAMSACS_DB_HOST=pgdb
-      - TEAMSACS_DB_PORT=5432
-      - TEAMSACS_DB_NAME=teamsacs
-      - TEAMSACS_DB_USER=teamsacs
-      - TEAMSACS_DB_PWD=teamsacs
-      - TEAMSACS_WEB_DEBUG=1
-    networks:
-      teamsacs_network:
+- `pgdb-volume` stores PostgreSQL data (operators / CPE / configs). Keep this volume when upgrading.
+- `teamsacs-volume` stores files and TLS material under `/var/teamsacs`.
+- TeamsACS waits for PostgreSQL health before starting, and retries DB connect on boot.
+- Bootstrap seeding is **idempotent**: existing operators are never overwritten (passwords included).
 
-networks:
-  teamsacs_network:
-
-volumes:
-  pgdb-volume:
-  teamsacs-volume:
-
+```bash
+docker compose up -d
 ```
+
+Optional first-boot only environment variables:
+
+| Variable | Default | Meaning |
+|----------|---------|---------|
+| `TEAMSACS_BOOTSTRAP_ADMIN_USERNAME` | `admin` | Created only when this username is missing |
+| `TEAMSACS_BOOTSTRAP_ADMIN_PASSWORD` | `teamsacs` | Used only for that first create |
+
+For production first installs, set a strong `TEAMSACS_BOOTSTRAP_ADMIN_PASSWORD` before the initial start. After the admin user exists, changing or removing these env vars has no effect on the account.
 
 ## Access web console
 
-Open the browser and enter the URL: `http://your-ip:2979` or `https://your-ip:2989` 
+Open the browser and enter the URL: `http://your-ip:2979` or `https://your-ip:2989`
 
-The default username and password are `admin/teamsacs`
+Default credentials (fresh install only): `admin` / `teamsacs` — change the password immediately after first login.
 
 ## Links
 
